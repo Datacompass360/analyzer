@@ -6,12 +6,28 @@
     <title>Dynamic Sheet Data Manager</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Inter font -->
+    <script>
+        // Configure Tailwind to include the specific Navy Blue and Accent Green colors
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'naviblue': '#000080', // Classic Navy Blue - Primary
+                        'accent-green': '#10b981', // Emerald 500 equivalent - Accent
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- Load Poppins font -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Very light blue background */
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f7f7; /* Soft light background */
         }
         .scroll-container::-webkit-scrollbar {
             height: 8px;
@@ -39,15 +55,18 @@
             flex: 0 0 auto; /* Prevent cards from growing or shrinking */
             width: 280px;
             min-width: 280px;
-            background: linear-gradient(135deg, #1f2937, #374151); /* Dark gradient background */
+            /* Dark background for contrast against Navy section background */
+            background: rgba(255, 255, 255, 0.1); 
             color: white;
             border-radius: 12px;
             padding: 1rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .match-card:hover {
             transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.2); 
         }
 
         /* Styling for the modal backdrop */
@@ -68,18 +87,23 @@
             max-height: 90vh; /* Limit height for responsiveness */
             overflow-y: auto;
         }
+        
+        /* Consistent Input Styling */
+        .styled-input {
+             @apply w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:ring-4 focus:ring-accent-green/50 focus:border-accent-green transition duration-200;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div class="max-w-7xl mx-auto">
 
-        <!-- Header and Title - DataCompass 360 -->
-        <header class="mb-8 p-6 bg-white shadow-2xl rounded-2xl border-t-4 border-blue-500">
+        <!-- Header and Title - DataCompass 360 (NAVY BLUE) -->
+        <header class="mb-8 p-6 bg-naviblue shadow-2xl rounded-2xl border-t-4 border-accent-green">
             <div class="flex items-center space-x-4">
-                <!-- Icon/Feature: Compass/Data Point SVG -->
-                <div class="p-3 bg-blue-100 rounded-xl shadow-md">
-                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <!-- Icon/Feature: Compass/Data Point SVG (ACCENT GREEN) -->
+                <div class="p-3 bg-accent-green/20 rounded-xl shadow-md">
+                    <svg class="w-8 h-8 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <!-- Compass structure -->
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 110-16 8 8 0 010 16zm-1-10.5h2V14h-2zm0-4h2V8h-2z"/>
                         <!-- North arrow -->
@@ -88,55 +112,56 @@
                 </div>
                 <!-- Title Text -->
                 <div>
-                    <h1 class="text-4xl font-extrabold text-gray-900 mb-1">
+                    <h1 class="text-4xl font-extrabold text-white mb-1">
                         DataCompass 360
                     </h1>
-                    <p class="text-gray-600 font-medium">
-                        Real-Time Football Insights | Click rows for **Team Stats**
-                    </p>
                 </div>
             </div>
         </header>
 
-        <!-- Loading Indicator -->
-        <div id="loading-indicator" class="mb-6 p-4 bg-blue-50 border border-blue-200 text-sm font-medium text-blue-800 rounded-lg flex items-center justify-center hidden">
-            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <!-- Loading Indicator (ACCENT GREEN) -->
+        <div id="loading-indicator" class="mb-6 p-4 bg-accent-green/10 border border-accent-green/30 text-sm font-medium text-naviblue rounded-lg flex items-center justify-center hidden">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-accent-green inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
             Loading Data...
         </div>
 
-        <!-- Dynamic Filters and Search Panel -->
-        <div class="mb-6 p-6 bg-white shadow-xl rounded-2xl">
-            <h2 class="text-xl font-bold text-gray-700 mb-4">Filter Controls</h2>
+        <!-- Dynamic Filters and Search Panel (WHITE) - ENHANCED STYLE -->
+        <div class="mb-6 p-6 bg-white shadow-2xl rounded-2xl border-t-4 border-naviblue">
+            
+            <!-- Filter Header -->
+            <h2 class="text-2xl font-extrabold text-naviblue mb-6 flex items-center border-b border-gray-200 pb-3">
+                <svg class="w-6 h-6 mr-3 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0012 15.586V21h-2v-5.414a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                Refine Your Data Insights
+            </h2>
             
             <!-- Team Search -->
-            <div class="mb-6">
-                 <label for="team-search-input" class="block text-sm font-medium text-gray-700 mb-1">Team Search (by Match)</label>
-                 <input type="text" id="team-search-input" placeholder="Search for teams (e.g., Chelsea vs. Arsenal)..."
-                       class="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
-                       oninput="handleTeamSearch()">
+            <div class="mb-8">
+                 <label for="team-search-input" class="block text-sm font-semibold text-gray-700 mb-2">Search Match or Team Name</label>
+                 <input type="text" id="team-search-input" placeholder="e.g., Chelsea vs. Arsenal or just 'Chelsea'"
+                        class="styled-input" oninput="handleTeamSearch()">
             </div>
 
 
             <!-- Dropdown Filters: League, Prediction, Date -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div>
-                    <label for="filter-league" class="block text-sm font-medium text-gray-700 mb-1">League</label>
-                    <select id="filter-league" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <label for="filter-league" class="block text-sm font-semibold text-gray-700 mb-2">League</label>
+                    <select id="filter-league" onchange="handleFilterChange()" class="styled-input">
                         <!-- Options populated dynamically -->
                     </select>
                 </div>
                 <div>
-                    <label for="filter-prediction" class="block text-sm font-medium text-gray-700 mb-1">Prediction</label>
-                    <select id="filter-prediction" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <label for="filter-prediction" class="block text-sm font-semibold text-gray-700 mb-2">Prediction Outcome</label>
+                    <select id="filter-prediction" onchange="handleFilterChange()" class="styled-input">
                         <!-- Options populated dynamically -->
                     </select>
                 </div>
                 <div>
-                    <label for="filter-matchDate" class="block text-sm font-medium text-gray-700 mb-1">Match Date</label>
-                    <select id="filter-matchDate" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                    <label for="filter-matchDate" class="block text-sm font-semibold text-gray-700 mb-2">Match Date</label>
+                    <select id="filter-matchDate" onchange="handleFilterChange()" class="styled-input">
                         <!-- Options populated dynamically -->
                     </select>
                 </div>
@@ -144,42 +169,42 @@
 
             <!-- Range Filters: Stakes and Streaks -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Stake Range -->
-                <div class="p-3 border border-gray-200 rounded-lg bg-gray-50">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Stake Range</label>
-                    <div class="flex space-x-2">
+                <!-- Stake Range Card -->
+                <div class="p-4 border border-gray-200 rounded-xl bg-gray-50 shadow-inner">
+                    <label class="block text-sm font-bold text-naviblue mb-3">Stake Range</label>
+                    <div class="flex space-x-3">
                         <input type="number" id="filter-stake-min" placeholder="Min Stake" oninput="handleFilterChange()"
-                               class="w-1/2 p-2 border border-gray-300 rounded-lg text-sm">
+                               class="styled-input p-2 text-sm focus:ring-1 focus:ring-accent-green/50">
                         <input type="number" id="filter-stake-max" placeholder="Max Stake" oninput="handleFilterChange()"
-                               class="w-1/2 p-2 border border-gray-300 rounded-lg text-sm">
+                               class="styled-input p-2 text-sm focus:ring-1 focus:ring-accent-green/50">
                     </div>
                 </div>
 
-                <!-- Winning Streak Range -->
-                <div class="p-3 border border-gray-200 rounded-lg bg-gray-50">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Winning Streak Range</label>
-                    <div class="flex space-x-2">
+                <!-- Winning Streak Range Card -->
+                <div class="p-4 border border-gray-200 rounded-xl bg-gray-50 shadow-inner">
+                    <label class="block text-sm font-bold text-naviblue mb-3">Winning Streak Range</label>
+                    <div class="flex space-x-3">
                         <input type="number" id="filter-wstreak-min" placeholder="Min Streak" oninput="handleFilterChange()"
-                               class="w-1/2 p-2 border border-gray-300 rounded-lg text-sm">
+                               class="styled-input p-2 text-sm focus:ring-1 focus:ring-accent-green/50">
                         <input type="number" id="filter-wstreak-max" placeholder="Max Streak" oninput="handleFilterChange()"
-                               class="w-1/2 p-2 border border-gray-300 rounded-lg text-sm">
+                               class="styled-input p-2 text-sm focus:ring-1 focus:ring-accent-green/50">
                     </div>
                 </div>
                 
-                <!-- Losing Streak Range -->
-                <div class="p-3 border border-gray-200 rounded-lg bg-gray-50">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Losing Streak Range</label>
-                    <div class="flex space-x-2">
+                <!-- Losing Streak Range Card -->
+                <div class="p-4 border border-gray-200 rounded-xl bg-gray-50 shadow-inner">
+                    <label class="block text-sm font-bold text-naviblue mb-3">Losing Streak Range</label>
+                    <div class="flex space-x-3">
                         <input type="number" id="filter-lstreak-min" placeholder="Min Streak" oninput="handleFilterChange()"
-                               class="w-1/2 p-2 border border-gray-300 rounded-lg text-sm">
+                               class="styled-input p-2 text-sm focus:ring-1 focus:ring-accent-green/50">
                         <input type="number" id="filter-lstreak-max" placeholder="Max Streak" oninput="handleFilterChange()"
-                               class="w-1/2 p-2 border border-gray-300 rounded-lg text-sm">
+                               class="styled-input p-2 text-sm focus:ring-1 focus:ring-accent-green/50">
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Data Table Container -->
+        <!-- Data Table Container (WHITE) -->
         <div class="bg-white shadow-2xl rounded-2xl overflow-hidden ring-1 ring-gray-200 mb-8">
             <!-- Table Wrapper with horizontal scroll on small screens -->
             <div class="overflow-x-auto scroll-container">
@@ -197,15 +222,15 @@
 
             <!-- Error/Empty State Message Box -->
             <div id="message-box" class="p-8 text-center hidden">
-                <p class="text-lg font-semibold text-gray-600">No data available or error during fetch.</p>
+                <p class="text-lg font-semibold text-naviblue">No data available or error during fetch.</p>
                 <p class="text-sm text-gray-400">Please check the console for details.</p>
             </div>
         </div>
 
-        <!-- Pagination Controls -->
+        <!-- Pagination Controls (ACCENT GREEN) -->
         <div id="pagination-controls" class="mt-4 p-4 bg-white shadow-xl rounded-2xl flex justify-between items-center hidden">
             <button id="prev-button" onclick="handlePrevPage()"
-                    class="px-4 py-2 text-sm font-medium rounded-full text-blue-700 bg-blue-100 hover:bg-blue-200 disabled:opacity-50 transition duration-150 shadow-md">
+                    class="px-4 py-2 text-sm font-medium rounded-full text-naviblue bg-accent-green/20 hover:bg-accent-green/30 disabled:opacity-50 transition duration-150 shadow-md">
                 <span class="inline-flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                     Previous
@@ -213,7 +238,7 @@
             </button>
             <span id="page-status" class="text-sm font-medium text-gray-600"></span>
             <button id="next-button" onclick="handleNextPage()"
-                    class="px-4 py-2 text-sm font-medium rounded-full text-blue-700 bg-blue-100 hover:bg-blue-200 disabled:opacity-50 transition duration-150 shadow-md">
+                    class="px-4 py-2 text-sm font-medium rounded-full text-naviblue bg-accent-green/20 hover:bg-accent-green/30 disabled:opacity-50 transition duration-150 shadow-md">
                  <span class="inline-flex items-center">
                     Next
                     <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -221,9 +246,9 @@
             </button>
         </div>
         
-        <!-- Upcoming Matches Scroller (New Feature) -->
-        <div class="mt-8 p-6 bg-gray-800 rounded-2xl shadow-2xl">
-            <h2 class="text-2xl font-bold text-yellow-400 mb-4 flex items-center">
+        <!-- Upcoming Matches Scroller (NAVY BLUE) -->
+        <div class="mt-8 p-6 bg-naviblue rounded-2xl shadow-2xl">
+            <h2 class="text-2xl font-bold text-accent-green mb-4 flex items-center">
                 <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 Upcoming Matches (Next 30 Mins)
             </h2>
@@ -242,8 +267,8 @@
             <div class="p-6 md:p-8">
                 <!-- Modal Header -->
                 <div class="flex justify-between items-start mb-6 border-b pb-4">
-                    <h3 id="modal-match-title" class="text-2xl md:text-3xl font-extrabold text-gray-800">Match Details</h3>
-                    <button onclick="hideModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <h3 id="modal-match-title" class="text-2xl md:text-3xl font-extrabold text-naviblue">Match Details</h3>
+                    <button onclick="hideModal()" class="text-gray-400 hover:text-naviblue transition">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
@@ -422,8 +447,8 @@
                 let icon = '';
                 if (col.key === sortColumn) {
                     icon = sortDirection === 'asc' 
-                        ? '<svg class="w-4 h-4 ml-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>'
-                        : '<svg class="w-4 h-4 ml-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>';
+                        ? '<svg class="w-4 h-4 ml-2 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>'
+                        : '<svg class="w-4 h-4 ml-2 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>';
                 }
                 
                 return `
@@ -459,9 +484,9 @@
 
             dataSlice.forEach((item, sliceIndex) => {
                 const row = document.createElement('tr');
-                // Added enhanced row styling: alternating background and strong hover effect
+                // Navy/Green Theme Hover Effect
                 const rowClass = sliceIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50';
-                row.classList.add(rowClass, 'hover:bg-blue-100', 'transition', 'duration-150', 'cursor-pointer', 'border-b', 'border-gray-200');
+                row.classList.add(rowClass, 'hover:bg-accent-green/10', 'transition', 'duration-150', 'cursor-pointer', 'border-b', 'border-gray-200');
                 
                 const dataIndex = startIndex + sliceIndex;
                 row.onclick = () => showDetailsModal(dataIndex);
@@ -476,7 +501,7 @@
                     // Apply conditional styling for 'Outcome', 'Result', and numbers
                     if (col.key === 'Outcome') {
                         const isWin = content.toLowerCase() === 'win';
-                        const bgColor = isWin ? 'bg-green-600' : 'bg-red-600';
+                        const bgColor = isWin ? 'bg-accent-green' : 'bg-red-600';
                         const textColor = 'text-white';
                         cell.innerHTML = `<span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${bgColor} ${textColor} shadow-md">${content || 'N/A'}</span>`;
                         cell.classList.add('text-center');
@@ -488,14 +513,14 @@
                         const isPending = lowerContent.includes('pending');
                         let bgColor = 'bg-gray-200';
                         let textColor = 'text-gray-800';
-                        if (isHit) { bgColor = 'bg-emerald-500'; textColor = 'text-white'; }
-                        if (isMiss) { bgColor = 'bg-rose-500'; textColor = 'text-white'; }
-                        if (isPending) { bgColor = 'bg-amber-500'; textColor = 'text-white'; }
+                        if (isHit) { bgColor = 'bg-accent-green'; textColor = 'text-white'; } // Green for Hit
+                        if (isMiss) { bgColor = 'bg-red-500'; textColor = 'text-white'; } // Red for Miss
+                        if (isPending) { bgColor = 'bg-yellow-500'; textColor = 'text-white'; } // Yellow for Pending
 
                         cell.innerHTML = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${bgColor} ${textColor}">${content || 'N/A'}</span>`;
                     }
                     else if (col.type === 'number') {
-                        cell.classList.add('text-right', 'font-mono', 'text-gray-700', 'font-semibold');
+                        cell.classList.add('text-right', 'font-mono', 'text-naviblue', 'font-semibold'); // Navy text for numbers
                         if (col.key.includes('Odds') || col.key === 'Stake') {
                             cell.textContent = item[col.key] !== null ? item[col.key].toFixed(2) : 'N/A';
                         } else {
@@ -543,23 +568,24 @@
                  return value !== null && value !== undefined ? Math.round(value) : 'N/A';
             };
 
+            // Customizing modal colors: Primary accent is Navy, secondary is Green/Red/Yellow
             const homeStats = `
-                <div class="p-4 rounded-xl bg-indigo-50 border-t-4 border-indigo-500 shadow-inner">
-                    <h4 class="text-xl font-bold text-indigo-700 mb-4">${item['Home Team'] || 'Home Team'} (Home Stats)</h4>
+                <div class="p-4 rounded-xl bg-naviblue/10 border-t-4 border-naviblue shadow-inner">
+                    <h4 class="text-xl font-bold text-naviblue mb-4">${item['Home Team'] || 'Home Team'} (Home Stats)</h4>
                     <div class="grid grid-cols-2 gap-4">
-                        <!-- Home Wins -->
-                        ${renderStatBlock('Home Wins', formatInteger('Home Wins'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.087 20.375l-.337.337m0 0l-7.5-7.5m7.5 7.5l7.5-7.5m-7.5 7.5l-.337.337m0 0l-7.5-7.5m7.5 7.5l7.5-7.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13.5l3 3 7-7"></path>', 'text-green-500')}
-                        <!-- Home Losses -->
+                        <!-- Home Wins (Green) -->
+                        ${renderStatBlock('Home Wins', formatInteger('Home Wins'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.087 20.375l-.337.337m0 0l-7.5-7.5m7.5 7.5l7.5-7.5m-7.5 7.5l-.337.337m0 0l-7.5-7.5m7.5 7.5l7.5-7.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13.5l3 3 7-7"></path>', 'text-accent-green')}
+                        <!-- Home Losses (Red) -->
                         ${renderStatBlock('Home Losses', formatInteger('Home Losses'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7 5V3H3v18h18z"></path>', 'text-red-500')}
                         
-                        <!-- Home Scored -->
-                        ${renderStatBlock('Total Scored', formatInteger('Home Team Scored'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>', 'text-blue-500')}
-                        <!-- Home Avg Scored -->
-                        ${renderStatBlock('Avg Scored', formatNumber('Home Avg Scored'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0v-6m6 6v-6a2 2 0 00-2-2h-2a2 2 0 00-2 2v6m0 0H9m-9 0h24"></path>', 'text-blue-500')}
+                        <!-- Home Scored (Navy/Blue) -->
+                        ${renderStatBlock('Total Scored', formatInteger('Home Team Scored'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>', 'text-naviblue')}
+                        <!-- Home Avg Scored (Navy/Blue) -->
+                        ${renderStatBlock('Avg Scored', formatNumber('Home Avg Scored'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0v-6m6 6v-6a2 2 0 00-2-2h-2a2 2 0 00-2 2v6m0 0H9m-9 0h24"></path>', 'text-naviblue')}
                         
-                        <!-- Home Conceded -->
+                        <!-- Home Conceded (Yellow/Amber) -->
                         ${renderStatBlock('Total Conceded', formatInteger('Home Conceded'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V3m0 0L8 7m4-4l4 4m-4 8v6m0 0l4-4m-4 4l-4-4"></path>', 'text-yellow-600')}
-                        <!-- Home Avg Conceded -->
+                        <!-- Home Avg Conceded (Yellow/Amber) -->
                         ${renderStatBlock('Avg Conceded', formatNumber('Home Avg Conceded'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m-3 0h24"></path>', 'text-yellow-600')}
 
                     </div>
@@ -567,155 +593,152 @@
             `;
 
             const awayStats = `
-                <div class="p-4 rounded-xl bg-purple-50 border-t-4 border-purple-500 shadow-inner">
-                    <h4 class="text-xl font-bold text-purple-700 mb-4">${item['Away Team'] || 'Away Team'} (Away Stats)</h4>
+                <div class="p-4 rounded-xl bg-accent-green/10 border-t-4 border-accent-green shadow-inner">
+                    <h4 class="text-xl font-bold text-accent-green mb-4">${item['Away Team'] || 'Away Team'} (Away Stats)</h4>
                     <div class="grid grid-cols-2 gap-4">
-                        <!-- Away Wins -->
-                        ${renderStatBlock('Away Wins', formatInteger('Away Wins'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.087 20.375l-.337.337m0 0l-7.5-7.5m7.5 7.5l7.5-7.5m-7.5 7.5l-.337.337m0 0l-7.5-7.5m7.5 7.5l7.5-7.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13.5l3 3 7-7"></path>', 'text-green-500')}
-                        <!-- Away Draws -->
-                        ${renderStatBlock('Away Draws', formatInteger('Away Draws'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m-9 3v4m0 0h6m-6 0h6m0 0l-3 3m3-3l-3-3m-6 3h.01M9 16h.01"></path>', 'text-cyan-500')}
-                        <!-- Away Losses -->
+                        <!-- Away Wins (Green) -->
+                        ${renderStatBlock('Away Wins', formatInteger('Away Wins'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.087 20.375l-.337.337m0 0l-7.5-7.5m7.5 7.5l7.5-7.5m-7.5 7.5l-.337.337m0 0l-7.5-7.5m7.5 7.5l7.5-7.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13.5l3 3 7-7"></path>', 'text-accent-green')}
+                        <!-- Away Losses (Red) -->
                         ${renderStatBlock('Away Losses', formatInteger('Away Losses'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7 5V3H3v18h18z"></path>', 'text-red-500')}
                         
-                        <!-- Away Scored -->
-                        ${renderStatBlock('Total Scored', formatInteger('Away Team Scored'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>', 'text-blue-500')}
-                        <!-- Away Avg Scored -->
-                        ${renderStatBlock('Avg Scored', formatNumber('Away Avg Scored'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0v-6m6 6v-6a2 2 0 00-2-2h-2a2 2 0 00-2 2v6m0 0H9m-9 0h24"></path>', 'text-blue-500')}
+                        <!-- Away Scored (Navy/Blue) -->
+                        ${renderStatBlock('Total Scored', formatInteger('Away Team Scored'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>', 'text-naviblue')}
+                        <!-- Away Avg Scored (Navy/Blue) -->
+                        ${renderStatBlock('Avg Scored', formatNumber('Away Avg Scored'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0v-6m6 6v-6a2 2 0 00-2-2h-2a2 2 0 00-2 2v6m0 0H9m-9 0h24"></path>', 'text-naviblue')}
                         
-                        <!-- Away Conceded -->
+                        <!-- Away Conceded (Yellow/Amber) -->
                         ${renderStatBlock('Total Conceded', formatInteger('Away Conceded'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V3m0 0L8 7m4-4l4 4m-4 8v6m0 0l4-4m-4 4l-4-4"></path>', 'text-yellow-600')}
-                        <!-- Away Avg Conceded -->
+                        <!-- Away Avg Conceded (Yellow/Amber) -->
                         ${renderStatBlock('Avg Conceded', formatNumber('Away Avg Conceded'), '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m-3 0h24"></path>', 'text-yellow-600')}
-
                     </div>
                 </div>
             `;
-            
-            modalContentStats.innerHTML = homeStats + awayStats;
+
+            const matchDetails = `
+                <div class="lg:col-span-2 p-6 bg-gray-100 rounded-xl shadow-inner mt-4">
+                    <h4 class="text-xl font-bold text-naviblue mb-4">Match & Prediction Summary</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${renderStatBlock('Prediction', item['Prediction'] || 'N/A', '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5h6"></path>', 'text-accent-green')}
+                        ${renderStatBlock('Score', item['Correct Score'] || 'N/A', '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2-3-.895-3-2 1.343-2 3-2zM21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.593 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>', 'text-accent-green')}
+                        ${renderStatBlock('Stake', item['Stake'] !== null ? item['Stake'].toFixed(0) : 'N/A', '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>', 'text-naviblue')}
+                        ${renderStatBlock('Result', item['Result'] || 'N/A', '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.24A9.95 9.95 0 0012 3C7.03 3 3 7.03 3 12s4.03 9 9 9 9-4.03 9-9c0-.49-.04-.97-.12-1.44"></path>', 'text-naviblue')}
+                    </div>
+                </div>
+            `;
+
+            modalContentStats.innerHTML = homeStats + awayStats + matchDetails;
             detailsModal.classList.remove('hidden');
-        }
+        };
 
         window.hideModal = function(event) {
-            if (event && event.target !== detailsModal) return; 
+            if (event && event.target !== event.currentTarget) return; // Prevent closing if clicking inside modal content
             detailsModal.classList.add('hidden');
+        };
+
+        // --- Core Logic (Filtering, Sorting, Pagination) ---
+
+        function applyFilters() {
+            currentPage = 1; // Reset to first page on filter change
+            let filtered = allData;
+
+            // 1. Team Search Filter
+            const search = filters.teamSearch.toLowerCase().trim();
+            if (search) {
+                filtered = filtered.filter(item => 
+                    item['Match'].toLowerCase().includes(search) || 
+                    item['Home Team'].toLowerCase().includes(search) || 
+                    item['Away Team'].toLowerCase().includes(search)
+                );
+            }
+
+            // 2. Dropdown Filters
+            if (filters.league !== 'All') {
+                filtered = filtered.filter(item => item['League'] === filters.league);
+            }
+            if (filters.prediction !== 'All') {
+                filtered = filtered.filter(item => item['Prediction'] === filters.prediction);
+            }
+            if (filters.matchDate !== 'All') {
+                filtered = filtered.filter(item => item['Match Date'] === filters.matchDate);
+            }
+
+            // 3. Range Filters (Stakes)
+            if (filters.stakeMin !== null) {
+                filtered = filtered.filter(item => item['Stake'] >= filters.stakeMin);
+            }
+            if (filters.stakeMax !== null) {
+                filtered = filtered.filter(item => item['Stake'] <= filters.stakeMax);
+            }
+            
+            // 4. Range Filters (Winning Streak)
+            if (filters.winningStreakMin !== null) {
+                filtered = filtered.filter(item => item['Winning Streak'] >= filters.winningStreakMin);
+            }
+            if (filters.winningStreakMax !== null) {
+                filtered = filtered.filter(item => item['Winning Streak'] <= filters.winningStreakMax);
+            }
+
+            // 5. Range Filters (Losing Streak)
+            if (filters.losingStreakMin !== null) {
+                filtered = filtered.filter(item => item['Losing Streak'] >= filters.losingStreakMin);
+            }
+            if (filters.losingStreakMax !== null) {
+                filtered = filtered.filter(item => item['Losing Streak'] <= filters.losingStreakMax);
+            }
+
+            currentData = filtered;
+            applySort();
         }
 
-        function updatePaginationControls() {
-            const totalRows = currentData.length;
-            const totalPages = Math.ceil(totalRows / rowsPerPage);
+        function applySort() {
+            const column = COLUMN_MAP.find(col => col.key === sortColumn);
+            if (!column) return;
 
-            if (totalRows <= rowsPerPage || totalRows === 0) {
-                paginationControls.classList.add('hidden');
-            } else {
+            currentData.sort((a, b) => {
+                const aVal = a[sortColumn];
+                const bVal = b[sortColumn];
+
+                if (column.type === 'number') {
+                    const numA = aVal === null || aVal === undefined ? (sortDirection === 'asc' ? -Infinity : Infinity) : aVal;
+                    const numB = bVal === null || bVal === undefined ? (sortDirection === 'asc' ? -Infinity : Infinity) : bVal;
+                    return sortDirection === 'asc' ? numA - numB : numB - numA;
+                } else {
+                    const strA = String(aVal || '').toLowerCase();
+                    const strB = String(bVal || '').toLowerCase();
+                    if (strA < strB) return sortDirection === 'asc' ? -1 : 1;
+                    if (strA > strB) return sortDirection === 'asc' ? 1 : -1;
+                    return 0;
+                }
+            });
+
+            renderTableHead(); // Update sort icon
+            renderPage();
+        }
+
+        function renderPage() {
+            const totalPages = Math.ceil(currentData.length / rowsPerPage);
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const dataSlice = currentData.slice(start, end);
+
+            renderTableBody(dataSlice);
+
+            // Update Pagination UI
+            if (currentData.length > rowsPerPage) {
                 paginationControls.classList.remove('hidden');
+            } else {
+                paginationControls.classList.add('hidden');
             }
 
             prevButton.disabled = currentPage === 1;
-            nextButton.disabled = currentPage >= totalPages;
-            
-            pageStatus.textContent = `Page ${currentPage} of ${totalPages} (${totalRows} total rows)`;
+            nextButton.disabled = currentPage === totalPages || currentData.length === 0;
+
+            const startRange = currentData.length > 0 ? start + 1 : 0;
+            const endRange = Math.min(end, currentData.length);
+            pageStatus.textContent = `Showing ${startRange} to ${endRange} of ${currentData.length} entries`;
         }
 
-        function renderTable() {
-            currentData = applyFilters(allData);
-            
-            const totalPages = Math.ceil(currentData.length / rowsPerPage);
-            if (currentPage > totalPages) {
-                currentPage = Math.max(1, totalPages);
-            }
-            if (currentData.length > 0 && currentPage === 0) {
-                 currentPage = 1;
-            }
-
-            const sortCol = COLUMN_MAP.find(col => col.key === sortColumn);
-            if (sortCol) {
-                currentData.sort((a, b) => {
-                    let valA = a[sortColumn];
-                    let valB = b[sortColumn];
-
-                    const isANull = valA === null || valA === undefined || valA === '';
-                    const isBNull = valB === null || valB === undefined || valB === '';
-                    
-                    if (isANull && isBNull) return 0;
-                    if (isANull) return sortDirection === 'asc' ? 1 : -1;
-                    if (isBNull) return sortDirection === 'asc' ? -1 : 1;
-
-                    let comparison = 0;
-                    if (sortCol.type === 'number') {
-                        comparison = valA - valB;
-                    } else { 
-                        comparison = valA.toString().localeCompare(valB.toString());
-                    }
-
-                    return sortDirection === 'asc' ? comparison : -comparison;
-                });
-            }
-
-            const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = startIndex + rowsPerPage;
-            const dataSlice = currentData.slice(startIndex, endIndex);
-
-            renderTableHead();
-            renderTableBody(dataSlice);
-            updatePaginationControls();
-        }
-
-        function applyFilters(data) {
-            let filtered = data.filter(item => {
-                const search = filters.teamSearch.toLowerCase();
-                if (!search) return true;
-                return item['Match']?.toString().toLowerCase().includes(search);
-            });
-
-            filtered = filtered.filter(item => {
-                const isLeagueMatch = filters.league === 'All' || item['League'] === filters.league;
-                const isPredictionMatch = filters.prediction === 'All' || item['Prediction'] === filters.prediction;
-                const isDateMatch = filters.matchDate === 'All' || item['Match Date'] === filters.matchDate;
-                return isLeagueMatch && isPredictionMatch && isDateMatch;
-            });
-
-            filtered = filtered.filter(item => {
-                const checkRange = (key, min, max) => {
-                    if (min === null && max === null) return true;
-                    const value = item[key];
-                    if (value === null && (min !== null || max !== null)) return false;
-
-                    const minPass = min === null || value >= min;
-                    const maxPass = max === null || value <= max;
-                    return minPass && maxPass;
-                };
-
-                const isStakeMatch = checkRange('Stake', filters.stakeMin, filters.stakeMax);
-                const isWStreakMatch = checkRange('Winning Streak', filters.winningStreakMin, filters.winningStreakMax);
-                const isLStreakMatch = checkRange('Losing Streak', filters.losingStreakMin, filters.losingStreakMax);
-
-                return isStakeMatch && isWStreakMatch && isLStreakMatch;
-            });
-
-            return filtered;
-        }
-
-        // --- Event Handlers (kept from previous version) ---
-        window.handleFilterChange = function() {
-            filters.league = document.getElementById('filter-league').value;
-            filters.prediction = document.getElementById('filter-prediction').value;
-            filters.matchDate = document.getElementById('filter-matchDate').value;
-            filters.stakeMin = parseFloat(document.getElementById('filter-stake-min').value) || null;
-            filters.stakeMax = parseFloat(document.getElementById('filter-stake-max').value) || null;
-            filters.winningStreakMin = parseInt(document.getElementById('filter-wstreak-min').value) || null;
-            filters.winningStreakMax = parseInt(document.getElementById('filter-wstreak-max').value) || null;
-            filters.losingStreakMin = parseInt(document.getElementById('filter-lstreak-min').value) || null;
-            filters.losingStreakMax = parseInt(document.getElementById('filter-lstreak-max').value) || null;
-
-            currentPage = 1; 
-            renderTable();
-        }
-
-        window.handleTeamSearch = function() {
-            filters.teamSearch = document.getElementById('team-search-input').value;
-            currentPage = 1; 
-            renderTable();
-        }
+        // --- Event Handlers ---
 
         window.handleSort = function(columnKey) {
             if (sortColumn === columnKey) {
@@ -724,140 +747,140 @@
                 sortColumn = columnKey;
                 sortDirection = 'asc';
             }
-            currentPage = 1; 
-            renderTable();
-        }
+            applySort();
+        };
+
+        window.handlePrevPage = function() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage();
+            }
+        };
 
         window.handleNextPage = function() {
             const totalPages = Math.ceil(currentData.length / rowsPerPage);
             if (currentPage < totalPages) {
                 currentPage++;
-                renderTable();
+                renderPage();
             }
-        }
+        };
 
-        window.handlePrevPage = function() {
-            if (currentPage > 1) {
-                currentPage--;
-                renderTable();
-            }
-        }
+        window.handleFilterChange = function() {
+            filters.league = document.getElementById('filter-league').value;
+            filters.prediction = document.getElementById('filter-prediction').value;
+            filters.matchDate = document.getElementById('filter-matchDate').value;
+            
+            filters.stakeMin = parseFloat(document.getElementById('filter-stake-min').value) || null;
+            filters.stakeMax = parseFloat(document.getElementById('filter-stake-max').value) || null;
+            filters.winningStreakMin = parseFloat(document.getElementById('filter-wstreak-min').value) || null;
+            filters.winningStreakMax = parseFloat(document.getElementById('filter-wstreak-max').value) || null;
+            filters.losingStreakMin = parseFloat(document.getElementById('filter-lstreak-min').value) || null;
+            filters.losingStreakMax = parseFloat(document.getElementById('filter-lstreak-max').value) || null;
+
+            applyFilters();
+        };
         
-        // --- New Feature: Upcoming Matches Scroller Logic ---
-        const leagues = ['Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1'];
-        const teams = [
-            'Manchester United', 'Liverpool', 'Real Madrid', 'Barcelona', 'Bayern Munich',
-            'Juventus', 'PSG', 'Chelsea', 'Arsenal', 'AC Milan', 'Inter Milan', 'Dortmund'
-        ];
+        window.handleTeamSearch = function() {
+            filters.teamSearch = document.getElementById('team-search-input').value;
+            applyFilters();
+        };
 
-        /**
-         * Generates mock data for upcoming matches.
-         */
-        function generateMockUpcomingMatches() {
-            const matches = [];
-            const count = 6; 
+        // --- Upcoming Matches Logic ---
+
+        function renderUpcomingMatches(data) {
+            upcomingScroller.innerHTML = '';
+            
             const now = new Date();
+            // Filter for matches within the next 30 minutes that are 'Pending'
+            const upcoming = data.filter(item => {
+                if (item.Result && item.Result.toLowerCase() !== 'pending') return false;
 
-            for (let i = 0; i < count; i++) {
-                // Determine kickoff time within the next 30 minutes
-                const minutesOffset = Math.floor(Math.random() * 25) + 5; // 5 to 30 mins
-                const kickoffTime = new Date(now.getTime() + minutesOffset * 60000);
-                const timeString = kickoffTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                // Simple date parsing (assumes "MM/DD/YYYY HH:MM")
+                const matchDate = new Date(item['Match Date']); 
+                if (isNaN(matchDate)) return false;
 
-                // Pick random teams and league
-                let home = teams[Math.floor(Math.random() * teams.length)];
-                let away = teams[Math.floor(Math.random() * teams.length)];
-                while (home === away) { // Ensure teams are different
-                    away = teams[Math.floor(Math.random() * teams.length)];
-                }
-                const league = leagues[Math.floor(Math.random() * leagues.length)];
-                
-                // Generate mock odds
-                const homeOdd = (Math.random() * 2 + 1).toFixed(2);
-                const drawOdd = (Math.random() * 2 + 2.5).toFixed(2);
-                const awayOdd = (Math.random() * 2 + 1).toFixed(2);
+                const diffMins = (matchDate - now) / (1000 * 60);
+                // Check if the match is in the future but within the next 30 minutes
+                return diffMins > 0 && diffMins <= 30; 
+            }).slice(0, 5); // Limit to the top 5 closest matches
 
-                matches.push({
-                    home,
-                    away,
-                    league,
-                    timeString,
-                    homeOdd,
-                    drawOdd,
-                    awayOdd
-                });
+            if (upcoming.length === 0) {
+                upcomingScroller.innerHTML = `<div class="p-4 text-white text-sm opacity-75">No matches pending within the next 30 minutes.</div>`;
+                return;
             }
-            return matches;
-        }
 
-        /**
-         * Renders the mock upcoming matches in the horizontal scroller.
-         */
-        function renderUpcomingMatches() {
-            const matches = generateMockUpcomingMatches();
-            upcomingScroller.innerHTML = matches.map(match => `
-                <div class="match-card">
-                    <p class="text-xs font-semibold uppercase text-yellow-400 mb-1">${match.league}</p>
-                    <div class="text-lg font-extrabold mb-3">
-                        ${match.home} <span class="text-gray-400">vs</span> ${match.away}
+            upcoming.forEach(item => {
+                // Determine the most predicted team/result for display
+                const predictionText = item.Prediction ? `${item.Prediction}` : 'TBD';
+                
+                const card = document.createElement('div');
+                card.className = 'match-card';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-gray-400 pb-2 mb-3">
+                        <span class="text-xs font-semibold text-accent-green uppercase">${item.League}</span>
+                        <span class="text-xs font-mono text-gray-300">${item['Match Date']}</span>
                     </div>
-                    <div class="flex items-center justify-between text-sm font-medium mb-3 border-b border-gray-700 pb-2">
-                        <span class="text-red-400">Kickoff:</span>
-                        <span class="text-white bg-red-600 px-2 py-0.5 rounded-full">${match.timeString}</span>
-                    </div>
+                    <p class="text-xl font-bold mb-3">${item['Home Team']} <span class="text-gray-400 font-normal text-base mx-1">vs</span> ${item['Away Team']}</p>
                     
-                    <div class="flex justify-between items-center text-xs font-semibold text-gray-400">
-                        <span>Odds (H/D/A)</span>
-                        <div class="flex space-x-2">
-                            <span class="bg-gray-700 text-green-300 px-2 py-1 rounded-md">${match.homeOdd}</span>
-                            <span class="bg-gray-700 text-cyan-300 px-2 py-1 rounded-md">${match.drawOdd}</span>
-                            <span class="bg-gray-700 text-red-300 px-2 py-1 rounded-md">${match.awayOdd}</span>
-                        </div>
+                    <div class="mt-4 pt-3 border-t border-gray-400">
+                        <p class="text-sm text-gray-400 mb-1">Our Prediction:</p>
+                        <p class="text-lg font-extrabold text-accent-green">${predictionText}</p>
                     </div>
-                </div>
-            `).join('');
+                    <div class="mt-3 grid grid-cols-3 gap-2 text-xs font-semibold text-center">
+                        <div class="p-1 bg-white/20 rounded-md">1: ${formatNumber(item['Home Odds'])}</div>
+                        <div class="p-1 bg-white/20 rounded-md">X: ${formatNumber(item['Draw Odds'])}</div>
+                        <div class="p-1 bg-white/20 rounded-md">2: ${formatNumber(item['Away Odds'])}</div>
+                    </div>
+                `;
+                upcomingScroller.appendChild(card);
+            });
+            
+            function formatNumber(value) {
+                return value !== null && value !== undefined ? value.toFixed(2) : 'N/A';
+            }
         }
-
 
         // --- Initialization ---
 
         async function fetchData() {
             loadingIndicator.classList.remove('hidden');
             messageBox.classList.add('hidden');
-            
-            try {
-                const response = await fetch(CSV_URL);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+
+            // Implement exponential backoff for robustness
+            const maxRetries = 3;
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(CSV_URL);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    
+                    const csvText = await response.text();
+                    allData = parseCSV(csvText);
+                    
+                    // Initial setup
+                    initializeFilters();
+                    applyFilters(); // Filter and sort initially
+                    renderUpcomingMatches(allData);
+
+                    loadingIndicator.classList.add('hidden');
+                    return; // Success
+                } catch (error) {
+                    console.error(`Attempt ${attempt + 1} failed to fetch data:`, error);
+                    if (attempt === maxRetries - 1) {
+                        loadingIndicator.classList.add('hidden');
+                        messageBox.classList.remove('hidden');
+                        messageBox.querySelector('p:first-child').textContent = 'Failed to load data after multiple attempts.';
+                        console.error('Final attempt failed. Cannot load data.');
+                        return;
+                    }
+                    // Wait with exponential backoff before retrying
+                    const delay = Math.pow(2, attempt) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
                 }
-                const csvText = await response.text();
-                
-                allData = parseCSV(csvText);
-                currentData = [...allData];
-
-                if (allData.length === 0) {
-                    messageBox.classList.remove('hidden');
-                    messageBox.querySelector('p:first-child').textContent = 'The sheet is empty or could not be parsed.';
-                }
-
-                initializeFilters();
-                renderTable();
-
-            } catch (error) {
-                console.error('Error fetching or parsing data:', error);
-                messageBox.classList.remove('hidden');
-                messageBox.querySelector('p:first-child').textContent = 'Failed to fetch data from Google Sheet.';
-            } finally {
-                loadingIndicator.classList.add('hidden');
             }
-            
-            // Render upcoming matches on load
-            renderUpcomingMatches();
         }
 
-        // Start the application
-        window.onload = fetchData;
-
+        // Start application
+        document.addEventListener('DOMContentLoaded', fetchData);
     </script>
 </body>
 </html>
