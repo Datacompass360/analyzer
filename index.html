@@ -19,6 +19,8 @@
                         'naviblue': '#0a0a2a',
                         'accent-green': '#10b981',
                         'light-green-bg': '#f0fff4',
+                        'popup-bg': '#e6f2ff', // Light blue
+                        'popup-text': '#003366', // Dark navy
                     },
                     fontFamily: { sans: ['Poppins', 'sans-serif'] },
                 }
@@ -65,7 +67,7 @@
         
         #data-table thead th, #favorites-table thead th { background-color: var(--naviblue) !important; color: white !important; font-weight: 800 !important; }
         #data-table tbody tr:hover, #favorites-table tbody tr:hover { background-image: linear-gradient(to right, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0)); transform: scale(1.01); transition: transform 0.2s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-left: 4px solid var(--accent-green); cursor: pointer; }
-        .viewed-row { background-color: var(--light-green-bg) !important; }
+        .viewed-row { background-color: #d1fae5 !important; } /* A slightly different green for viewed */
         
         .sort-icon { transition: transform 0.3s ease; }
         @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
@@ -111,8 +113,6 @@
                  <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">League</label><select id="filter-league" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
                  <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Prediction</label><select id="filter-prediction" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
                  <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Home Odds (Min)</label><input type="number" id="filter-home-odds" placeholder="e.g., 1.5" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm" oninput="handleFilterChange()"></div>
-                 <div class="relative hidden"><label class="block text-sm font-semibold text-gray-700 mb-2">Min Win Streak</label><input type="number" id="filter-win-streak" placeholder="e.g., 3" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm" oninput="handleFilterChange()"></div>
-                 <div class="relative hidden"><label class="block text-sm font-semibold text-gray-700 mb-2">Min Lose Streak</label><input type="number" id="filter-lose-streak" placeholder="e.g., 2" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm" oninput="handleFilterChange()"></div>
              </div>
              <button onclick="showFilterModal()" class="absolute -bottom-5 right-6 px-5 py-3 bg-accent-green text-white font-bold rounded-full shadow-lg hover:bg-accent-green/90 transition flex items-center" style="animation: glowing 3s infinite ease-in-out;"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 16v-2m8-6h2m-16 0H4m14.243-7.757l1.414-1.414M5.343 18.657l-1.414 1.414m14.142 0l-1.414-1.414M6.757 5.343l-1.414-1.414M12 18a6 6 0 100-12 6 6 0 000 12z"></path></svg>More Filters</button>
         </div>
@@ -125,7 +125,6 @@
                 <div class="overflow-x-auto"><table id="data-table" class="min-w-full"><thead class="sticky top-0 z-10"><tr></tr></thead><tbody id="table-body" class="divide-y divide-gray-100"></tbody></table></div>
                 <div id="message-box" class="p-8 text-center hidden"><p class="text-lg font-semibold text-naviblue">No data found.</p></div>
             </div>
-            <div id="clicked-row-summary" class="mt-6 p-6 bg-naviblue text-white rounded-2xl shadow-xl hidden"></div>
             <div id="pagination-controls" class="mt-6 flex justify-between items-center hidden"></div>
         </div>
         
@@ -186,7 +185,6 @@
         tableHeadRow: document.querySelector('#data-table thead tr'),
         messageBox: document.getElementById('message-box'),
         pagination: document.getElementById('pagination-controls'),
-        summary: document.getElementById('clicked-row-summary'),
         glider: document.getElementById('glider'),
         detailsModal: document.getElementById('details-modal'),
         filtersModal: document.getElementById('more-filters-modal'),
@@ -194,21 +192,14 @@
     };
 
     const icons = {
-        win: '<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>',
-        draw: '<svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>',
-        loss: '<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>',
-        goal: '<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>',
-        shield: '<svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 20.944A12.02 12.02 0 0012 22a12.02 12.02 0 009-1.056v-1.217A5 5 0 0016 14.582V13a6 6 0 10-12 0v1.582A5 5 0 003 20.944V21"></path></svg>'
+        win: '🏆', draw: '🤝', loss: '❌', goal: '⚽', average: '📊', analysis: '🔍', streak: '🔥'
     };
 
     const parseCSV = (csvText) => {
         const lines = csvText.trim().split("\n");
-        if (lines.length === 0) return [];
         const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ""));
-        const rows = lines.slice(1);
-        const data = [];
-        rows.forEach(line => {
-            if (!line.trim()) return;
+        return lines.slice(1).map(line => {
+            if (!line.trim()) return null;
             const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/"/g, ''));
             const rowObject = {};
             COLUMN_MAP.forEach(col => {
@@ -219,9 +210,8 @@
                     rowObject[col.key] = col.type === 'number' ? null : "";
                 }
             });
-            data.push(rowObject);
-        });
-        return data.filter(row => row.Match);
+            return rowObject;
+        }).filter(row => row && row.Match);
     };
 
     const applyFilters = () => {
@@ -294,10 +284,11 @@
         const visibleCols = COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key));
         data.forEach(item => {
             const row = document.createElement("tr");
+            const itemJSON = encodeURIComponent(JSON.stringify(item));
             row.className = `transition-all duration-200 ${viewedRows.has(item.Match) ? "viewed-row" : ""}`;
             row.ondblclick = () => handleRowClick(item);
 
-            let rowHTML = `<td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.Match}')" class="star-icon ${favorites.some(f => f.Match === item.Match) ? "favorited" : ""}">⭐</span></td>`;
+            let rowHTML = `<td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.Match}')" class="star-icon text-2xl ${favorites.some(f => f.Match === item.Match) ? "favorited" : ""}">${favorites.some(f => f.Match === item.Match) ? '⭐' : '☆'}</span></td>`;
             visibleCols.forEach(col => {
                 const value = item[col.key] || "N/A";
                 if (col.key === 'Outcome') {
@@ -307,7 +298,7 @@
                     rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm">${value}</td>`;
                 }
             });
-            const itemJSON = encodeURIComponent(JSON.stringify(item));
+            
             rowHTML += `<td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-blue-500 text-white rounded-full hover:bg-blue-600">View</button></td>`;
             row.innerHTML = rowHTML;
             dom.tableBody.appendChild(row);
@@ -326,7 +317,7 @@
     const handleRowClick = (item) => {
         viewedRows.add(item.Match);
         showDetailsModal(item);
-        renderPage();
+        if (['all', 'best'].includes(activeTab)) renderPage();
     };
     window.handleSort = (key) => { sortColumn === key ? sortDirection = (sortDirection === 'asc' ? 'desc' : 'asc') : (sortColumn = key, sortDirection = 'asc'); applySort(); };
     window.handleTabClick = (tab) => { activeTab = tab; updateUiForTab(); };
@@ -364,40 +355,62 @@
         dom.favoritesContent.classList.toggle('hidden', !isFavorites);
         dom.mainContent.classList.toggle('hidden', isDashboard || isFavorites);
         dom.filtersPanel.classList.toggle('hidden', false);
-        if (isDashboard || isFavorites) dom.summary.classList.add("hidden");
         applyFilters();
     };
     
     window.showDetailsModal = (item) => {
+        const isFavorited = favorites.some(f => f.Match === item.Match);
         const formatInt = (val) => val !== null ? Math.round(val) : "N/A";
         const formatAvg = (val) => val !== null ? val.toFixed(2) : "N/A";
-        const stat = (icon, label, value) => `<div class="flex items-center space-x-3"><div class="w-6">${icon}</div><span class="font-semibold text-gray-700">${label}:</span><span class="font-bold text-gray-900">${value}</span></div>`;
-        
-        const homeStats = `<div><h4 class="text-lg font-bold text-gray-800 mb-3 text-center">${item['Home Team']}</h4><div class="space-y-2">
-            ${stat(icons.win, 'Wins', formatInt(item['Home Wins']))}
-            ${stat(icons.draw, 'Draws', formatInt(item['Home Draws']))}
-            ${stat(icons.loss, 'Losses', formatInt(item['Home Losses']))}
-            <hr class="my-2 border-gray-300">
-            ${stat(icons.goal, 'Goals Scored', formatInt(item['Home Team Scored']))}
-            ${stat(icons.goal, 'Avg Scored', formatAvg(item['Home Avg Scored']))}
-            <hr class="my-2 border-gray-300">
-            ${stat(icons.shield, 'Goals Conceded', formatInt(item['Home Conceded']))}
-            ${stat(icons.shield, 'Avg Conceded', formatAvg(item['Home Avg Conceded']))}
-        </div></div>`;
-
-        const awayStats = `<div><h4 class="text-lg font-bold text-gray-800 mb-3 text-center">${item['Away Team']}</h4><div class="space-y-2">
-            ${stat(icons.win, 'Wins', formatInt(item['Away Wins']))}
-            ${stat(icons.draw, 'Draws', formatInt(item['Away Draws']))}
-            ${stat(icons.loss, 'Losses', formatInt(item['Away Losses']))}
-            <hr class="my-2 border-gray-300">
-            ${stat(icons.goal, 'Avg Scored', formatAvg(item['Away Avg Scored']))}
-            ${stat(icons.shield, 'Avg Conceded', formatAvg(item['Away Avg Conceded']))}
-        </div></div>`;
-
-        dom.detailsModal.innerHTML = `<div class="modal-content bg-blue-100 w-full max-w-4xl mx-4 rounded-3xl shadow-2xl text-gray-800"><button onclick="hideDetailsModal(event)" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 rounded-full p-2 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button><div class="p-6 md:p-8"><h3 class="text-2xl font-extrabold text-center mb-6">${item.Match} <span class="text-base font-medium text-gray-600">(${item.League})</span></h3><div class="grid grid-cols-1 md:grid-cols-2 gap-6">${homeStats}${awayStats}</div></div></div>`;
+        const statRow = (icon, label, homeVal, awayVal) => `
+            <div class="grid grid-cols-11 gap-2 text-sm items-center">
+                <div class="col-span-4 text-right font-semibold">${homeVal}</div>
+                <div class="col-span-3 text-center flex items-center justify-center">
+                    <span class="text-xl">${icon}</span>
+                    <span class="hidden md:inline ml-2 text-xs text-popup-text/70">${label}</span>
+                </div>
+                <div class="col-span-4 text-left font-semibold">${awayVal}</div>
+            </div>`;
+        const itemJSON = encodeURIComponent(JSON.stringify(item));
+        dom.detailsModal.innerHTML = `
+            <div class="modal-content bg-popup-bg w-full max-w-2xl mx-4 rounded-2xl shadow-2xl text-popup-text relative">
+                <button onclick="hideDetailsModal(event)" class="absolute top-3 right-3 text-popup-text/50 hover:text-popup-text hover:bg-black/10 rounded-full p-2 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <div class="p-6">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-grow">
+                             <h3 class="text-2xl font-extrabold text-center">${item.Match}</h3>
+                             <p class="text-center text-sm font-medium text-popup-text/80 mb-6">${item.League}</p>
+                        </div>
+                        <button onclick="toggleFavorite(decodeURIComponent('${itemJSON}'), true)" class="text-3xl transition-transform duration-200 hover:scale-125">${isFavorited ? '⭐' : '☆'}</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        <div class="bg-black/5 p-4 rounded-lg"><h4 class="text-lg font-bold text-center mb-4">${item['Home Team']}</h4>
+                            <div class="space-y-3">
+                                ${statRow(icons.win, 'Wins', formatInt(item['Home Wins']), formatInt(item['Away Wins']))}
+                                ${statRow(icons.draw, 'Draws', formatInt(item['Home Draws']), formatInt(item['Away Draws']))}
+                                ${statRow(icons.loss, 'Losses', formatInt(item['Home Losses']), formatInt(item['Away Losses']))}
+                            </div>
+                        </div>
+                         <div class="bg-black/5 p-4 rounded-lg"><h4 class="text-lg font-bold text-center mb-4">${item['Away Team']}</h4>
+                             <div class="space-y-3">
+                                ${statRow(icons.goal, 'Scored', formatInt(item['Home Team Scored']), formatInt(item['Away Team Scored']))}
+                                ${statRow(icons.average, 'Avg Scored', formatAvg(item['Home Avg Scored']), formatAvg(item['Away Avg Scored']))}
+                                ${statRow(icons.average, 'Avg Conceded', formatAvg(item['Home Avg Conceded']), formatAvg(item['Away Avg Conceded']))}
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 bg-black/5 p-4 rounded-lg space-y-3">
+                             ${statRow(icons.streak, 'Streaks', `Win: ${formatInt(item['Winning Streak'])}`, `Loss: ${formatInt(item['Losing Streak'])}`)}
+                             ${statRow(icons.analysis, 'Analysis', item['Match Analysis'] || 'N/A', item['Goals Analysis'] || 'N/A')}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
         dom.detailsModal.classList.remove("hidden");
         requestAnimationFrame(() => { dom.detailsModal.classList.add("active"); dom.detailsModal.querySelector(".modal-content").classList.add("active"); });
     };
+
     window.hideDetailsModal = (event) => {
         if(event && event.currentTarget !== event.target) return;
         dom.detailsModal.classList.remove("active");
@@ -451,13 +464,25 @@
         </table>`;
     };
 
-    window.toggleFavorite = (matchId) => {
+    window.toggleFavorite = (item, fromPopup = false) => {
+        const matchId = item.Match;
         const matchIndex = favorites.findIndex(f => f.Match === matchId);
         if (matchIndex > -1) favorites.splice(matchIndex, 1);
-        else { const matchData = allData.find(d => d.Match === matchId); if (matchData) favorites.push(matchData); }
+        else favorites.push(item);
+        
         localStorage.setItem('favorites', JSON.stringify(favorites));
-        activeTab === 'favorites' ? applyFilters() : renderPage(); 
+
+        if (fromPopup) {
+            showDetailsModal(item); // Re-render the popup to update the star
+        }
+
+        if (activeTab === 'favorites') {
+             applyFilters();
+        } else if (['all', 'best'].includes(activeTab)) {
+            renderPage();
+        }
     };
+
 
     window.removeFromFavorites = (matchId) => {
         favorites = favorites.filter(f => f.Match !== matchId);
@@ -488,10 +513,7 @@
         doc.text(filterText, 14, 32);
 
         doc.autoTable({
-            startY: doc.previousAutoTable ? doc.previousAutoTable.finalY + 10 : 50,
-            head: head,
-            body: body,
-            theme: 'striped',
+            startY: 50, head: head, body: body, theme: 'striped',
             headStyles: { fillColor: [10, 10, 42] }
         });
         
@@ -529,9 +551,13 @@
         scroller.innerHTML += scroller.innerHTML;
     }
 
-    const populateDateFilter = () => {
+    const populateFilters = () => {
         const uniqueDates = ['All Dates', ...[...new Set(allData.map(item => item['Match Date']).filter(Boolean))].sort((a, b) => new Date(b) - new Date(a))];
         document.getElementById('filter-date').innerHTML = uniqueDates.map(d => `<option value="${d}">${d}</option>`).join('');
+        const uniqueLeagues = ['All', ...new Set(allData.map(item => item.League).filter(Boolean))].sort();
+        document.getElementById('filter-league').innerHTML = uniqueLeagues.map(l => `<option value="${l}">${l}</option>`).join('');
+        const uniquePredictions = ['All', ...new Set(allData.map(item => item.Prediction).filter(Boolean))].sort();
+        document.getElementById('filter-prediction').innerHTML = uniquePredictions.map(p => `<option value="${p}">${p}</option>`).join('');
     }
 
     const clearFilters = () => {
@@ -541,7 +567,6 @@
         document.getElementById('filter-league').value = 'All';
         document.getElementById('filter-prediction').value = 'All';
         document.getElementById('filter-home-odds').value = '';
-        // If advanced filter inputs need clearing, do it here
         applyFilters();
     };
 
@@ -555,12 +580,7 @@
             const savedFavorites = localStorage.getItem('favorites');
             if (savedFavorites) favorites = JSON.parse(savedFavorites);
 
-            populateDateFilter();
-            const uniqueLeagues = ['All', ...new Set(allData.map(item => item.League).filter(Boolean))].sort();
-            document.getElementById('filter-league').innerHTML = uniqueLeagues.map(l => `<option value="${l}">${l}</option>`).join('');
-            const uniquePredictions = ['All', ...new Set(allData.map(item => item.Prediction).filter(Boolean))].sort();
-            document.getElementById('filter-prediction').innerHTML = uniquePredictions.map(p => `<option value="${p}">${p}</option>`).join('');
-            
+            populateFilters();
             renderScroller();
             handleTabClick('dashboard');
         } catch (error) {
