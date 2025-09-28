@@ -362,47 +362,52 @@
         const isFavorited = favorites.some(f => f.Match === item.Match);
         const formatInt = (val) => val !== null ? Math.round(val) : "N/A";
         const formatAvg = (val) => val !== null ? val.toFixed(2) : "N/A";
-        const statRow = (icon, label, homeVal, awayVal) => `
-            <div class="grid grid-cols-11 gap-2 text-sm items-center">
-                <div class="col-span-4 text-right font-semibold">${homeVal}</div>
-                <div class="col-span-3 text-center flex items-center justify-center">
-                    <span class="text-xl">${icon}</span>
-                    <span class="hidden md:inline ml-2 text-xs text-popup-text/70">${label}</span>
-                </div>
-                <div class="col-span-4 text-left font-semibold">${awayVal}</div>
+
+        const statRow = (icon, homeVal, awayVal) => `
+            <div class="grid grid-cols-11 gap-2 text-sm items-center py-2">
+                <div class="col-span-5 text-right font-semibold">${homeVal}</div>
+                <div class="col-span-1 text-center text-xl">${icon}</div>
+                <div class="col-span-5 text-left font-semibold">${awayVal}</div>
             </div>`;
+
+        const analysisRow = (icon, homeVal, awayVal) => `
+            <div class="grid grid-cols-11 gap-2 text-sm items-start py-2">
+                <div class="col-span-5 text-right font-semibold">${homeVal}</div>
+                <div class="col-span-1 text-center text-xl pt-1">${icon}</div>
+                <div class="col-span-5 text-left font-semibold">${awayVal}</div>
+            </div>`;
+
         const itemJSON = encodeURIComponent(JSON.stringify(item));
         dom.detailsModal.innerHTML = `
-            <div class="modal-content bg-popup-bg w-full max-w-2xl mx-4 rounded-2xl shadow-2xl text-popup-text relative">
-                <button onclick="hideDetailsModal(event)" class="absolute top-3 right-3 text-popup-text/50 hover:text-popup-text hover:bg-black/10 rounded-full p-2 transition">
+            <div class="modal-content bg-popup-bg w-full max-w-3xl mx-4 rounded-2xl shadow-2xl text-popup-text relative">
+                <button onclick="hideDetailsModal()" class="absolute top-3 right-3 text-popup-text/50 hover:text-popup-text hover:bg-black/10 rounded-full p-2 transition z-10">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
                 <div class="p-6">
-                    <div class="flex justify-between items-start">
+                    <div class="flex justify-between items-start mb-4">
                         <div class="flex-grow">
                              <h3 class="text-2xl font-extrabold text-center">${item.Match}</h3>
-                             <p class="text-center text-sm font-medium text-popup-text/80 mb-6">${item.League}</p>
+                             <p class="text-center text-sm font-medium text-popup-text/80">${item.League}</p>
                         </div>
-                        <button onclick="toggleFavorite(decodeURIComponent('${itemJSON}'), true)" class="text-3xl transition-transform duration-200 hover:scale-125">${isFavorited ? '⭐' : '☆'}</button>
+                        <button onclick="toggleFavorite(JSON.parse(decodeURIComponent('${itemJSON}')), true)" class="text-3xl transition-transform duration-200 hover:scale-125 -mt-1 ml-4">${isFavorited ? '⭐' : '☆'}</button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                        <div class="bg-black/5 p-4 rounded-lg"><h4 class="text-lg font-bold text-center mb-4">${item['Home Team']}</h4>
-                            <div class="space-y-3">
-                                ${statRow(icons.win, 'Wins', formatInt(item['Home Wins']), formatInt(item['Away Wins']))}
-                                ${statRow(icons.draw, 'Draws', formatInt(item['Home Draws']), formatInt(item['Away Draws']))}
-                                ${statRow(icons.loss, 'Losses', formatInt(item['Home Losses']), formatInt(item['Away Losses']))}
-                            </div>
+                    
+                    <div class="bg-white/50 p-4 rounded-lg">
+                        <div class="grid grid-cols-11 gap-2 text-sm font-bold text-popup-text/80 mb-2 border-b-2 border-popup-text/10 pb-2">
+                            <div class="col-span-5 text-right">${item['Home Team']}</div>
+                            <div class="col-span-1 text-center"></div>
+                            <div class="col-span-5 text-left">${item['Away Team']}</div>
                         </div>
-                         <div class="bg-black/5 p-4 rounded-lg"><h4 class="text-lg font-bold text-center mb-4">${item['Away Team']}</h4>
-                             <div class="space-y-3">
-                                ${statRow(icons.goal, 'Scored', formatInt(item['Home Team Scored']), formatInt(item['Away Team Scored']))}
-                                ${statRow(icons.average, 'Avg Scored', formatAvg(item['Home Avg Scored']), formatAvg(item['Away Avg Scored']))}
-                                ${statRow(icons.average, 'Avg Conceded', formatAvg(item['Home Avg Conceded']), formatAvg(item['Away Avg Conceded']))}
-                            </div>
-                        </div>
-                        <div class="md:col-span-2 bg-black/5 p-4 rounded-lg space-y-3">
-                             ${statRow(icons.streak, 'Streaks', `Win: ${formatInt(item['Winning Streak'])}`, `Loss: ${formatInt(item['Losing Streak'])}`)}
-                             ${statRow(icons.analysis, 'Analysis', item['Match Analysis'] || 'N/A', item['Goals Analysis'] || 'N/A')}
+                        <div class="divide-y divide-popup-text/10">
+                            ${statRow(icons.win, formatInt(item['Home Wins']), formatInt(item['Away Wins']))}
+                            ${statRow(icons.draw, formatInt(item['Home Draws']), formatInt(item['Away Draws']))}
+                            ${statRow(icons.loss, formatInt(item['Home Losses']), formatInt(item['Away Losses']))}
+                            ${statRow(icons.goal, formatInt(item['Home Team Scored']), formatInt(item['Away Team Scored']))}
+                            ${statRow(icons.average, formatAvg(item['Home Avg Scored']), formatAvg(item['Away Avg Scored']))}
+                            ${statRow(icons.average, formatInt(item['Home Conceded']), formatInt(item['Away Conceded']))}
+                            ${statRow(icons.average, formatAvg(item['Home Avg Conceded']), formatAvg(item['Away Avg Conceded']))}
+                            ${analysisRow(icons.streak, `Win Streak: ${formatInt(item['Winning Streak'])}`, item['Match Analysis'] || 'N/A')}
+                            ${analysisRow(icons.streak, `Loss Streak: ${formatInt(item['Losing Streak'])}`, item['Goals Analysis'] || 'N/A')}
                         </div>
                     </div>
                 </div>
@@ -412,6 +417,7 @@
     };
 
     window.hideDetailsModal = (event) => {
+        // This now works for the button too, as event will be undefined.
         if(event && event.currentTarget !== event.target) return;
         dom.detailsModal.classList.remove("active");
         if(dom.detailsModal.querySelector(".modal-content")) dom.detailsModal.querySelector(".modal-content").classList.remove("active");
@@ -594,4 +600,5 @@
     </script>
 </body>
 </html>
+
 
