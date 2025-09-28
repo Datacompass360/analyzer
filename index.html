@@ -79,11 +79,49 @@
         .star-icon.favorited { color: #facc15; }
 
         .glow-win { animation: twinkle 2s infinite ease-in-out; }
+
+        /* Animated Logo Styles */
+        #animated-logo .compass-needle {
+            transform-origin: center;
+            animation: spin 8s linear infinite;
+        }
+        #animated-logo .graph-line {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: dash 3s ease-in-out infinite alternate;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes dash { to { stroke-dashoffset: 0; } }
+
+        /* Summary Table Styles */
+        #summary-table-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+            padding: 0;
+        }
+         #summary-table-container.active {
+            max-height: 500px; /* Adjust as needed */
+            padding: 24px;
+        }
+
     </style>
 </head>
 <body class="p-4 md:p-8 bg-gray-100">
 
-    <div class="max-w-7xl mx-auto mb-6 flex justify-center">
+    <div class="max-w-7xl mx-auto mb-6 flex justify-between items-center">
+        <!-- Animated Logo -->
+        <div id="animated-logo" class="w-16 h-16">
+             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="var(--naviblue)" stroke-width="4"/>
+                <path class="graph-line" d="M 20 60 Q 40 30, 60 50 T 80 40" fill="none" stroke="var(--accent-green)" stroke-width="4" stroke-linecap="round"/>
+                <g class="compass-needle">
+                    <path d="M 50 10 L 45 50 L 50 90 L 55 50 Z" fill="#ef4444"/>
+                    <path d="M 50 10 L 45 50 L 50 90 L 55 50 Z" fill-opacity="0.5" fill="white"/>
+                </g>
+                <circle cx="50" cy="50" r="5" fill="var(--naviblue)"/>
+            </svg>
+        </div>
         <div id="nav-container" class="pill-switcher glassmorphic">
             <span id="glider" class="glider"></span>
             <button id="tab-dashboard" onclick="handleTabClick('dashboard')" class="flex-1 py-3 px-6 rounded-full text-sm font-bold">Dashboard</button>
@@ -91,11 +129,11 @@
             <button id="tab-best" onclick="handleTabClick('best')" class="flex-1 py-3 px-6 rounded-full text-sm font-bold">Best Tips</button>
             <button id="tab-favorites" onclick="handleTabClick('favorites')" class="flex-1 py-3 px-6 rounded-full text-sm font-bold">Favorites</button>
         </div>
+        <div class="w-16 h-16"></div> <!-- Spacer to balance the logo -->
     </div>
 
     <div class="max-w-7xl mx-auto">
         <header class="mb-8 p-8 bg-gradient-to-br from-naviblue via-indigo-900 to-black shadow-2xl rounded-2xl text-center overflow-hidden">
-            <div class="inline-block p-4 bg-white/10 rounded-full" style="animation: glowing 3s infinite ease-in-out;"><svg class="w-12 h-12 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 110-16 8 8 0 010 16z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12l-3-3m0 0l-3 3m3-3v12"></path></svg></div>
             <h1 class="text-4xl md:text-5xl font-extrabold text-white mt-4">DataCompass 360</h1>
             <p class="text-white/70 mt-2 text-sm md:text-base">Smart Football Insights Dashboard</p>
         </header>
@@ -104,15 +142,15 @@
 
         <div id="filters-panel" class="mb-6 p-6 bg-blue-100 shadow-xl rounded-2xl relative hidden">
              <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-extrabold text-gray-800 flex items-center"><svg class="w-6 h-6 mr-3 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0012 15.586V21h-2v-5.414a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>Refine Insights</h2>
-                <button onclick="clearFilters()" class="px-4 py-2 text-sm font-bold bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Clear Filters</button>
+                 <h2 class="text-2xl font-extrabold text-gray-800 flex items-center"><svg class="w-6 h-6 mr-3 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0012 15.586V21h-2v-5.414a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>Refine Insights</h2>
+                 <button onclick="clearFilters()" class="px-4 py-2 text-sm font-bold bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Clear Filters</button>
              </div>
              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                 <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Search</label><input type="text" id="team-search-input" placeholder="e.g., Chelsea" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm" oninput="handleFilterChange()"></div>
-                 <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Match Date</label><select id="filter-date" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
-                 <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">League</label><select id="filter-league" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
-                 <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Prediction</label><select id="filter-prediction" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
-                 <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Home Odds (Min)</label><input type="number" id="filter-home-odds" placeholder="e.g., 1.5" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm" oninput="handleFilterChange()"></div>
+                  <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Search</label><input type="text" id="team-search-input" placeholder="e.g., Chelsea" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm" oninput="handleFilterChange()"></div>
+                  <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Match Date</label><select id="filter-date" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
+                  <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">League</label><select id="filter-league" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
+                  <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Prediction</label><select id="filter-prediction" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
+                  <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Home Odds (Min)</label><input type="number" id="filter-home-odds" placeholder="e.g., 1.5" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm" oninput="handleFilterChange()"></div>
              </div>
              <button onclick="showFilterModal()" class="absolute -bottom-5 right-6 px-5 py-3 bg-accent-green text-white font-bold rounded-full shadow-lg hover:bg-accent-green/90 transition flex items-center" style="animation: glowing 3s infinite ease-in-out;"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 16v-2m8-6h2m-16 0H4m14.243-7.757l1.414-1.414M5.343 18.657l-1.414 1.414m14.142 0l-1.414-1.414M6.757 5.343l-1.414-1.414M12 18a6 6 0 100-12 6 6 0 000 12z"></path></svg>More Filters</button>
         </div>
@@ -125,6 +163,10 @@
                 <div class="overflow-x-auto"><table id="data-table" class="min-w-full"><thead class="sticky top-0 z-10"><tr></tr></thead><tbody id="table-body" class="divide-y divide-gray-100"></tbody></table></div>
                 <div id="message-box" class="p-8 text-center hidden"><p class="text-lg font-semibold text-naviblue">No data found.</p></div>
             </div>
+             <!-- Summary Table Container -->
+            <div id="summary-table-container" class="bg-popup-bg shadow-2xl rounded-2xl overflow-hidden mt-6">
+                 <div id="summary-content" class="p-6"></div>
+            </div>
             <div id="pagination-controls" class="mt-6 flex justify-between items-center hidden"></div>
         </div>
         
@@ -135,33 +177,49 @@
                 <div class="p-6 bg-white rounded-2xl shadow-lg"><h3 class="text-sm font-bold text-gray-500">TOTAL TIPS</h3><p id="stat-total-tips" class="text-3xl font-extrabold text-gray-700 mt-1">0</p></div>
                 <div class="p-6 bg-white rounded-2xl shadow-lg"><h3 class="text-sm font-bold text-gray-500">TOP TIP</h3><p id="stat-top-tip" class="text-xl font-bold text-naviblue mt-1">N/A</p></div>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="p-6 bg-white rounded-2xl shadow-lg"><h3 class="text-lg font-bold text-naviblue mb-4">Outcome Distribution</h3><canvas id="outcome-pie-chart"></canvas></div>
-                <div class="p-6 bg-white rounded-2xl shadow-lg"><h3 class="text-lg font-bold text-naviblue mb-4">Prediction vs. Result</h3><canvas id="prediction-bar-chart"></canvas></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 place-items-center">
+                <div class="p-6 bg-white rounded-2xl shadow-lg w-full flex flex-col items-center">
+                    <h3 class="text-lg font-bold text-naviblue mb-4">Outcome Distribution</h3>
+                    <div class="relative w-full max-w-[480px] aspect-square">
+                        <canvas id="outcome-pie-chart"></canvas>
+                    </div>
+                </div>
+                <div class="p-6 bg-white rounded-2xl shadow-lg w-full flex flex-col items-center">
+                    <h3 class="text-lg font-bold text-naviblue mb-4">Prediction vs. Result</h3>
+                    <div class="relative w-full max-w-[480px] aspect-square">
+                        <canvas id="prediction-bar-chart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div id="favorites-content" class="hidden">
             <div class="bg-white shadow-2xl rounded-2xl overflow-hidden p-6">
                  <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-extrabold text-naviblue">⭐ Your Favorite Matches</h2>
-                    <button id="download-pdf-btn" onclick="downloadFavoritesPDF()" class="px-4 py-2 text-sm font-bold bg-accent-green text-white rounded-lg hover:bg-green-600 transition flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>Download PDF</button>
-                </div>
-                <div id="favorites-table-container" class="overflow-x-auto"></div>
+                     <h2 class="text-2xl font-extrabold text-naviblue">⭐ Your Favorite Matches</h2>
+                     <button id="download-pdf-btn" onclick="downloadFavoritesPDF()" class="px-4 py-2 text-sm font-bold bg-accent-green text-white rounded-lg hover:bg-green-600 transition flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>Download PDF</button>
+                 </div>
+                 <div id="favorites-table-container" class="overflow-x-auto"></div>
+            </div>
+            <!-- Favorites Summary Table Container -->
+            <div id="favorites-summary-table-container" class="bg-popup-bg shadow-2xl rounded-2xl overflow-hidden mt-6">
+                 <div id="favorites-summary-content" class="p-6"></div>
             </div>
         </div>
     </div>
     
-    <div id="details-modal" class="modal-backdrop hidden" onclick="hideDetailsModal(event)"></div>
-    <div id="more-filters-modal" class="modal-backdrop hidden" onclick="hideFilterModal(event)"></div>
+    <div id="details-modal" class="modal-backdrop" onclick="hideDetailsModal(event)"></div>
+    <div id="more-filters-modal" class="modal-backdrop" onclick="hideFilterModal(event)"></div>
 
     <script type="text/javascript">
     const { jsPDF } = window.jspdf;
     // --- Configuration ---
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQH-Uue5Ctuo4aU-4S81U9QvoXxslOq6YjKHnVkPjyOeJqci4p19cs2iZ8y5GgzsSh_vQHxPYb-gl-5/pub?gid=0&single=true&output=csv';
-    const HIDDEN_COLUMNS = ['Home Team', 'Away Team', 'Home Wins', 'Home Draws', 'Home Losses', 'Away Wins', 'Away Draws', 'Away Losses', 'Home Team Scored', 'Home Avg Scored', 'Home Conceded', 'Home Avg Conceded', 'Away Team Scored', 'Away Avg Scored', 'Away Conceded', 'Away Avg Conceded', 'Match Analysis', 'Goals Analysis'];
+    const HIDDEN_COLUMNS = ['Home Team', 'Away Team', 'Home Wins', 'Home Draws', 'Home Losses', 'Away Wins', 'Away Draws', 'Away Losses', 'Home Avg Scored', 'Home Conceded', 'Home Avg Conceded', 'Away Avg Scored', 'Away Conceded', 'Away Avg Conceded', 'Match Analysis', 'Goals Analysis'];
+    
     const COLUMN_MAP = [
-        { key: 'Match Date', label: 'Date' }, { key: 'League', label: 'League' }, { key: 'Match', label: 'Match' }, { key: 'Prediction', label: 'Prediction' }, { key: 'Outcome', label: 'Outcome' }, { key: 'Correct Score', label: 'Score' }, { key: 'Home Odds', label: '1' }, { key: 'Draw Odds', label: 'X' }, { key: 'Away Odds', label: '2' }, { key: 'Home Team', type: 'string' }, { key: 'Away Team', type: 'string' }, { key: 'Result', type: 'string' }, { key: 'Winning Streak', type: 'number' }, { key: 'Losing Streak', type: 'number' }, { key: 'Stake', type: 'number' }, { key: 'Home Wins', type: 'number' }, { key: 'Home Draws', type: 'number' }, { key: 'Home Losses', type: 'number' }, { key: 'Away Wins', type: 'number' }, { key: 'Away Draws', type: 'number' }, { key: 'Away Losses', type: 'number' }, { key: 'Home Team Scored', type: 'number' }, { key: 'Home Avg Scored', type: 'number' }, { key: 'Home Conceded', type: 'number' }, { key: 'Home Avg Conceded', type: 'number' }, { key: 'Away Team Scored', type: 'number' }, { key: 'Away Avg Scored', type: 'number' }, { key: 'Away Conceded', type: 'number' }, { key: 'Away Avg Conceded', type: 'number' }, { key: 'Match Analysis', type: 'string' }, { key: 'Goals Analysis', type: 'string' }
+        { key: 'Match Date', label: 'Date' }, { key: 'League', label: 'League' }, { key: 'Match', label: 'Match' }, { key: 'Prediction', label: 'Prediction' }, { key: 'Outcome', label: 'Outcome' }, { key: 'Result', label: 'Result' }, { key: 'Correct Score', label: 'Score' }, { key: 'Home Odds', label: '1' }, { key: 'Draw Odds', label: 'X' }, { key: 'Away Odds', label: '2' }, 
+        { key: 'Home Team', type: 'string' }, { key: 'Away Team', type: 'string' }, { key: 'Winning Streak', type: 'number' }, { key: 'Losing Streak', type: 'number' }, { key: 'Stake', type: 'number' }, { key: 'Home Wins', type: 'number' }, { key: 'Home Draws', type: 'number' }, { key: 'Home Losses', type: 'number' }, { key: 'Away Wins', type: 'number' }, { key: 'Away Draws', type: 'number' }, { key: 'Away Losses', type: 'number' }, { key: 'Home Team Scored', type: 'number' }, { key: 'Home Avg Scored', type: 'number' }, { key: 'Home Conceded', type: 'number' }, { key: 'Home Avg Conceded', type: 'number' }, { key: 'Away Team Scored', type: 'number' }, { key: 'Away Avg Scored', type: 'number' }, { key: 'Away Conceded', type: 'number' }, { key: 'Away Avg Conceded', type: 'number' }, { key: 'Match Analysis', type: 'string' }, { key: 'Goals Analysis', type: 'string' }
     ];
 
     let allData = [], currentData = [], favorites = [], viewedRows = new Set(), outcomeChart, predictionChart, filteredFavorites = [];
@@ -188,11 +246,15 @@
         glider: document.getElementById('glider'),
         detailsModal: document.getElementById('details-modal'),
         filtersModal: document.getElementById('more-filters-modal'),
-        filtersPanel: document.getElementById('filters-panel')
+        filtersPanel: document.getElementById('filters-panel'),
+        summaryContainer: document.getElementById('summary-table-container'),
+        summaryContent: document.getElementById('summary-content'),
+        favoritesSummaryContainer: document.getElementById('favorites-summary-table-container'),
+        favoritesSummaryContent: document.getElementById('favorites-summary-content')
     };
 
     const icons = {
-        win: '🏆', draw: '🤝', loss: '❌', goal: '⚽', average: '📊', analysis: '🔍', streak: '🔥'
+        win: '🏆', draw: '🤝', loss: '❌', goal: '⚽', average: '📊', analysis: '🔍', streak: '🔥', odds: '📈', score: '🎯', prediction: '🔮', outcome: '🏁', result: '✅', stake: '💰'
     };
 
     const parseCSV = (csvText) => {
@@ -204,7 +266,14 @@
             const rowObject = {};
             COLUMN_MAP.forEach(col => {
                 const index = headers.indexOf(col.key);
-                if (index !== -1 && values[index] !== undefined) {
+                if (col.key === 'Result' && index === -1) {
+                    const scoreIndex = headers.indexOf('Correct Score');
+                    if (scoreIndex !== -1) {
+                         rowObject[col.key] = values[scoreIndex] || "";
+                    } else {
+                         rowObject[col.key] = "";
+                    }
+                } else if (index !== -1 && values[index] !== undefined) {
                     rowObject[col.key] = col.type === 'number' ? (isNaN(parseFloat(values[index])) ? null : parseFloat(values[index])) : values[index];
                 } else {
                     rowObject[col.key] = col.type === 'number' ? null : "";
@@ -253,6 +322,11 @@
     const applySort = () => {
         currentData.sort((a, b) => {
             const valA = a[sortColumn], valB = b[sortColumn];
+            if (sortColumn === 'Match Date') {
+                 const dateA = new Date(valA.split('/').reverse().join('-'));
+                 const dateB = new Date(valB.split('/').reverse().join('-'));
+                 return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+            }
             if (typeof valA === 'number') return sortDirection === 'asc' ? (valA || 0) - (valB || 0) : (valB || 0) - (valA || 0);
             return sortDirection === 'asc' ? String(valA || "").localeCompare(String(valB || "")) : String(valB || "").localeCompare(String(valA || ""));
         });
@@ -262,7 +336,14 @@
 
     const renderTableHead = () => {
         const visibleCols = COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key));
-        dom.tableHeadRow.innerHTML = `<th></th>` + visibleCols.map(col => `<th onclick="handleSort('${col.key}')" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"><div class="flex items-center">${col.label}${col.key === sortColumn ? `<svg class="w-4 h-4 ml-2 sort-icon ${sortDirection === 'desc' ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"></path></svg>` : ''}</div></th>`).join("") + `<th>Actions</th>`;
+        let headHTML = '<th></th>'; // For the star icon
+        visibleCols.forEach(col => {
+            headHTML += `<th onclick="handleSort('${col.key}')" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"><div class="flex items-center">${col.label}${col.key === sortColumn ? `<svg class="w-4 h-4 ml-2 sort-icon ${sortDirection === 'desc' ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"></path></svg>` : ''}</div></th>`;
+            if (col.key === 'Match Date') {
+                headHTML += '<th>Actions</th>';
+            }
+        });
+        dom.tableHeadRow.innerHTML = headHTML;
     };
 
     const renderPage = () => {
@@ -286,7 +367,7 @@
             const row = document.createElement("tr");
             const itemJSON = encodeURIComponent(JSON.stringify(item));
             row.className = `transition-all duration-200 ${viewedRows.has(item.Match) ? "viewed-row" : ""}`;
-            row.ondblclick = () => handleRowClick(item);
+            row.onclick = () => handleRowClick(item);
 
             let rowHTML = `<td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.Match}')" class="star-icon text-2xl ${favorites.some(f => f.Match === item.Match) ? "favorited" : ""}">${favorites.some(f => f.Match === item.Match) ? '⭐' : '☆'}</span></td>`;
             visibleCols.forEach(col => {
@@ -297,30 +378,85 @@
                 } else {
                     rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm">${value}</td>`;
                 }
+                if (col.key === 'Match Date') {
+                     rowHTML += `<td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-blue-500 text-white rounded-full hover:bg-blue-600">View</button></td>`;
+                }
             });
             
-            rowHTML += `<td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-blue-500 text-white rounded-full hover:bg-blue-600">View</button></td>`;
             row.innerHTML = rowHTML;
             dom.tableBody.appendChild(row);
         });
     };
     
     const getOutcomeColor = (prediction, outcome) => {
-        if (!prediction || !outcome || outcome === "N/A") return ["bg-gray-400", outcome, false];
+        if (!prediction || !outcome || outcome === "N/A" || outcome.trim() === '') return ["bg-gray-400", "Pending", false];
         const p = prediction.toLowerCase(), o = outcome.toLowerCase();
         if ((p.includes("home") && o.includes("home")) || (p.includes("away") && o.includes("away")) || (p.includes("draw") && o.includes("draw"))) {
             return ["bg-accent-green", outcome, true];
         }
         return ["bg-red-500", outcome, false];
     };
+    
+    const renderFavorites = () => {
+        const container = document.getElementById('favorites-table-container');
+        if (filteredFavorites.length === 0) {
+            container.innerHTML = `<div class="p-8 text-center"><p class="text-lg font-semibold text-naviblue">You haven't favorited any matches yet.</p></div>`;
+            return;
+        }
+
+        const headers = ['Date', 'League', 'Match', 'Prediction', 'Outcome', 'Result', 'Score'];
+        const keys = ['Match Date', 'League', 'Match', 'Prediction', 'Outcome', 'Result', 'Correct Score'];
+
+        let tableHTML = `<table id="favorites-table" class="min-w-full"><thead class="sticky top-0 z-10"><tr>`;
+        tableHTML += `<th></th>`
+        headers.forEach(h => {
+            tableHTML += `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">${h}</th>`;
+            if (h === 'Date') {
+                tableHTML += `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Actions</th>`;
+            }
+        });
+        tableHTML += `</tr></thead><tbody class="divide-y divide-gray-100">`;
+
+        filteredFavorites.forEach(item => {
+            const itemJSON = encodeURIComponent(JSON.stringify(item));
+            tableHTML += `<tr class="transition-all duration-200" onclick="handleRowClick(item, true)">`;
+            tableHTML += `<td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.Match}')" class="star-icon text-2xl favorited">⭐</span></td>`;
+            keys.forEach(key => {
+                const value = item[key] || "N/A";
+                if (key === 'Outcome') {
+                    const [bgColor, text, isWin] = getOutcomeColor(item.Prediction, value);
+                    tableHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm"><span class="px-3 py-1 text-xs font-bold rounded-full text-white ${bgColor} shadow-md ${isWin ? 'glow-win' : ''}">${text}</span></td>`;
+                } else {
+                    tableHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm">${value}</td>`;
+                }
+                if (key === 'Match Date') {
+                    tableHTML += `<td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-blue-500 text-white rounded-full hover:bg-blue-600">View</button></td>`;
+                }
+            });
+            tableHTML += `</tr>`;
+        });
+
+        tableHTML += `</tbody></table>`;
+        container.innerHTML = tableHTML;
+    };
+
 
     const handleRowClick = (item) => {
         viewedRows.add(item.Match);
-        showDetailsModal(item);
-        if (['all', 'best'].includes(activeTab)) renderPage();
+        renderSummaryTable(item);
+        if (['all', 'best', 'favorites'].includes(activeTab)) {
+            if (activeTab === 'favorites') renderFavorites();
+            else renderPage();
+        }
     };
     window.handleSort = (key) => { sortColumn === key ? sortDirection = (sortDirection === 'asc' ? 'desc' : 'asc') : (sortColumn = key, sortDirection = 'asc'); applySort(); };
-    window.handleTabClick = (tab) => { activeTab = tab; updateUiForTab(); };
+    window.handleTabClick = (tab) => {
+        activeTab = tab;
+        // Hide summary tables when switching tabs
+        dom.summaryContainer.classList.remove('active');
+        dom.favoritesSummaryContainer.classList.remove('active');
+        updateUiForTab();
+    };
     window.handleFilterChange = () => {
         filters.league = document.getElementById("filter-league").value; 
         filters.prediction = document.getElementById("filter-prediction").value; 
@@ -354,32 +490,31 @@
         dom.dashboardContent.classList.toggle('hidden', !isDashboard);
         dom.favoritesContent.classList.toggle('hidden', !isFavorites);
         dom.mainContent.classList.toggle('hidden', isDashboard || isFavorites);
-        dom.filtersPanel.classList.toggle('hidden', false);
+        dom.filtersPanel.classList.toggle('hidden', isDashboard);
         applyFilters();
     };
     
     window.showDetailsModal = (item) => {
         const isFavorited = favorites.some(f => f.Match === item.Match);
-        const formatInt = (val) => val !== null ? Math.round(val) : "N/A";
-        const formatAvg = (val) => val !== null ? val.toFixed(2) : "N/A";
+        const formatInt = (val) => val !== null && !isNaN(val) ? Math.round(val) : "N/A";
+        const formatAvg = (val) => val !== null && !isNaN(val) ? val.toFixed(2) : "N/A";
 
-        const statRow = (icon, homeVal, awayVal) => `
-            <div class="grid grid-cols-11 gap-2 text-sm items-center py-2">
-                <div class="col-span-5 text-right font-semibold">${homeVal}</div>
-                <div class="col-span-1 text-center text-xl">${icon}</div>
-                <div class="col-span-5 text-left font-semibold">${awayVal}</div>
+        const statRow = (icon, category, homeVal, awayVal) => `
+            <div class="grid grid-cols-3 gap-4 text-sm items-center py-2">
+                <div class="text-right font-semibold">${homeVal}</div>
+                <div class="text-center text-popup-text/80 flex items-center justify-center font-medium">${icon} <span class="ml-2">${category}</span></div>
+                <div class="text-left font-semibold">${awayVal}</div>
             </div>`;
 
-        const analysisRow = (icon, homeVal, awayVal) => `
-            <div class="grid grid-cols-11 gap-2 text-sm items-start py-2">
-                <div class="col-span-5 text-right font-semibold">${homeVal}</div>
-                <div class="col-span-1 text-center text-xl pt-1">${icon}</div>
-                <div class="col-span-5 text-left font-semibold">${awayVal}</div>
-            </div>`;
+        const analysisBlock = (title, content) => content ? `
+            <div class="mt-4">
+                <h4 class="font-bold text-center mb-2">${title}</h4>
+                <p class="text-xs text-center bg-black/5 p-3 rounded-md">${content}</p>
+            </div>` : '';
 
         const itemJSON = encodeURIComponent(JSON.stringify(item));
         dom.detailsModal.innerHTML = `
-            <div class="modal-content bg-popup-bg w-full max-w-3xl mx-4 rounded-2xl shadow-2xl text-popup-text relative">
+            <div class="modal-content bg-popup-bg w-full max-w-lg mx-4 rounded-2xl shadow-2xl text-popup-text relative">
                 <button onclick="hideDetailsModal()" class="absolute top-3 right-3 text-popup-text/50 hover:text-popup-text hover:bg-black/10 rounded-full p-2 transition z-10">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
@@ -387,218 +522,307 @@
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex-grow">
                              <h3 class="text-2xl font-extrabold text-center">${item.Match}</h3>
-                             <p class="text-center text-sm font-medium text-popup-text/80">${item.League}</p>
+                             <p class="text-center text-sm font-medium text-popup-text/80">${item.League} - ${item['Match Date']}</p>
                         </div>
-                        <button onclick="toggleFavorite(JSON.parse(decodeURIComponent('${itemJSON}')), true)" class="text-3xl transition-transform duration-200 hover:scale-125 -mt-1 ml-4">${isFavorited ? '⭐' : '☆'}</button>
+                        <button onclick="toggleFavorite('${item.Match}', true)" class="text-3xl transition-transform duration-200 hover:scale-125 -mt-1 ml-4">${isFavorited ? '⭐' : '☆'}</button>
                     </div>
                     
                     <div class="bg-white/50 p-4 rounded-lg">
-                        <div class="grid grid-cols-11 gap-2 text-sm font-bold text-popup-text/80 mb-2 border-b-2 border-popup-text/10 pb-2">
-                            <div class="col-span-5 text-right">${item['Home Team']}</div>
-                            <div class="col-span-1 text-center"></div>
-                            <div class="col-span-5 text-left">${item['Away Team']}</div>
+                        <div class="grid grid-cols-3 gap-4 text-sm font-bold text-popup-text/80 mb-2 border-b-2 border-popup-text/10 pb-2">
+                            <div class="text-right">${item['Home Team']}</div>
+                            <div class="text-center">Stats</div>
+                            <div class="text-left">${item['Away Team']}</div>
                         </div>
                         <div class="divide-y divide-popup-text/10">
-                            ${statRow(icons.win, formatInt(item['Home Wins']), formatInt(item['Away Wins']))}
-                            ${statRow(icons.draw, formatInt(item['Home Draws']), formatInt(item['Away Draws']))}
-                            ${statRow(icons.loss, formatInt(item['Home Losses']), formatInt(item['Away Losses']))}
-                            ${statRow(icons.goal, formatInt(item['Home Team Scored']), formatInt(item['Away Team Scored']))}
-                            ${statRow(icons.average, formatAvg(item['Home Avg Scored']), formatAvg(item['Away Avg Scored']))}
-                            ${statRow(icons.average, formatInt(item['Home Conceded']), formatInt(item['Away Conceded']))}
-                            ${statRow(icons.average, formatAvg(item['Home Avg Conceded']), formatAvg(item['Away Avg Conceded']))}
-                            ${analysisRow(icons.streak, `Win Streak: ${formatInt(item['Winning Streak'])}`, item['Match Analysis'] || 'N/A')}
-                            ${analysisRow(icons.streak, `Loss Streak: ${formatInt(item['Losing Streak'])}`, item['Goals Analysis'] || 'N/A')}
+                            ${statRow(icons.win, 'Wins', formatInt(item['Home Wins']), formatInt(item['Away Wins']))}
+                            ${statRow(icons.draw, 'Draws', formatInt(item['Home Draws']), formatInt(item['Away Draws']))}
+                            ${statRow(icons.loss, 'Losses', formatInt(item['Home Losses']), formatInt(item['Away Losses']))}
+                            ${statRow(icons.goal, 'Scored', formatInt(item['Home Team Scored']), formatInt(item['Away Team Scored']))}
+                            ${statRow(icons.goal, 'Avg Scored', formatAvg(item['Home Avg Scored']), formatAvg(item['Away Avg Scored']))}
+                            ${statRow(icons.average, 'Avg Conceded', formatAvg(item['Home Avg Conceded']), formatAvg(item['Away Avg Conceded']))}
                         </div>
+                        ${analysisBlock('Match Analysis', item['Match Analysis'])}
+                        ${analysisBlock('Goals Analysis', item['Goals Analysis'])}
                     </div>
                 </div>
             </div>`;
-        dom.detailsModal.classList.remove("hidden");
-        requestAnimationFrame(() => { dom.detailsModal.classList.add("active"); dom.detailsModal.querySelector(".modal-content").classList.add("active"); });
+        dom.detailsModal.classList.add('active');
+        setTimeout(() => document.querySelector('.modal-content').classList.add('active'), 10);
     };
 
+    const renderSummaryTable = (item) => {
+        const container = activeTab === 'favorites' ? dom.favoritesSummaryContainer : dom.summaryContainer;
+        const contentEl = activeTab === 'favorites' ? dom.favoritesSummaryContent : dom.summaryContent;
+
+        const summaryItem = (icon, category, value) => value ? `
+            <div class="p-4 bg-white/50 rounded-lg text-center">
+                <div class="text-2xl">${icon}</div>
+                <p class="text-xs font-bold text-popup-text/70 mt-1">${category}</p>
+                <p class="text-lg font-extrabold text-popup-text mt-1">${value}</p>
+            </div>
+        ` : '';
+
+        const analysisItem = (icon, category, value) => value ? `
+            <div class="p-4 bg-white/50 rounded-lg col-span-1 md:col-span-2">
+                 <div class="flex items-center mb-2">
+                    <span class="text-2xl mr-2">${icon}</span>
+                    <p class="text-sm font-bold text-popup-text/70">${category}</p>
+                </div>
+                <p class="text-sm text-popup-text">${value}</p>
+            </div>
+        ` : '';
+
+        const oddsValue = `1: ${item['Home Odds']} | X: ${item['Draw Odds']} | 2: ${item['Away Odds']}`;
+
+        contentEl.innerHTML = `
+            <h3 class="text-2xl font-extrabold text-popup-text text-center mb-4">${item.Match} - Summary</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                ${summaryItem(icons.prediction, 'Prediction', item.Prediction)}
+                ${summaryItem(icons.outcome, 'Outcome', item.Outcome)}
+                ${summaryItem(icons.result, 'Result', item.Result)}
+                ${summaryItem(icons.score, 'Correct Score', item['Correct Score'])}
+                ${summaryItem(icons.odds, 'Odds', oddsValue)}
+                ${summaryItem(icons.stake, 'Stake', item.Stake)}
+                ${summaryItem(icons.streak, 'Winning Streak', item['Winning Streak'])}
+                ${summaryItem(icons.streak, 'Losing Streak', item['Losing Streak'])}
+                ${analysisItem(icons.analysis, 'Match Analysis', item['Match Analysis'])}
+                ${analysisItem(icons.analysis, 'Goals Analysis', item['Goals Analysis'])}
+            </div>
+        `;
+        container.classList.add('active');
+    };
+
+
     window.hideDetailsModal = (event) => {
-        // This now works for the button too, as event will be undefined.
-        if(event && event.currentTarget !== event.target) return;
-        dom.detailsModal.classList.remove("active");
-        if(dom.detailsModal.querySelector(".modal-content")) dom.detailsModal.querySelector(".modal-content").classList.remove("active");
-        setTimeout(() => dom.detailsModal.classList.add("hidden"), 300);
+        if (event && event.target !== dom.detailsModal && !event.target.closest('button[onclick^="hideDetailsModal"]')) return;
+        const content = document.querySelector('.modal-content');
+        if (content) content.classList.remove('active');
+        dom.detailsModal.classList.remove('active');
     };
 
     window.showFilterModal = () => {
-        dom.filtersModal.innerHTML = `<div class="modal-content bg-blue-100 border border-accent-green/20 w-full max-w-4xl mx-4 rounded-3xl shadow-2xl text-gray-800"><button onclick="hideFilterModal(event)" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 rounded-full p-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button><div class="p-6 md:p-8"><h3 class="text-2xl font-extrabold text-gray-800 text-center mb-6">Advanced Filters</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="p-4 bg-white/60 rounded-xl space-y-4">
-                    <div><label class="block text-sm font-semibold mb-2">Match Analysis</label><select id="filter-match-analysis" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
-                    <div><label class="block text-sm font-semibold mb-2">Goals Analysis</label><select id="filter-goals-analysis" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label class="block text-sm font-semibold mb-2">Min Win Streak</label><input type="number" id="adv-filter-win-streak" placeholder="e.g., 3" class="w-full p-3 border rounded-lg" value="${filters.winningStreak || ''}"></div>
-                        <div><label class="block text-sm font-semibold mb-2">Min Lose Streak</label><input type="number" id="adv-filter-lose-streak" placeholder="e.g., 2" class="w-full p-3 border rounded-lg" value="${filters.losingStreak || ''}"></div>
-                    </div>
-                </div>
-                <div class="p-4 bg-white/60 rounded-xl space-y-4">
-                    <div class="grid grid-cols-2 gap-x-4 items-center"><label class="font-semibold">Home Odds</label><div class="grid grid-cols-2 gap-2"><input type="number" id="home-odds-min" placeholder="Min" class="w-full p-2 border rounded-lg" value="${filters.homeOddsAdvancedMin || ''}"><input type="number" id="home-odds-max" placeholder="Max" class="w-full p-2 border rounded-lg" value="${filters.homeOddsAdvancedMax || ''}"></div></div>
-                    <div class="grid grid-cols-2 gap-x-4 items-center"><label class="font-semibold">Draw Odds</label><div class="grid grid-cols-2 gap-2"><input type="number" id="draw-odds-min" placeholder="Min" class="w-full p-2 border rounded-lg" value="${filters.drawOddsMin || ''}"><input type="number" id="draw-odds-max" placeholder="Max" class="w-full p-2 border rounded-lg" value="${filters.drawOddsMax || ''}"></div></div>
-                    <div class="grid grid-cols-2 gap-x-4 items-center"><label class="font-semibold">Away Odds</label><div class="grid grid-cols-2 gap-2"><input type="number" id="away-odds-min" placeholder="Min" class="w-full p-2 border rounded-lg" value="${filters.awayOddsMin || ''}"><input type="number" id="away-odds-max" placeholder="Max" class="w-full p-2 border rounded-lg" value="${filters.awayOddsMax || ''}"></div></div>
-                </div>
-            </div>
-            <div class="mt-8 pt-6 border-t border-gray-300 flex justify-end space-x-4"><button onclick="hideFilterModal(event)" class="px-6 py-2 text-sm font-bold bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Cancel</button><button onclick="handleAdvancedFilterChange()" class="px-6 py-2 text-sm font-bold text-white bg-accent-green rounded-lg hover:bg-green-500">Apply</button></div></div></div>`;
-        dom.filtersModal.classList.remove("hidden");
-        requestAnimationFrame(() => { dom.filtersModal.classList.add("active"); dom.filtersModal.querySelector(".modal-content").classList.add("active"); });
-        const matchAnalysisOptions = ["All", ...new Set(allData.map(item => item["Match Analysis"]).filter(Boolean))].sort();
-        document.getElementById("filter-match-analysis").innerHTML = matchAnalysisOptions.map(opt => `<option value="${opt}" ${filters.matchAnalysis === opt ? 'selected' : ''}>${opt}</option>`).join('');
-        const goalsAnalysisOptions = ["All", ...new Set(allData.map(item => item["Goals Analysis"]).filter(Boolean))].sort();
-        document.getElementById("filter-goals-analysis").innerHTML = goalsAnalysisOptions.map(opt => `<option value="${opt}" ${filters.goalsAnalysis === opt ? 'selected' : ''}>${opt}</option>`).join('');
+        document.getElementById('adv-filter-win-streak').value = filters.winningStreak || '';
+        document.getElementById('adv-filter-lose-streak').value = filters.losingStreak || '';
+        document.getElementById('home-odds-min').value = filters.homeOddsAdvancedMin || '';
+        document.getElementById('home-odds-max').value = filters.homeOddsAdvancedMax || '';
+        document.getElementById('draw-odds-min').value = filters.drawOddsMin || '';
+        document.getElementById('draw-odds-max').value = filters.drawOddsMax || '';
+        document.getElementById('away-odds-min').value = filters.awayOddsMin || '';
+        document.getElementById('away-odds-max').value = filters.awayOddsMax || '';
+        document.getElementById('filter-match-analysis').value = filters.matchAnalysis;
+        document.getElementById('filter-goals-analysis').value = filters.goalsAnalysis;
+
+        dom.filtersModal.classList.add('active');
+         setTimeout(() => document.querySelector('#more-filters-modal .modal-content').classList.add('active'), 10);
     };
+
     window.hideFilterModal = (event) => {
-        if(event && event.currentTarget !== event.target) return;
-        dom.filtersModal.classList.remove("active");
-        if(dom.filtersModal.querySelector(".modal-content")) dom.filtersModal.querySelector(".modal-content").classList.remove("active");
-        setTimeout(() => dom.filtersModal.classList.add("hidden"), 300);
-    };
-    
-    const renderFavorites = () => {
-        const container = document.getElementById('favorites-table-container');
-        document.getElementById('download-pdf-btn').disabled = filteredFavorites.length === 0;
-        if (filteredFavorites.length === 0) {
-            container.innerHTML = '<p class="text-center text-gray-500 py-8">No favorites match the current filters. Clear filters to see all your favorites.</p>';
-            return;
-        }
-        const visibleCols = COLUMN_MAP.filter(c => ['Match Date', 'League', 'Match', 'Prediction', 'Outcome'].includes(c.key));
-        container.innerHTML = `<table id="favorites-table" class="min-w-full">
-            <thead class="sticky top-0 z-10"><tr>${visibleCols.map(c => `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">${c.label}</th>`).join('')}<th></th></tr></thead>
-            <tbody class="divide-y divide-gray-100">${filteredFavorites.map(item => `<tr ondblclick="showDetailsModal(JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(item))}')))">${visibleCols.map(c => `<td class="px-4 py-3 whitespace-nowrap text-sm">${item[c.key] || 'N/A'}</td>`).join('')}<td class="px-4 py-3 text-center"><button onclick="event.stopPropagation(); removeFromFavorites('${item.Match}')" class="text-red-500 hover:text-red-700 font-bold p-2 rounded-full text-xl leading-none">&times;</button></td></tr>`).join('')}</tbody>
-        </table>`;
+        if (event && event.target !== dom.filtersModal && !event.target.closest('button')) return;
+         const content = document.querySelector('#more-filters-modal .modal-content');
+        if (content) content.classList.remove('active');
+        dom.filtersModal.classList.remove('active');
     };
 
-    window.toggleFavorite = (item, fromPopup = false) => {
-        const matchId = item.Match;
-        const matchIndex = favorites.findIndex(f => f.Match === matchId);
-        if (matchIndex > -1) favorites.splice(matchIndex, 1);
-        else favorites.push(item);
-        
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-
-        if (fromPopup) {
-            showDetailsModal(item); // Re-render the popup to update the star
-        }
-
-        if (activeTab === 'favorites') {
-             applyFilters();
-        } else if (['all', 'best'].includes(activeTab)) {
-            renderPage();
-        }
-    };
-
-
-    window.removeFromFavorites = (matchId) => {
-        favorites = favorites.filter(f => f.Match !== matchId);
-        localStorage.setItem('favorites', JSON.stringify(favorites));
-        applyFilters();
-        if (['all', 'best'].includes(activeTab)) renderPage();
-    };
-
-    const downloadFavoritesPDF = () => {
-        const doc = new jsPDF();
-        const head = [['Date', 'League', 'Match', 'Prediction', 'Outcome']];
-        const body = filteredFavorites.map(item => [item['Match Date'], item.League, item.Match, item.Prediction, item.Outcome || 'N/A']);
-        
-        doc.setFontSize(18);
-        doc.text("Favorite Matches Report", 14, 22);
-        
-        let filterText = "Applied Filters:\n";
-        let activeFilters = 0;
-        Object.entries(filters).forEach(([key, value]) => {
-            if(value && value !== 'All' && value !== 'All Dates') {
-                filterText += `${key.replace(/([A-Z])/g, ' $1').trim()}: ${value}\n`;
-                activeFilters++;
-            }
-        });
-        if(activeFilters === 0) filterText += "None\n";
-
-        doc.setFontSize(11);
-        doc.text(filterText, 14, 32);
-
-        doc.autoTable({
-            startY: 50, head: head, body: body, theme: 'striped',
-            headStyles: { fillColor: [10, 10, 42] }
-        });
-        
-        doc.save('DataCompass_Favorites.pdf');
-    };
-
-    const renderDashboard = (data = allData) => {
-        const completed = data.filter(item => item.Outcome && item.Outcome !== "N/A");
-        if (completed.length === 0) {
-            ["stat-win-rate", "stat-accuracy"].forEach(id => document.getElementById(id).textContent = `0%`);
-            document.getElementById("stat-total-tips").textContent = 0;
-            if (outcomeChart) outcomeChart.destroy(); if (predictionChart) predictionChart.destroy();
-            return;
-        }
-        const wins = completed.filter(item => getOutcomeColor(item.Prediction, item.Outcome)[2]).length;
-        document.getElementById("stat-win-rate").textContent = `${(wins / completed.length * 100).toFixed(1)}%`;
-        document.getElementById("stat-accuracy").textContent = `${(wins / completed.length * 100).toFixed(1)}%`;
-        document.getElementById("stat-total-tips").textContent = completed.length;
-        const outcomeCounts = completed.reduce((acc, item) => { acc[item.Outcome] = (acc[item.Outcome] || 0) + 1; return acc; }, {});
-        if (outcomeChart) outcomeChart.destroy();
-        if(document.getElementById("outcome-pie-chart")) {
-            outcomeChart = new Chart(document.getElementById("outcome-pie-chart").getContext("2d"), { type: 'pie', data: { labels: Object.keys(outcomeCounts), datasets: [{ data: Object.values(outcomeCounts), backgroundColor: ["#10b981", "#ef4444", "#f59e0b"] }] } });
-        }
-        const predictionCounts = completed.reduce((acc, item) => { acc[item.Prediction] = (acc[item.Prediction] || 0) + 1; return acc; }, {});
-        if (predictionChart) predictionChart.destroy();
-        if(document.getElementById("prediction-bar-chart")) {
-            predictionChart = new Chart(document.getElementById("prediction-bar-chart").getContext("2d"), { type: 'bar', data: { labels: Object.keys(predictionCounts), datasets: [{ label: 'Prediction Frequency', data: Object.values(predictionCounts), backgroundColor: '#0a0a2a' }] } });
-        }
-    };
-    
-    const renderScroller = () => {
-        const scroller = document.querySelector("#upcoming-matches-scroller .scroller-inner");
-        const upcoming = allData.filter(d => !d.Outcome || d.Outcome === "N/A").slice(0, 20);
-        scroller.innerHTML = upcoming.map(match => `<div class="flex-shrink-0 w-64 p-3 m-2 bg-white/10 text-white rounded-lg text-xs font-semibold"><p>${match.Match}</p><p class="text-accent-green">${match.Prediction}</p></div>`).join('');
-        scroller.innerHTML += scroller.innerHTML;
-    }
-
-    const populateFilters = () => {
-        const uniqueDates = ['All Dates', ...[...new Set(allData.map(item => item['Match Date']).filter(Boolean))].sort((a, b) => new Date(b) - new Date(a))];
-        document.getElementById('filter-date').innerHTML = uniqueDates.map(d => `<option value="${d}">${d}</option>`).join('');
-        const uniqueLeagues = ['All', ...new Set(allData.map(item => item.League).filter(Boolean))].sort();
-        document.getElementById('filter-league').innerHTML = uniqueLeagues.map(l => `<option value="${l}">${l}</option>`).join('');
-        const uniquePredictions = ['All', ...new Set(allData.map(item => item.Prediction).filter(Boolean))].sort();
-        document.getElementById('filter-prediction').innerHTML = uniquePredictions.map(p => `<option value="${p}">${p}</option>`).join('');
-    }
-
-    const clearFilters = () => {
+    window.clearFilters = () => {
         filters = { ...initialFilters };
-        document.getElementById('team-search-input').value = '';
-        document.getElementById('filter-date').value = 'All Dates';
-        document.getElementById('filter-league').value = 'All';
-        document.getElementById('filter-prediction').value = 'All';
-        document.getElementById('filter-home-odds').value = '';
+        document.getElementById("filter-league").value = 'All';
+        document.getElementById("filter-prediction").value = 'All';
+        document.getElementById("team-search-input").value = '';
+        document.getElementById("filter-date").value = 'All Dates';
+        document.getElementById("filter-home-odds").value = '';
         applyFilters();
     };
 
+    window.toggleFavorite = (matchIdentifier, fromModal = false) => {
+        const matchIndex = favorites.findIndex(f => f.Match === matchIdentifier);
+        if (matchIndex > -1) {
+            favorites.splice(matchIndex, 1);
+        } else {
+            const matchToAdd = allData.find(d => d.Match === matchIdentifier);
+            if (matchToAdd) favorites.push(matchToAdd);
+        }
+        localStorage.setItem('favorites', JSON.stringify(favorites.map(f => f.Match)));
+        if (fromModal) {
+            const matchData = allData.find(d => d.Match === matchIdentifier);
+            if (matchData) showDetailsModal(matchData);
+        }
+        applyFilters();
+    };
+    
     document.addEventListener('DOMContentLoaded', async () => {
         dom.loading.classList.remove('hidden');
         try {
             const response = await fetch(CSV_URL);
-            if (!response.ok) throw new Error(`Network response error: ${response.statusText}`);
+            if (!response.ok) throw new Error('Network response was not ok');
             const csvText = await response.text();
             allData = parseCSV(csvText);
-            const savedFavorites = localStorage.getItem('favorites');
-            if (savedFavorites) favorites = JSON.parse(savedFavorites);
 
-            populateFilters();
-            renderScroller();
-            handleTabClick('dashboard');
+            const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            favorites = allData.filter(item => savedFavorites.includes(item.Match));
+
+            populateFilterDropdowns();
+            populateUpcomingMatchesScroller();
+            
+            updateUiForTab();
+
         } catch (error) {
-            console.error("Initialization failed:", error);
-            dom.messageBox.classList.remove("hidden");
-            dom.messageBox.querySelector("p").textContent = "Failed to load data. See console for details.";
+            console.error('Failed to load or parse data:', error);
+            dom.mainContent.innerHTML = `<p class="text-center text-red-500">Error loading data. Please try again later.</p>`;
         } finally {
             dom.loading.classList.add('hidden');
         }
     });
+
+    const populateFilterDropdowns = () => {
+        const uniqueValues = (key) => [...new Set(allData.map(item => item[key]).filter(Boolean))].sort();
+        const populate = (id, options, defaultLabel) => {
+            const select = document.getElementById(id);
+            select.innerHTML = `<option>${defaultLabel}</option>${options.map(o => `<option>${o}</option>`).join('')}`;
+        };
+        populate('filter-league', uniqueValues('League'), 'All');
+        populate('filter-prediction', uniqueValues('Prediction'), 'All');
+        populate('filter-match-analysis', uniqueValues('Match Analysis'), 'All');
+        populate('filter-goals-analysis', uniqueValues('Goals Analysis'), 'All');
+
+        const dateOptions = ['All Dates', ...[...new Set(allData.map(item => item['Match Date']))].sort((a,b) => {
+            const dateA = new Date(a.split('/').reverse().join('-'));
+            const dateB = new Date(b.split('/').reverse().join('-'));
+            return dateB - dateA;
+        })];
+        const dateSelect = document.getElementById('filter-date');
+        dateSelect.innerHTML = dateOptions.map(o => `<option>${o}</option>`).join('');
+    };
+    
+    const populateUpcomingMatchesScroller = () => {
+        const scroller = document.querySelector('#upcoming-matches-scroller .scroller-inner');
+        const upcoming = allData.filter(m => {
+            if (!m['Match Date']) return false;
+            const parts = m['Match Date'].split('/');
+            if (parts.length !== 3) return false;
+            const [day, month, year] = parts;
+            const matchDate = new Date(`${year}-${month}-${day}`);
+            return matchDate >= new Date();
+        }).slice(0, 20);
+
+        const itemsHTML = upcoming.map(match => `
+            <div class="flex-shrink-0 w-64 p-4 m-2 bg-white/10 rounded-lg text-white text-center interactive-scale transition-transform duration-300">
+                <p class="text-xs font-semibold opacity-70">${match.League}</p>
+                <p class="font-bold my-1">${match['Home Team']} vs ${match['Away Team']}</p>
+                <p class="text-xs opacity-70">${match['Match Date']}</p>
+                <p class="mt-2 text-sm font-bold bg-accent-green/20 text-accent-green py-1 px-3 rounded-full">${match.Prediction}</p>
+            </div>
+        `).join('');
+        scroller.innerHTML = itemsHTML.repeat(2);
+    };
+
+    const renderDashboard = (data) => {
+        const completed = data.filter(d => d.Outcome && d.Outcome !== 'N/A' && d.Outcome.trim() !== '');
+        const totalCompleted = completed.length;
+        const wins = completed.filter(d => getOutcomeColor(d.Prediction, d.Outcome)[2]).length;
+
+        document.getElementById('stat-win-rate').textContent = totalCompleted > 0 ? `${((wins / totalCompleted) * 100).toFixed(1)}%` : '0%';
+        document.getElementById('stat-accuracy').textContent = totalCompleted > 0 ? `${((wins / totalCompleted) * 100).toFixed(1)}%` : '0%';
+        document.getElementById('stat-total-tips').textContent = data.length;
+        
+        const topTip = data.find(d => ["Best Home Tip", "Best Away Tip"].includes(d['Match Analysis']));
+        document.getElementById('stat-top-tip').textContent = topTip ? topTip.Match : 'N/A';
+
+        const outcomeCounts = completed.reduce((acc, d) => {
+            const outcomeText = getOutcomeColor(d.Prediction, d.Outcome)[2] ? 'Win' : 'Loss';
+            acc[outcomeText] = (acc[outcomeText] || 0) + 1;
+            return acc;
+        }, {});
+
+        if (outcomeChart) outcomeChart.destroy();
+        outcomeChart = new Chart(document.getElementById('outcome-pie-chart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: Object.keys(outcomeCounts),
+                datasets: [{ data: Object.values(outcomeCounts), backgroundColor: ['#10b981', '#ef4444'] }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        const predictionCounts = data.reduce((acc, d) => {
+            acc[d.Prediction] = (acc[d.Prediction] || 0) + 1;
+            return acc;
+        }, {});
+
+        if (predictionChart) predictionChart.destroy();
+        predictionChart = new Chart(document.getElementById('prediction-bar-chart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(predictionCounts),
+                datasets: [{ label: 'Prediction Count', data: Object.values(predictionCounts), backgroundColor: '#0a0a2a' }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+    };
+
+    window.downloadFavoritesPDF = () => {
+        if (filteredFavorites.length === 0) {
+            alert('No favorites to download.');
+            return;
+        }
+        const doc = new jsPDF();
+        doc.text("My Favorite Matches", 14, 16);
+        doc.autoTable({
+            startY: 20,
+            head: [['Date', 'Match', 'Prediction', 'Outcome', 'Result']],
+            body: filteredFavorites.map(fav => [
+                fav['Match Date'],
+                fav.Match,
+                fav.Prediction,
+                fav.Outcome,
+                fav.Result
+            ]),
+        });
+        doc.save('DataCompass360_Favorites.pdf');
+    };
+
+    const buildAdvancedFiltersModal = () => {
+        const modal = document.createElement('div');
+        modal.id = 'more-filters-modal';
+        modal.className = 'modal-backdrop';
+        modal.onclick = (e) => hideFilterModal(e);
+        modal.innerHTML = `
+            <div class="modal-content bg-white w-full max-w-4xl mx-4 p-6 rounded-2xl shadow-2xl relative">
+                <button onclick="hideFilterModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <h3 class="text-2xl font-bold text-naviblue mb-6">Advanced Filters</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="font-semibold mb-2 text-gray-700">Analysis Type</h4>
+                        <label class="block text-sm mb-1">Match Analysis</label>
+                        <select id="filter-match-analysis" class="w-full p-2 border rounded-md"></select>
+                        <label class="block text-sm mt-3 mb-1">Goals Analysis</label>
+                        <select id="filter-goals-analysis" class="w-full p-2 border rounded-md"></select>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-2 text-gray-700">Team Streaks (Min)</h4>
+                        <label class="block text-sm mb-1">Winning Streak</label>
+                        <input type="number" id="adv-filter-win-streak" placeholder="e.g., 3" class="w-full p-2 border rounded-md">
+                        <label class="block text-sm mt-3 mb-1">Losing Streak</label>
+                        <input type="number" id="adv-filter-lose-streak" placeholder="e.g., 2" class="w-full p-2 border rounded-md">
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-2 text-gray-700">Odds Ranges</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div><label class="text-sm">Home Odds</label><input type="number" id="home-odds-min" placeholder="Min" class="w-full p-1 border rounded"><input type="number" id="home-odds-max" placeholder="Max" class="w-full p-1 border rounded mt-1"></div>
+                            <div><label class="text-sm">Draw Odds</label><input type="number" id="draw-odds-min" placeholder="Min" class="w-full p-1 border rounded"><input type="number" id="draw-odds-max" placeholder="Max" class="w-full p-1 border rounded mt-1"></div>
+                            <div class="col-span-2"><label class="text-sm">Away Odds</label><div class="grid grid-cols-2 gap-2"><input type="number" id="away-odds-min" placeholder="Min" class="w-full p-1 border rounded"><input type="number" id="away-odds-max" placeholder="Max" class="w-full p-1 border rounded"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 text-right">
+                    <button onclick="handleAdvancedFilterChange()" class="px-6 py-3 bg-accent-green text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition">Apply Filters</button>
+                </div>
+            </div>`;
+        document.body.appendChild(modal);
+    };
+    buildAdvancedFiltersModal();
     </script>
 </body>
 </html>
+
 
 
