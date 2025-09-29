@@ -1,19 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DataCompass 360 - Smart Football Insights</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Chart.js for Dashboard -->
+    <!-- Load Chart.js for Dashboard & In-depth Analysis -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PDF Generation Libraries -->
+    <!-- PDF & Excel Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+
     <script>
         // Tailwind CSS Configuration
         tailwind.config = {
+            darkMode: 'class', // Enable dark mode
             theme: {
                 extend: {
                     colors: {
@@ -21,33 +24,32 @@
                         'primary-purple': '#673ab7',
                         'accent-green': '#00c853',
                         'accent-orange': '#ff9800',
-                        'base-bg': '#f4f7fa', // Light Gray-Blue
+                        // Light theme colors
+                        'base-bg': '#f4f7fa',
+                        'panel-bg': '#ffffff',
                         'filter-panel-bg': '#eef3f9',
-                        'dark-navy': '#0a0a2a',
+                        'text-primary': '#0a0a2a',
+                        'text-secondary': '#4a5568',
+                        // Dark theme colors
+                        'dark-base-bg': '#1a202c',
+                        'dark-panel-bg': '#2d3748',
+                        'dark-filter-panel-bg': '#252c3a',
+                        'dark-text-primary': '#f7fafc',
+                        'dark-text-secondary': '#a0aec0',
                     },
-                    borderRadius: {
-                        'xl': '14px',
-                    },
+                    borderRadius: { 'xl': '14px' },
                     fontFamily: { sans: ['Poppins', 'sans-serif'] },
                 }
             }
         }
     </script>
     <style>
-        /* Import Google Font */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-        
-        /* Define CSS variables for easier theming */
         :root {
             --glow-color-blue: rgba(63, 81, 181, 0.4);
             --glow-color-green: rgba(0, 200, 83, 0.5);
         }
-
-        /* Base body styles */
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background-color: #f4f7fa; /* Use new base background color */
-        }
+        body { font-family: 'Poppins', sans-serif; }
 
         /* Keyframe animations */
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -62,120 +64,113 @@
 
         /* Navigation Tabs Styling */
         .nav-tabs-container { position: relative; display: flex; align-items: center; justify-content: center; }
-        .nav-tab {
-            background-color: white;
-            color: #0a0a2a; /* Dark Navy Text */
-            border-radius: 9999px; /* Pill shape */
-            transition: color 0.3s ease, background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .nav-tab.active {
-            color: white;
-            background-image: linear-gradient(to right, #3f51b5, #673ab7); /* Blue -> Purple Gradient */
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px -5px rgba(63, 81, 181, 0.6);
-        }
-        .nav-tab:hover:not(.active) {
-            background-color: #f0f0f0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        #nav-underline {
-            position: absolute;
-            bottom: -8px;
-            height: 3px;
-            background-image: linear-gradient(to right, #3f51b5, #673ab7);
-            border-radius: 2px;
-            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
+        .nav-tab { transition: color 0.3s ease, background-color 0.3s ease, transform 0.2s ease; }
+        .nav-tab.active { transform: translateY(-2px); }
+        #nav-underline { transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
 
         /* Modal styling */
-        .modal-backdrop {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(10, 10, 42, 0.7); backdrop-filter: blur(8px);
-            display: flex; align-items: center; justify-content: center; z-index: 50;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        .modal-backdrop { 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease; 
         }
-        .modal-backdrop.active { opacity: 1; pointer-events: auto; animation: fadeIn 0.3s ease forwards; }
-        .modal-content.active { animation: slideUp 0.4s ease-out forwards; opacity: 1; }
+        .modal-backdrop.active { 
+            opacity: 1;
+            pointer-events: auto;
+            animation: fadeIn 0.3s ease forwards; 
+        }
+        .modal-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+        .modal-content.active { 
+            opacity: 1;
+            transform: translateY(0);
+        }
         
         /* Table styles */
-        #data-table thead th, #favorites-table thead th { 
-            background-color: white !important; 
-            color: #0a0a2a !important; 
-            font-weight: 700 !important;
-            border-bottom: 2px solid #eef3f9;
-        }
-        #data-table tbody tr:hover, #favorites-table tbody tr:hover { 
-            background-color: #e6ffed; /* Soft light green tint */
+        .table-row-hover:hover { 
             transform: scale(1.01); 
-            transition: transform 0.2s ease, background-color 0.2s ease; 
-            box-shadow: 0 6px 25px rgba(0,0,0,0.07); 
-            border-left: 4px solid #00c853; 
+            transition: transform 0.2s ease, background-color 0.2s ease;
             cursor: pointer; 
         }
-        .viewed-row { background-color: #e0e7ff !important; }
+        .pinned-row { border-left: 4px solid var(--accent-orange) !important; }
         
-        /* Interactive element effects */
         .interactive-glow:hover {
             box-shadow: 0 0 15px var(--glow-color-blue);
             transform: translateY(-2px);
             transition: all 0.2s ease-out;
         }
 
-        /* Twinkle effect for correct predictions */
-        .glow-win { animation: twinkle 1.8s infinite ease-in-out; }
+        .glow-win { animation: twinkle 3s 1 ease-in-out; } /* Animate once for 3 seconds */
 
         /* Animated Logo Styles */
         #animated-logo .compass-needle { transform-origin: center; animation: spin 8s linear infinite; }
         #animated-logo .graph-line { stroke-dasharray: 100; stroke-dashoffset: 100; animation: dash 3s ease-in-out infinite alternate; }
 
-        /* Summary Table Animation */
-        #summary-table-container, #favorites-summary-table-container {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-out, padding 0.5s ease-out, margin 0.5s ease-out;
-            padding: 0; margin-top: 0;
-        }
-         #summary-table-container.active, #favorites-summary-table-container.active {
-            max-height: 600px; 
-            padding: 24px;
-            margin-top: 1.5rem;
+        /* Collapsible Section */
+        .collapsible-content { max-height: 1000px; transition: max-height 0.5s ease-out, padding 0.5s ease-out, margin 0.5s ease-out; overflow: hidden; }
+        .collapsible-content.collapsed { max-height: 0; padding-top: 0; padding-bottom: 0; margin-top: 0 !important; }
+        .collapse-icon { transition: transform 0.3s ease; }
+        .collapsed .collapse-icon { transform: rotate(-90deg); }
+        
+        /* Tooltip for quick stats */
+        #quick-stats-tooltip {
+            position: fixed;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 100;
         }
 
     </style>
 </head>
-<body class="p-4 md:p-8 bg-base-bg">
+<body class="bg-base-bg text-text-primary dark:bg-dark-base-bg dark:text-dark-text-primary transition-colors duration-300">
 
     <!-- Top Bar: Logo + Navigation -->
-    <div class="max-w-7xl mx-auto mb-6 flex justify-between items-center">
+    <div class="max-w-7xl mx-auto mb-6 flex justify-between items-center px-4">
         <div id="animated-logo" class="w-16 h-16 flex-shrink-0">
              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="45" fill="none" stroke="#0a0a2a" stroke-width="4"/>
+                <circle cx="50" cy="50" r="45" fill="none" class="stroke-text-primary dark:stroke-dark-text-primary" stroke-width="4"/>
                 <path class="graph-line" d="M 20 60 Q 40 30, 60 50 T 80 40" fill="none" stroke="#00c853" stroke-width="4" stroke-linecap="round"/>
                 <g class="compass-needle"><path d="M 50 10 L 45 50 L 50 90 L 55 50 Z" fill="#ef4444"/><path d="M 50 10 L 45 50 L 50 90 L 55 50 Z" fill-opacity="0.5" fill="white"/></g>
-                <circle cx="50" cy="50" r="5" fill="#0a0a2a"/>
+                <circle cx="50" cy="50" r="5" class="fill-text-primary dark:fill-dark-text-primary"/>
             </svg>
         </div>
 
         <div id="nav-container" class="nav-tabs-container flex-grow">
-            <div id="nav-tabs" class="flex space-x-2 p-1 bg-gray-200/50 rounded-full">
-                <button id="tab-dashboard" onclick="handleTabClick('dashboard', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>📊 Dashboard</button>
-                <button id="tab-all" onclick="handleTabClick('all', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>⚽ All Matches</button>
-                <button id="tab-best" onclick="handleTabClick('best', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>🎯 Best Tips</button>
-                <button id="tab-extrapolation" onclick="handleTabClick('extrapolation', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>📈 Winning Extrapolation</button>
-                <button id="tab-favorites" onclick="handleTabClick('favorites', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>⭐ Favorites</button>
+            <div id="nav-tabs" class="flex space-x-2 p-1 bg-gray-200/50 dark:bg-gray-700/50 rounded-full">
+                <!-- Navigation Tabs -->
+                <button id="tab-dashboard" onclick="handleTabClick('dashboard', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>📊 Dashboard</button>
+                <button id="tab-all" onclick="handleTabClick('all', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>⚽ All Matches</button>
+                <button id="tab-best" onclick="handleTabClick('best', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>🎯 Best Tips</button>
+                <button id="tab-extrapolation" onclick="handleTabClick('extrapolation', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>📈 Winning Extrapolation</button>
+                <button id="tab-favorites" onclick="handleTabClick('favorites', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>⭐ Favorites</button>
             </div>
-            <div id="nav-underline"></div>
+            <div id="nav-underline" class="absolute bottom-[-8px] h-[3px] bg-gradient-to-r from-primary-blue to-primary-purple rounded-full"></div>
         </div>
 
-        <div class="w-16 h-16 flex-shrink-0"></div> <!-- Spacer -->
+        <!-- Dark Mode Toggle -->
+        <div class="w-16 h-16 flex-shrink-0 flex items-center justify-center">
+            <button id="dark-mode-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-text-primary dark:text-dark-text-primary">
+                <svg id="sun-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M12 12a5 5 0 100-10 5 5 0 000 10z"></path></svg>
+                <svg id="moon-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
     </div>
-
+    
     <div class="max-w-7xl mx-auto">
         <!-- Main Header -->
         <header class="mb-8 p-8 bg-gradient-to-br from-primary-blue to-primary-purple shadow-2xl rounded-xl text-center overflow-hidden">
@@ -184,32 +179,44 @@
         </header>
 
         <!-- Loading Indicator -->
-        <div id="loading-indicator" class="mb-6 p-4 bg-blue-100 border border-blue-200 text-sm font-medium text-dark-navy rounded-xl flex items-center justify-center hidden"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-primary-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></path><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Loading Data...</div>
+        <div id="loading-indicator" class="mb-6 p-4 bg-blue-100 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-700 text-sm font-medium text-text-primary dark:text-dark-text-primary rounded-xl flex items-center justify-center hidden"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-primary-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></path><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Loading Data...</div>
 
-        <!-- Filters Panel -->
-        <div id="filters-panel" class="mb-6 p-6 bg-filter-panel-bg shadow-xl rounded-xl relative hidden">
-             <div class="flex justify-between items-center mb-6">
-                 <h2 class="text-2xl font-extrabold text-dark-navy flex items-center"><svg class="w-6 h-6 mr-3 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0012 15.586V21h-2v-5.414a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>Refine Insights</h2>
-                 <button onclick="clearFilters()" class="px-4 py-2 text-sm font-bold bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center interactive-glow"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Clear Filters</button>
-             </div>
-             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                  <div class="relative"><label class="block text-sm font-semibold text-dark-navy mb-2">Search</label><input type="text" id="team-search-input" placeholder="e.g., Chelsea" class="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm" oninput="handleFilterChange()"></div>
-                  <div class="relative"><label class="block text-sm font-semibold text-dark-navy mb-2">Match Date</label><select id="filter-date" onchange="handleFilterChange()" class="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm"></select></div>
-                  <div class="relative"><label class="block text-sm font-semibold text-dark-navy mb-2">League</label><select id="filter-league" onchange="handleFilterChange()" class="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm"></select></div>
-                  <div class="relative"><label class="block text-sm font-semibold text-dark-navy mb-2">Prediction</label><select id="filter-prediction" onchange="handleFilterChange()" class="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm"></select></div>
-                  <div class="relative"><label class="block text-sm font-semibold text-dark-navy mb-2">Home Odds (Min)</label><input type="number" id="filter-home-odds" placeholder="e.g., 1.5" class="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm" oninput="handleFilterChange()"></div>
+        <!-- Filters Panel (Collapsible) -->
+        <div id="filters-container" class="mb-6 bg-filter-panel-bg dark:bg-dark-filter-panel-bg shadow-xl rounded-xl relative hidden">
+            <div id="filters-header" class="p-4 cursor-pointer flex justify-between items-center">
+                <h2 class="text-2xl font-extrabold text-text-primary dark:text-dark-text-primary flex items-center"><svg class="w-6 h-6 mr-3 text-primary-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0012 15.586V21h-2v-5.414a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>Refine Insights</h2>
+                <svg class="w-6 h-6 collapse-icon text-text-secondary dark:text-dark-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div id="filters-panel" class="collapsible-content p-6 pt-0">
+                <div class="flex justify-between items-center mb-6">
+                    <div></div> <!-- Spacer -->
+                    <button onclick="clearFilters()" class="px-4 py-2 text-sm font-bold bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center interactive-glow"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Clear Filters</button>
+                </div>
+                 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Search</label><input type="text" id="team-search-input" placeholder="e.g., Chelsea" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()"></div>
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Match Date</label><select id="filter-date" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">League</label><select id="filter-league" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Prediction</label><select id="filter-prediction" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Home Odds (Min)</label><input type="number" id="filter-home-odds" placeholder="e.g., 1.5" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()"></div>
+                 </div>
              </div>
              <button onclick="showFilterModal()" class="absolute -bottom-5 right-6 px-5 py-3 bg-accent-orange text-white font-bold rounded-full shadow-lg hover:bg-accent-orange/90 transition flex items-center interactive-glow"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 16v-2m8-6h2m-16 0H4m14.243-7.757l1.414-1.414M5.343 18.657l-1.414 1.414m14.142 0l-1.414-1.414M6.757 5.343l-1.414-1.414M12 18a6 6 0 100-12 6 6 0 000 12z"></path></svg>More Filters</button>
         </div>
 
         <!-- Main Content Area -->
         <div id="main-content" class="hidden">
-            <div id="table-container" class="bg-white shadow-2xl rounded-xl overflow-hidden mt-8">
-                <div class="overflow-x-auto"><table id="data-table" class="min-w-full"><thead class="sticky top-0 z-10"><tr></tr></thead><tbody id="table-body" class="divide-y divide-gray-200/50"></tbody><tfoot id="table-footer" class="hidden bg-gray-50"></tfoot></table></div>
-                <div id="message-box" class="p-8 text-center hidden"><p class="text-lg font-semibold text-dark-navy">No data found.</p></div>
+            <div id="table-container" class="bg-panel-bg dark:bg-dark-panel-bg shadow-2xl rounded-xl overflow-hidden mt-8">
+                <div class="overflow-x-auto">
+                    <table id="data-table" class="min-w-full">
+                        <thead class="sticky top-0 z-10 bg-panel-bg dark:bg-dark-panel-bg"><tr></tr></thead>
+                        <tbody id="table-body" class="divide-y divide-gray-200/50 dark:divide-gray-700"></tbody>
+                        <tfoot id="table-footer" class="hidden bg-gray-50 dark:bg-gray-700"></tfoot>
+                    </table>
+                </div>
+                <div id="message-box" class="p-8 text-center hidden"><p class="text-lg font-semibold text-text-primary dark:text-dark-text-primary">No data found.</p></div>
             </div>
-             <!-- Summary Table Container -->
-            <div id="summary-table-container" class="bg-filter-panel-bg shadow-xl rounded-xl overflow-hidden">
+            <!-- Summary Table Container -->
+            <div id="summary-table-container" class="bg-filter-panel-bg dark:bg-dark-filter-panel-bg shadow-xl rounded-xl overflow-hidden">
                  <div id="summary-content"></div>
             </div>
             <div id="pagination-controls" class="mt-6 flex justify-between items-center hidden"></div>
@@ -218,29 +225,29 @@
         <!-- Dashboard Content -->
         <div id="dashboard-content" class="hidden">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <div class="p-6 bg-white rounded-xl shadow-lg"><h3 class="text-sm font-bold text-gray-500">WIN RATE</h3><p id="stat-win-rate" class="text-3xl font-extrabold text-accent-green mt-1">0%</p></div>
-                <div class="p-6 bg-white rounded-xl shadow-lg"><h3 class="text-sm font-bold text-gray-500">PREDICTION ACCURACY</h3><p id="stat-accuracy" class="text-3xl font-extrabold text-dark-navy mt-1">0%</p></div>
-                <div class="p-6 bg-white rounded-xl shadow-lg"><h3 class="text-sm font-bold text-gray-500">TOTAL TIPS</h3><p id="stat-total-tips" class="text-3xl font-extrabold text-gray-700 mt-1">0</p></div>
-                <div class="p-6 bg-white rounded-xl shadow-lg"><h3 class="text-sm font-bold text-gray-500">TOP TIP</h3><p id="stat-top-tip" class="text-xl font-bold text-dark-navy mt-1">N/A</p></div>
+                <div class="p-6 bg-panel-bg dark:bg-dark-panel-bg rounded-xl shadow-lg"><h3 class="text-sm font-bold text-text-secondary">WIN RATE</h3><p id="stat-win-rate" class="text-3xl font-extrabold text-accent-green mt-1">0%</p></div>
+                <div class="p-6 bg-panel-bg dark:bg-dark-panel-bg rounded-xl shadow-lg"><h3 class="text-sm font-bold text-text-secondary">PREDICTION ACCURACY</h3><p id="stat-accuracy" class="text-3xl font-extrabold text-text-primary dark:text-dark-text-primary mt-1">0%</p></div>
+                <div class="p-6 bg-panel-bg dark:bg-dark-panel-bg rounded-xl shadow-lg"><h3 class="text-sm font-bold text-text-secondary">TOTAL TIPS</h3><p id="stat-total-tips" class="text-3xl font-extrabold text-gray-700 dark:text-gray-300 mt-1">0</p></div>
+                <div class="p-6 bg-panel-bg dark:bg-dark-panel-bg rounded-xl shadow-lg"><h3 class="text-sm font-bold text-text-secondary">TOP TIP</h3><p id="stat-top-tip" class="text-xl font-bold text-text-primary dark:text-dark-text-primary mt-1">N/A</p></div>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 place-items-center">
-                <div class="p-6 bg-white rounded-xl shadow-lg w-full flex flex-col items-center"><h3 class="text-lg font-bold text-dark-navy mb-4">Outcome Distribution</h3><div class="relative w-full max-w-[480px] aspect-square"><canvas id="outcome-pie-chart"></canvas></div></div>
-                <div class="p-6 bg-white rounded-xl shadow-lg w-full flex flex-col items-center"><h3 class="text-lg font-bold text-dark-navy mb-4">Prediction vs. Result</h3><div class="relative w-full max-w-[480px] aspect-square"><canvas id="prediction-bar-chart"></canvas></div></div>
+                <div class="p-6 bg-panel-bg dark:bg-dark-panel-bg rounded-xl shadow-lg w-full flex flex-col items-center"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4">Outcome Distribution</h3><div class="relative w-full max-w-[480px] aspect-square"><canvas id="outcome-pie-chart"></canvas></div></div>
+                <div class="p-6 bg-panel-bg dark:bg-dark-panel-bg rounded-xl shadow-lg w-full flex flex-col items-center"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4">Prediction vs. Result</h3><div class="relative w-full max-w-[480px] aspect-square"><canvas id="prediction-bar-chart"></canvas></div></div>
             </div>
         </div>
         
         <!-- Favorites Content -->
         <div id="favorites-content" class="hidden">
-            <div class="bg-white shadow-2xl rounded-xl overflow-hidden p-6">
+            <div class="bg-panel-bg dark:bg-dark-panel-bg shadow-2xl rounded-xl overflow-hidden p-6">
                  <div class="flex justify-between items-center mb-4">
-                     <h2 class="text-2xl font-extrabold text-dark-navy">⭐ Your Favorite Matches</h2>
-                     <button id="download-pdf-btn" onclick="downloadFavoritesPDF()" class="px-4 py-2 text-sm font-bold bg-gradient-to-r from-primary-blue to-primary-purple text-white rounded-lg hover:shadow-lg hover:shadow-primary-blue/50 transition flex items-center interactive-glow"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>Download PDF</button>
+                     <h2 class="text-2xl font-extrabold text-text-primary dark:text-dark-text-primary">⭐ Your Favorite Matches</h2>
+                     <div class="flex space-x-2">
+                        <button onclick="exportFavorites('pdf')" class="px-4 py-2 text-sm font-bold bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg interactive-glow">PDF</button>
+                        <button onclick="exportFavorites('csv')" class="px-4 py-2 text-sm font-bold bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg interactive-glow">CSV</button>
+                        <button onclick="exportFavorites('xlsx')" class="px-4 py-2 text-sm font-bold bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg interactive-glow">Excel</button>
+                     </div>
                  </div>
                  <div id="favorites-table-container" class="overflow-x-auto"></div>
-            </div>
-            <!-- Favorites Summary Table Container -->
-            <div id="favorites-summary-table-container" class="bg-filter-panel-bg shadow-xl rounded-xl overflow-hidden">
-                 <div id="favorites-summary-content"></div>
             </div>
         </div>
     </div>
@@ -249,28 +256,37 @@
     <div id="details-modal" class="modal-backdrop" onclick="hideDetailsModal(event)"></div>
     <div id="more-filters-modal" class="modal-backdrop" onclick="hideFilterModal(event)"></div>
 
+    <!-- Tooltip -->
+    <div id="quick-stats-tooltip" class="p-3 bg-gray-800 text-white text-sm rounded-lg shadow-lg"></div>
+
     <script type="text/javascript">
     const { jsPDF } = window.jspdf;
+
     // --- Configuration ---
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQH-Uue5Ctuo4aU-4S81U9QvoXxslOq6YjKHnVkPjyOeJqci4p19cs2iZ8y5GgzsSh_vQHxPYb-gl-5/pub?gid=0&single=true&output=csv';
     const HIDDEN_COLUMNS = ['Home Team', 'Away Team', 'Home Wins', 'Home Draws', 'Home Losses', 'Away Wins', 'Away Draws', 'Away Losses', 'Home Avg Scored', 'Home Conceded', 'Home Avg Conceded', 'Away Avg Scored', 'Away Conceded', 'Away Avg Conceded', 'Match Analysis', 'Goals Analysis'];
-    
     const COLUMN_MAP = [
         { key: 'Match Date', label: 'Date' }, { key: 'League', label: 'League' }, { key: 'Match', label: 'Match' }, { key: 'Prediction', label: 'Prediction' }, { key: 'Outcome', label: 'Outcome' }, { key: 'Result', label: 'Result' }, { key: 'Correct Score', label: 'Score' }, { key: 'Home Odds', label: '1', type: 'number' }, { key: 'Draw Odds', label: 'X', type: 'number' }, { key: 'Away Odds', label: '2', type: 'number' }, 
         { key: 'Home Team', type: 'string' }, { key: 'Away Team', type: 'string' }, { key: 'Winning Streak', type: 'number' }, { key: 'Losing Streak', type: 'number' }, { key: 'Stake', type: 'number' }, { key: 'Home Wins', type: 'number' }, { key: 'Home Draws', type: 'number' }, { key: 'Home Losses', type: 'number' }, { key: 'Away Wins', type: 'number' }, { key: 'Away Draws', type: 'number' }, { key: 'Away Losses', type: 'number' }, { key: 'Home Team Scored', type: 'number' }, { key: 'Home Avg Scored', type: 'number' }, { key: 'Home Conceded', type: 'number' }, { key: 'Home Avg Conceded', type: 'number' }, { key: 'Away Team Scored', type: 'number' }, { key: 'Away Avg Scored', type: 'number' }, { key: 'Away Conceded', type: 'number' }, { key: 'Away Avg Conceded', type: 'number' }, { key: 'Match Analysis', type: 'string' }, { key: 'Goals Analysis', type: 'string' }
     ];
-
-    let allData = [], currentData = [], favorites = [], viewedRows = new Set(), outcomeChart, predictionChart, filteredFavorites = [], lostMatches = new Set();
+    
+    // --- STATE MANAGEMENT ---
+    let allData = [], currentData = [], favorites = [], pinnedMatches = [], viewedRows = new Set(), outcomeChart, predictionChart, filteredFavorites = [], lostMatches = new Set();
     let sortColumn = 'Match Date', sortDirection = 'desc', rowsPerPage = 30, currentPage = 1, activeTab = 'dashboard';
     const initialFilters = { 
         league: 'All', prediction: 'All', teamSearch: '', matchDate: 'All Dates', homeOddsMin: null,
-        // Performance Stats
-        homeWins: null, homeDraws: null, homeLosses: null, awayWins: null, awayDraws: null, awayLosses: null,
-        homeAvgScored: null, homeAvgConceded: null, awayAvgScored: null, awayAvgConceded: null,
+        homeWins: {min: null, max: null}, homeDraws: {min: null, max: null}, homeLosses: {min: null, max: null},
+        awayWins: {min: null, max: null}, awayDraws: {min: null, max: null}, awayLosses: {min: null, max: null},
+        homeAvgScored: {min: null, max: null}, homeAvgConceded: {min: null, max: null},
+        awayAvgScored: {min: null, max: null}, awayAvgConceded: {min: null, max: null},
+        homeOdds: {min: null, max: null}, drawOdds: {min: null, max: null}, awayOdds: {min: null, max: null},
+        predictionOdds: {min: null, max: null}
     };
     let filters = { ...initialFilters };
 
+    // --- DOM ELEMENTS ---
     const dom = {
+        html: document.documentElement,
         loading: document.getElementById('loading-indicator'),
         mainContent: document.getElementById('main-content'),
         dashboardContent: document.getElementById('dashboard-content'),
@@ -283,15 +299,67 @@
         navUnderline: document.getElementById('nav-underline'),
         detailsModal: document.getElementById('details-modal'),
         filtersModal: document.getElementById('more-filters-modal'),
+        filtersContainer: document.getElementById('filters-container'),
         filtersPanel: document.getElementById('filters-panel'),
+        filtersHeader: document.getElementById('filters-header'),
         summaryContainer: document.getElementById('summary-table-container'),
         summaryContent: document.getElementById('summary-content'),
-        favoritesSummaryContainer: document.getElementById('favorites-summary-table-container'),
-        favoritesSummaryContent: document.getElementById('favorites-summary-content')
+        tooltip: document.getElementById('quick-stats-tooltip'),
+        darkModeToggle: document.getElementById('dark-mode-toggle'),
+        sunIcon: document.getElementById('sun-icon'),
+        moonIcon: document.getElementById('moon-icon'),
     };
     
-    // ... (The rest of the JS is largely the same, with key functions updated below)
+    // --- ICONS ---
+    const ICONS = {
+        goal: '⚽', shield: '🛡️', streak: '🔥', pin: '📌', star: '⭐', starOutline: '☆'
+    };
 
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            dom.html.classList.add('dark');
+            dom.sunIcon.classList.add('hidden');
+            dom.moonIcon.classList.remove('hidden');
+        }
+        dom.darkModeToggle.addEventListener('click', toggleDarkMode);
+        dom.filtersHeader.addEventListener('click', () => {
+            dom.filtersContainer.classList.toggle('collapsed');
+            dom.filtersPanel.classList.toggle('collapsed');
+        });
+        dom.loading.classList.remove('hidden');
+        try {
+            const response = await fetch(CSV_URL);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const csvText = await response.text();
+            allData = parseCSV(csvText);
+            const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+            favorites = allData.filter(item => savedFavorites.includes(item.uniqueId));
+            const savedPins = JSON.parse(localStorage.getItem('pinnedMatches')) || [];
+            pinnedMatches = allData.filter(item => savedPins.includes(item.uniqueId)).map(i => i.uniqueId);
+            buildAdvancedFiltersModal();
+            populateFilterDropdowns();
+            const initialTab = document.getElementById('tab-dashboard');
+            if (initialTab) handleTabClick('dashboard', initialTab);
+            else updateUiForTab();
+        } catch (error) {
+            console.error('Failed to load or parse data:', error);
+            dom.mainContent.innerHTML = `<p class="text-center text-red-500">Error loading data.</p>`;
+        } finally {
+            dom.loading.classList.add('hidden');
+        }
+    });
+
+    // --- DARK MODE ---
+    function toggleDarkMode() {
+        dom.html.classList.toggle('dark');
+        dom.sunIcon.classList.toggle('hidden');
+        dom.moonIcon.classList.toggle('hidden');
+        localStorage.setItem('theme', dom.html.classList.contains('dark') ? 'dark' : 'light');
+        if (activeTab === 'dashboard' && allData.length > 0) renderDashboard(currentData);
+    }
+    
+    // --- PARSING & FILTERING ---
     const parseCSV = (csvText) => {
         const lines = csvText.trim().split("\n");
         const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ""));
@@ -301,11 +369,7 @@
             const rowObject = {};
             COLUMN_MAP.forEach(col => {
                 const index = headers.indexOf(col.key);
-                if (col.key === 'Result' && index === -1) {
-                    const scoreIndex = headers.indexOf('Correct Score');
-                    if (scoreIndex !== -1) { rowObject[col.key] = values[scoreIndex] || ""; } 
-                    else { rowObject[col.key] = ""; }
-                } else if (index !== -1 && values[index] !== undefined) {
+                if (index !== -1 && values[index] !== undefined) {
                     rowObject[col.key] = col.type === 'number' ? (isNaN(parseFloat(values[index])) ? null : parseFloat(values[index])) : values[index];
                 } else {
                     rowObject[col.key] = col.type === 'number' ? null : "";
@@ -326,12 +390,6 @@
             filteredData = filteredData.filter(item => bestTipsValues.includes(item["Match Analysis"]));
         }
         
-        if (activeTab === 'extrapolation') {
-            const extrapolationValues = ["Best Away Tip", "Best Home Tip", "Home Good Tip"];
-            filteredData = filteredData.filter(item => extrapolationValues.includes(item["Match Analysis"]));
-            lostMatches.clear(); 
-        }
-
         const searchTerm = filters.teamSearch.toLowerCase().trim();
         if (searchTerm) filteredData = filteredData.filter(item => item.Match.toLowerCase().includes(searchTerm));
         if (filters.league !== 'All') filteredData = filteredData.filter(item => item.League === filters.league);
@@ -339,266 +397,34 @@
         if (filters.matchDate !== 'All Dates') filteredData = filteredData.filter(item => item['Match Date'] === filters.matchDate);
         if (filters.homeOddsMin) filteredData = filteredData.filter(item => item['Home Odds'] >= filters.homeOddsMin);
 
-        // New Performance Stats Filters
-        const perfFilters = [
-            { key: 'Home Wins', val: filters.homeWins }, { key: 'Home Draws', val: filters.homeDraws }, { key: 'Home Losses', val: filters.homeLosses },
-            { key: 'Away Wins', val: filters.awayWins }, { key: 'Away Draws', val: filters.awayDraws }, { key: 'Away Losses', val: filters.awayLosses },
-            { key: 'Home Avg Scored', val: filters.homeAvgScored }, { key: 'Home Avg Conceded', val: filters.homeAvgConceded },
-            { key: 'Away Avg Scored', val: filters.awayAvgScored }, { key: 'Away Avg Conceded', val: filters.awayAvgConceded },
+        const rangeFilters = [
+            { key: 'homeWins', dataKey: 'Home Wins' }, { key: 'homeDraws', dataKey: 'Home Draws' }, { key: 'homeLosses', dataKey: 'Home Losses' },
+            { key: 'awayWins', dataKey: 'Away Wins' }, { key: 'awayDraws', dataKey: 'Away Draws' }, { key: 'awayLosses', dataKey: 'Away Losses' },
+            { key: 'homeAvgScored', dataKey: 'Home Avg Scored' }, { key: 'homeAvgConceded', dataKey: 'Home Avg Conceded' },
+            { key: 'awayAvgScored', dataKey: 'Away Avg Scored' }, { key: 'awayAvgConceded', dataKey: 'Away Avg Conceded' },
+            { key: 'homeOdds', dataKey: 'Home Odds' }, { key: 'drawOdds', dataKey: 'Draw Odds' }, { key: 'awayOdds', dataKey: 'Away Odds' }
         ];
-        perfFilters.forEach(f => {
-            if (f.val !== null && f.val !== undefined) {
-                filteredData = filteredData.filter(item => (item[f.key] || 0) >= f.val);
+        rangeFilters.forEach(f => {
+            const range = filters[f.key];
+            if (range) {
+                if (range.min !== null) filteredData = filteredData.filter(item => (item[f.dataKey] || 0) >= range.min);
+                if (range.max !== null) filteredData = filteredData.filter(item => (item[f.dataKey] || 0) <= range.max);
             }
         });
         
-        // Extrapolation Logic
-        if (activeTab === 'extrapolation') {
-            filteredData.forEach(item => {
-                const prediction = (item.Prediction || '').toLowerCase();
-                const outcome = (item.Outcome || '').toLowerCase();
-                let isLoss = true;
-                if (!outcome || outcome === 'n/a') isLoss = false;
-                if (prediction.includes('home') && outcome.includes('home')) isLoss = false;
-                if (prediction.includes('away') && outcome.includes('away')) isLoss = false;
-                if (prediction.includes('draw') && outcome.includes('draw')) isLoss = false;
-                if (isLoss) lostMatches.add(item.uniqueId);
-            });
-            filteredData.forEach(item => {
-                let oddsPrediction = null;
-                const prediction = (item.Prediction || '').toLowerCase();
-                if (prediction.includes('home')) oddsPrediction = item['Home Odds'];
-                else if (prediction.includes('away')) oddsPrediction = item['Away Odds'];
-                else if (prediction.includes('draw')) oddsPrediction = item['Draw Odds'];
-                item.oddsPrediction = oddsPrediction;
-                item.totalStake = item.Match ? 100 : 0;
-                const isLost = lostMatches.has(item.uniqueId);
-                if (isLost) {
-                    item.potentialWinning = 0;
-                    item.profit = -100;
-                } else {
-                    item.potentialWinning = oddsPrediction ? (oddsPrediction * 100) : 0;
-                    item.profit = item.potentialWinning - item.totalStake;
-                }
-            });
-        }
-
-        if (activeTab === 'dashboard') renderDashboard(filteredData);
-        else if (activeTab === 'favorites') { filteredFavorites = filteredData; renderFavorites(); }
-        else { currentData = filteredData; applySort(); }
+        currentData = filteredData;
+        if (activeTab === 'dashboard') renderDashboard(currentData);
+        else if (activeTab === 'favorites') { filteredFavorites = currentData; renderFavorites(); }
+        else { applySort(); }
     };
     
-    // ... (applySort, renderTableHead, renderPage, renderTableBody are similar but use new styles)
-     const renderStandardTable = (data) => {
-        const visibleCols = COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key));
-        data.forEach(item => {
-            const row = document.createElement("tr");
-            const itemJSON = encodeURIComponent(JSON.stringify(item));
-            row.className = `transition-all duration-200 even:bg-white odd:bg-gray-50 ${viewedRows.has(item.uniqueId) ? "viewed-row" : ""}`;
-            row.onclick = () => handleRowClick(item);
-
-            let rowHTML = `<td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.uniqueId}')" class="star-icon text-2xl cursor-pointer transition transform hover:scale-125 ${favorites.some(f => f.uniqueId === item.uniqueId) ? "text-yellow-400" : "text-gray-300"}">${favorites.some(f => f.uniqueId === item.uniqueId) ? '⭐' : '☆'}</span></td>`;
-            const viewButtonHTML = `<td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-primary-blue text-white rounded-full hover:bg-primary-purple interactive-glow">View</button></td>`;
-
-            visibleCols.forEach(col => {
-                const value = item[col.key] || "N/A";
-                if (col.key === 'Outcome') {
-                    const [bgColor, text, isWin] = getOutcomeColor(item.Prediction, value);
-                    rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm"><span class="px-3 py-1 text-xs font-bold rounded-full text-white ${bgColor} shadow-md ${isWin ? 'glow-win' : ''}">${text}</span></td>`;
-                } else {
-                    rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${value}</td>`;
-                }
-                if (col.key === 'Match Date') {
-                    rowHTML += viewButtonHTML;
-                }
-            });
-            row.innerHTML = rowHTML;
-            dom.tableBody.appendChild(row);
-        });
-    };
-
-    const getOutcomeColor = (prediction, outcome) => {
-        if (!prediction || !outcome || outcome === "N/A" || outcome.trim() === '') return ["bg-gray-400", "Pending", false];
-        const p = prediction.toLowerCase(), o = outcome.toLowerCase();
-        if ((p.includes("home") && o.includes("home")) || (p.includes("away") && o.includes("away")) || (p.includes("draw") && o.includes("draw"))) {
-            return ["bg-accent-green", outcome, true]; // New green
-        }
-        return ["bg-red-500", outcome, false]; // Standard red
-    };
-
-    window.handleTabClick = (tab, element) => {
-        activeTab = tab;
-        dom.summaryContainer.classList.remove('active');
-        dom.favoritesSummaryContainer.classList.remove('active');
-        
-        // Update tab UI
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        element.classList.add('active');
-        
-        // Slide underline
-        const container = document.getElementById('nav-tabs');
-        const containerRect = container.getBoundingClientRect();
-        const elRect = element.getBoundingClientRect();
-        dom.navUnderline.style.width = `${elRect.width}px`;
-        dom.navUnderline.style.left = `${elRect.left - containerRect.left}px`;
-        
-        updateUiForTab();
-    };
-
-    const updateUiForTab = () => {
-        const isDashboard = activeTab === 'dashboard', isFavorites = activeTab === 'favorites';
-        dom.dashboardContent.classList.toggle('hidden', !isDashboard);
-        dom.favoritesContent.classList.toggle('hidden', !isFavorites);
-        dom.mainContent.classList.toggle('hidden', isDashboard || isFavorites);
-        dom.filtersPanel.classList.toggle('hidden', isDashboard);
-        applyFilters();
-    };
-
-    window.handleAdvancedFilterChange = () => {
-        const getVal = (id) => {
-            const val = document.getElementById(id).value;
-            return val ? parseFloat(val) : null;
-        }
-        // New performance filters
-        filters.homeWins = getVal('adv-home-wins');
-        filters.homeDraws = getVal('adv-home-draws');
-        filters.homeLosses = getVal('adv-home-losses');
-        filters.awayWins = getVal('adv-away-wins');
-        filters.awayDraws = getVal('adv-away-draws');
-        filters.awayLosses = getVal('adv-away-losses');
-        filters.homeAvgScored = getVal('adv-home-avg-scored');
-        filters.homeAvgConceded = getVal('adv-home-avg-conceded');
-        filters.awayAvgScored = getVal('adv-away-avg-scored');
-        filters.awayAvgConceded = getVal('adv-away-avg-conceded');
-        
-        hideFilterModal();
-        applyFilters();
-    };
-    
-    window.clearFilters = () => {
-        filters = { ...initialFilters };
-        // Clear main filters
-        document.getElementById("filter-league").value = 'All';
-        document.getElementById("filter-prediction").value = 'All';
-        document.getElementById("team-search-input").value = '';
-        document.getElementById("filter-date").value = 'All Dates';
-        document.getElementById("filter-home-odds").value = '';
-        
-        // Clear advanced filters from modal
-        const advancedInputs = document.querySelectorAll('#more-filters-modal input');
-        advancedInputs.forEach(input => input.value = '');
-        
-        applyFilters();
-    };
-
-    document.addEventListener('DOMContentLoaded', async () => {
-        dom.loading.classList.remove('hidden');
-        try {
-            const response = await fetch(CSV_URL);
-            if (!response.ok) throw new Error('Network response was not ok');
-            const csvText = await response.text();
-            allData = parseCSV(csvText);
-
-            const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-            favorites = allData.filter(item => savedFavorites.includes(item.uniqueId));
-
-            buildAdvancedFiltersModal();
-            populateFilterDropdowns();
-            
-            // Set initial tab state
-            const initialTab = document.getElementById('tab-dashboard');
-            if (initialTab) {
-                handleTabClick('dashboard', initialTab);
-            } else {
-                updateUiForTab();
-            }
-
-        } catch (error) {
-            console.error('Failed to load or parse data:', error);
-            dom.mainContent.innerHTML = `<p class="text-center text-red-500">Error loading data. Please try again later.</p>`;
-        } finally {
-            dom.loading.classList.add('hidden');
-        }
-    });
-
-    // Remainder of JS functions (like renderDashboard, downloadFavoritesPDF, etc.) are largely unchanged
-    // but would benefit from using the new color scheme in their chart/UI generation.
-    // ... (renderTableHead, renderPage, renderTableBody, handleRowClick, etc. from original script)
-    // Here is the new buildAdvancedFiltersModal function
-    const buildAdvancedFiltersModal = () => {
-        const createInput = (id, label) => `
-            <div>
-                <label for="${id}" class="block text-sm font-medium text-gray-700">${label}</label>
-                <input type="number" id="${id}" name="${id}" placeholder="Min Value" class="mt-1 block w-full bg-white p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-blue focus:border-primary-blue sm:text-sm">
-            </div>`;
-
-        dom.filtersModal.innerHTML = `
-            <div class="modal-content bg-white w-full max-w-3xl mx-4 p-8 rounded-xl shadow-2xl relative" onclick="event.stopPropagation()">
-                <button onclick="hideFilterModal(event)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                <h3 class="text-2xl font-bold text-dark-navy mb-6">Performance Stats Filters</h3>
-                <p class="text-sm text-gray-500 mb-6">Set minimum values for team performance statistics to refine your results.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                    <!-- Column 1 -->
-                    <div class="space-y-4 p-4 border-r border-gray-200">
-                        <h4 class="font-semibold text-gray-800 border-b pb-2">Home Team Stats</h4>
-                        ${createInput('adv-home-wins', 'Home Wins')}
-                        ${createInput('adv-home-draws', 'Home Draws')}
-                        ${createInput('adv-home-losses', 'Home Losses')}
-                        ${createInput('adv-home-avg-scored', 'Home Avg Scored')}
-                        ${createInput('adv-home-avg-conceded', 'Home Avg Conceded')}
-                    </div>
-                    <!-- Column 2 -->
-                    <div class="space-y-4 p-4">
-                        <h4 class="font-semibold text-gray-800 border-b pb-2">Away Team Stats</h4>
-                        ${createInput('adv-away-wins', 'Away Wins')}
-                        ${createInput('adv-away-draws', 'Away Draws')}
-                        ${createInput('adv-away-losses', 'Away Losses')}
-                        ${createInput('adv-away-avg-scored', 'Away Avg Scored')}
-                        ${createInput('adv-away-avg-conceded', 'Away Avg Conceded')}
-                    </div>
-                </div>
-                <div class="mt-8 text-right">
-                    <button onclick="handleAdvancedFilterChange()" class="px-6 py-3 bg-gradient-to-r from-primary-blue to-primary-purple text-white font-bold rounded-lg shadow-md hover:shadow-lg hover:shadow-primary-blue/50 transition interactive-glow">Apply Filters</button>
-                </div>
-            </div>`;
-    };
-    
-    // Paste in the rest of the unmodified JS functions from the original file here to ensure full functionality.
-    // For brevity, I'm omitting functions that don't need direct changes for this UI overhaul request,
-    // like applySort, renderTableHead, renderPage, renderExtrapolationTable, updateTotals,
-    // handleSort, handlePrevPage, handleNextPage, handleLossToggle, showDetailsModal,
-    // renderSummaryTable, hideDetailsModal, showFilterModal, hideFilterModal, toggleFavorite,
-    // populateFilterDropdowns, renderDashboard, downloadFavoritesPDF.
-    // They will work as is but will adopt the new styles automatically.
-    
-    // --- (Paste remaining JS functions here) ---
-     window.handleSort = (key) => { sortColumn === key ? sortDirection = (sortDirection === 'asc' ? 'desc' : 'asc') : (sortColumn = key, sortDirection = 'asc'); applySort(); };
-    window.handleFilterChange = () => {
-        filters.league = document.getElementById("filter-league").value; 
-        filters.prediction = document.getElementById("filter-prediction").value; 
-        filters.teamSearch = document.getElementById("team-search-input").value;
-        filters.matchDate = document.getElementById("filter-date").value;
-        filters.homeOddsMin = parseFloat(document.getElementById("filter-home-odds").value) || null;
-        applyFilters(); 
-    };
-    window.handlePrevPage = () => { if (currentPage > 1) { currentPage--; renderPage(); } };
-    window.handleNextPage = () => { if (currentPage < Math.ceil(currentData.length / rowsPerPage)) { currentPage++; renderPage(); } };
-    window.handleLossToggle = (uniqueId, isChecked) => {
-        const item = currentData.find(d => d.uniqueId === uniqueId);
-        if (!item) return;
-        if (isChecked) {
-            lostMatches.add(uniqueId);
-            item.potentialWinning = 0;
-            item.profit = -100;
-        } else {
-            lostMatches.delete(uniqueId);
-            item.potentialWinning = item.oddsPrediction ? (item.oddsPrediction * 100) : 0;
-            item.profit = item.potentialWinning - item.totalStake;
-        }
-        renderPage();
-    };
-     const applySort = () => {
+    // --- DATA RENDERING ---
+    const applySort = () => {
         currentData.sort((a, b) => {
+            const isAPinned = pinnedMatches.includes(a.uniqueId);
+            const isBPinned = pinnedMatches.includes(b.uniqueId);
+            if (isAPinned && !isBPinned) return -1;
+            if (!isAPinned && isBPinned) return 1;
             const valA = a[sortColumn], valB = b[sortColumn];
             if (sortColumn === 'Match Date') {
                  const dateA = new Date(valA.split('/').reverse().join('-'));
@@ -611,37 +437,17 @@
         renderTableHead();
         renderPage();
     };
-    const renderTableHead = () => {
-        let headHTML = '';
-        if (activeTab === 'extrapolation') {
-            const extrapolationCols = [
-                { key: 'Match Date', label: 'Date' }, { key: 'League', label: 'League' }, { key: 'Match', label: 'Match' }, { key: 'Prediction', label: 'Prediction' }, { key: 'Outcome', label: 'Outcome' }, { key: 'oddsPrediction', label: 'Odds'}, { key: 'totalStake', label: 'Stake'}, { key: 'potentialWinning', label: 'Potential Win'}, { key: 'profit', label: 'Profit'}, { key: 'isLoss', label: 'Loss?'}
-            ];
-            headHTML += '<th></th>';
-            extrapolationCols.forEach(col => {
-                if (col.key === 'isLoss') { headHTML += `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">${col.label}</th>`; } 
-                else { headHTML += `<th onclick="handleSort('${col.key}')" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"><div class="flex items-center">${col.label}${col.key === sortColumn ? `<svg class="w-4 h-4 ml-2 sort-icon ${sortDirection === 'desc' ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"></path></svg>` : ''}</div></th>`; }
-                if (col.key === 'Match Date') { headHTML += '<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Actions</th>'; }
-            });
-        } else {
-            const visibleCols = COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key));
-            headHTML += '<th></th>';
-            visibleCols.forEach(col => {
-                headHTML += `<th onclick="handleSort('${col.key}')" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"><div class="flex items-center">${col.label}${col.key === sortColumn ? `<svg class="w-4 h-4 ml-2 sort-icon ${sortDirection === 'desc' ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"></path></svg>` : ''}</div></th>`;
-                if (col.key === 'Match Date') { headHTML += '<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Actions</th>'; }
-            });
-        }
-        dom.tableHeadRow.innerHTML = headHTML;
-    };
+
     const renderPage = () => {
         const totalPages = Math.ceil(currentData.length / rowsPerPage);
         const start = (currentPage - 1) * rowsPerPage;
         renderTableBody(currentData.slice(start, start + rowsPerPage));
-        dom.pagination.innerHTML = currentData.length > rowsPerPage ? `<button onclick="handlePrevPage()" class="px-4 py-2 text-sm font-medium rounded-full bg-white shadow interactive-glow" ${currentPage === 1 ? 'disabled' : ''}>Prev</button><span class="text-sm font-semibold">Page ${currentPage} of ${totalPages}</span><button onclick="handleNextPage()" class="px-4 py-2 text-sm font-medium rounded-full bg-white shadow interactive-glow" ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}>Next</button>` : "";
+        dom.pagination.innerHTML = currentData.length > rowsPerPage ? `<button onclick="handlePrevPage()" class="px-4 py-2 text-sm font-medium rounded-full bg-panel-bg dark:bg-dark-panel-bg shadow interactive-glow" ${currentPage === 1 ? 'disabled' : ''}>Prev</button><span class="text-sm font-semibold">Page ${currentPage} of ${totalPages}</span><button onclick="handleNextPage()" class="px-4 py-2 text-sm font-medium rounded-full bg-panel-bg dark:bg-dark-panel-bg shadow interactive-glow" ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}>Next</button>` : "";
         dom.pagination.classList.toggle('hidden', currentData.length <= rowsPerPage);
         dom.tableFooter.classList.toggle('hidden', activeTab !== 'extrapolation');
         if (activeTab === 'extrapolation') updateTotals();
     };
+
     const renderTableBody = (data) => {
         dom.tableBody.innerHTML = "";
         if (data.length === 0) {
@@ -653,103 +459,211 @@
         if (activeTab === 'extrapolation') { renderExtrapolationTable(data); } 
         else { renderStandardTable(data); }
     };
-    const renderExtrapolationTable = (data) => {
+
+    const renderTableHead = () => {
+        if (activeTab === 'extrapolation') {
+            dom.tableHeadRow.innerHTML = `
+                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Date</th>
+                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Match</th>
+                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Prediction</th>
+                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Odds</th>
+                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Stake</th>
+                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Potential Win</th>
+                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Profit</th>
+                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Loss</th>
+            `;
+            return;
+        }
+        
+        let headHTML = '';
+        const baseCols = COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key));
+        const sortableHeader = (key, label) => `<th onclick="handleSort('${key}')" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"><div class="flex items-center">${label}${key === sortColumn ? `<svg class="w-4 h-4 ml-2 sort-icon ${sortDirection === 'desc' ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"></path></svg>` : ''}</div></th>`;
+        
+        headHTML += '<th class="w-10"></th><th class="w-10"></th>'; // Pin & Star
+        baseCols.forEach(col => {
+            headHTML += sortableHeader(col.key, col.label);
+        });
+        dom.tableHeadRow.innerHTML = headHTML;
+    };
+
+    const renderStandardTable = (data) => {
+        const visibleCols = COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key));
+        dom.tableBody.innerHTML = "";
         data.forEach(item => {
             const row = document.createElement("tr");
             const itemJSON = encodeURIComponent(JSON.stringify(item));
-            row.className = `transition-all duration-200 even:bg-white odd:bg-gray-50 ${viewedRows.has(item.uniqueId) ? "viewed-row" : ""}`;
-            row.onclick = () => handleRowClick(item);
+            const isPinned = pinnedMatches.includes(item.uniqueId);
+            row.className = `transition-all duration-200 even:bg-panel-bg odd:bg-gray-50 dark:even:bg-dark-panel-bg dark:odd:bg-gray-800/50 table-row-hover ${viewedRows.has(item.uniqueId) ? "viewed-row" : ""} ${isPinned ? 'pinned-row' : ''}`;
+            
+            row.addEventListener('dblclick', () => showDetailsModal(item));
+            row.addEventListener('mouseenter', (e) => showQuickStats(e, item));
+            row.addEventListener('mouseleave', hideQuickStats);
+            row.addEventListener('mousemove', moveQuickStats);
+
             const isFavorited = favorites.some(f => f.uniqueId === item.uniqueId);
-            const isLost = lostMatches.has(item.uniqueId);
-            row.innerHTML = `<td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.uniqueId}')" class="star-icon text-2xl cursor-pointer transition transform hover:scale-125 ${isFavorited ? "text-yellow-400" : "text-gray-300"}">${isFavorited ? '⭐' : '☆'}</span></td> <td class="px-4 py-3 whitespace-nowrap text-sm">${item['Match Date'] || 'N/A'}</td> <td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-primary-blue text-white rounded-full hover:bg-primary-purple interactive-glow">View</button></td> <td class="px-4 py-3 whitespace-nowrap text-sm">${item.League || 'N/A'}</td> <td class="px-4 py-3 whitespace-nowrap text-sm">${item.Match || 'N/A'}</td> <td class="px-4 py-3 whitespace-nowrap text-sm">${item.Prediction || 'N/A'}</td> <td class="px-4 py-3 whitespace-nowrap text-sm">${item.Outcome || 'N/A'}</td> <td class="px-4 py-3 whitespace-nowrap text-sm font-bold">${(item.oddsPrediction && typeof item.oddsPrediction === 'number') ? item.oddsPrediction.toFixed(2) : 'N/A'}</td> <td class="px-4 py-3 whitespace-nowrap text-sm font-bold">${(item.totalStake || 0).toFixed(2)}</td> <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-accent-green">${(item.potentialWinning || 0).toFixed(2)}</td> <td class="px-4 py-3 whitespace-nowrap text-sm font-bold ${item.profit >= 0 ? 'text-green-600' : 'text-red-500'}">${(item.profit || 0).toFixed(2)}</td> <td class="px-4 py-3 whitespace-nowrap text-sm text-center"> <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-red-600 focus:ring-red-500" ${isLost ? 'checked' : ''} onclick="event.stopPropagation(); handleLossToggle('${item.uniqueId}', this.checked)"> </td>`;
+
+            let rowHTML = `
+                <td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); togglePin('${item.uniqueId}')" class="text-xl cursor-pointer transition transform hover:scale-125 ${isPinned ? 'text-accent-orange' : 'text-gray-300 dark:text-gray-600'}">${ICONS.pin}</span></td>
+                <td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.uniqueId}')" class="text-2xl cursor-pointer transition transform hover:scale-125 ${isFavorited ? "text-yellow-400" : "text-gray-300 dark:text-gray-600"}">${isFavorited ? ICONS.star : ICONS.starOutline}</span></td>`;
+            
+            visibleCols.forEach(col => {
+                const value = item[col.key] || "N/A";
+                if (col.key === 'Outcome') {
+                    const [bgColor, text, isWin] = getOutcomeColor(item.Prediction, value);
+                    rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm"><span class="px-3 py-1 text-xs font-bold rounded-full text-white ${bgColor} shadow-md ${isWin ? 'glow-win' : ''}">${text}</span></td>`;
+                } else if (col.key === 'Match') {
+                    rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-text-primary dark:text-dark-text-primary">${getLeagueLogo(item.League)} ${value}</td>`;
+                } else {
+                    rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm text-text-secondary dark:text-dark-text-secondary">${value}</td>`;
+                }
+            });
+            
+            row.innerHTML = rowHTML;
             dom.tableBody.appendChild(row);
         });
     };
-    const updateTotals = () => {
-        const totals = currentData.reduce((acc, item) => {
-            acc.stake += item.totalStake || 0;
-            acc.potentialWinning += item.potentialWinning || 0;
-            acc.profit += item.profit || 0;
-            return acc;
-        }, { stake: 0, potentialWinning: 0, profit: 0 });
-        dom.tableFooter.innerHTML = `<tr><td colspan="8" class="px-4 py-4 text-right font-bold text-lg text-dark-navy">Totals:</td><td class="px-4 py-4 font-extrabold text-lg text-gray-700">${totals.stake.toFixed(2)}</td><td class="px-4 py-4 font-extrabold text-lg text-accent-green">${totals.potentialWinning.toFixed(2)}</td><td class="px-4 py-4 font-extrabold text-lg ${totals.profit >= 0 ? 'text-green-600' : 'text-red-500'}">${totals.profit.toFixed(2)}</td><td></td></tr>`;
+
+    const getOutcomeColor = (prediction, outcome) => {
+        if (!prediction || !outcome || outcome === "N/A" || outcome.trim() === '') return ["bg-gray-400", "Pending", false];
+        const p = prediction.toLowerCase(), o = outcome.toLowerCase();
+        if ((p.includes("home") && o.includes("home")) || (p.includes("away") && o.includes("away")) || (p.includes("draw") && o.includes("draw"))) {
+            return ["bg-accent-green", outcome, true];
+        }
+        return ["bg-red-500", outcome, false];
     };
-     const renderFavorites = () => {
+    
+    // --- NEWLY ADDED/FIXED FUNCTIONS ---
+    const renderExtrapolationTable = (data) => {
+        dom.tableBody.innerHTML = "";
+        data.forEach(item => {
+            const row = document.createElement("tr");
+            const isPinned = pinnedMatches.includes(item.uniqueId);
+            row.className = `transition-colors duration-200 even:bg-panel-bg odd:bg-gray-50 dark:even:bg-dark-panel-bg dark:odd:bg-gray-800/50 ${isPinned ? 'pinned-row' : ''}`;
+            
+            const prediction = item.Prediction || '';
+            let odds = 0;
+            if (prediction.toLowerCase().includes('home')) odds = item['Home Odds'];
+            else if (prediction.toLowerCase().includes('away')) odds = item['Away Odds'];
+            else if (prediction.toLowerCase().includes('draw')) odds = item['Draw Odds'];
+            
+            const stake = 100;
+            let potentialWin = stake * odds;
+            let profit = potentialWin - stake;
+            
+            const outcome = item.Outcome || 'N/A';
+            let isLoss = false;
+            if (outcome !== 'N/A') {
+                isLoss = !((prediction.toLowerCase().includes('home') && outcome.toLowerCase().includes('home')) ||
+                         (prediction.toLowerCase().includes('away') && outcome.toLowerCase().includes('away')) ||
+                         (prediction.toLowerCase().includes('draw') && outcome.toLowerCase().includes('draw')));
+            }
+
+            if (isLoss) {
+                potentialWin = 0;
+                profit = -100;
+            }
+
+            row.innerHTML = `
+                <td class="px-4 py-3 text-sm">${item['Match Date']}</td>
+                <td class="px-4 py-3 text-sm font-semibold">${item.Match}</td>
+                <td class="px-4 py-3 text-sm">${item.Prediction}</td>
+                <td class="px-4 py-3 text-sm">${odds || 'N/A'}</td>
+                <td class="px-4 py-3 text-sm font-bold text-blue-600 dark:text-blue-400">€${stake.toFixed(2)}</td>
+                <td class="px-4 py-3 text-sm font-bold text-green-600 dark:text-green-400">€${potentialWin.toFixed(2)}</td>
+                <td class="px-4 py-3 text-sm font-bold ${profit >= 0 ? 'text-accent-green' : 'text-red-500'}">€${profit.toFixed(2)}</td>
+                <td class="px-4 py-3 text-center"><input type="checkbox" ${isLoss ? 'checked' : ''} onchange="handleLossChange(this, '${item.uniqueId}')"></td>
+            `;
+            dom.tableBody.appendChild(row);
+        });
+    };
+    
+    const updateTotals = () => {
+        const footerRow = dom.tableFooter.querySelector('tr') || dom.tableFooter.appendChild(document.createElement('tr'));
+        const totalStake = currentData.length * 100;
+        
+        const { totalProfit, totalPotentialWin } = currentData.reduce((acc, item) => {
+            const prediction = item.Prediction || '';
+            let odds = 0;
+            if (prediction.toLowerCase().includes('home')) odds = item['Home Odds'];
+            else if (prediction.toLowerCase().includes('away')) odds = item['Away Odds'];
+            else if (prediction.toLowerCase().includes('draw')) odds = item['Draw Odds'];
+            
+            const stake = 100;
+            const potentialWin = stake * odds;
+            
+            const outcome = item.Outcome || 'N/A';
+            let isLoss = lostMatches.has(item.uniqueId);
+
+            if (!lostMatches.has(item.uniqueId) && outcome !== 'N/A') {
+                 isLoss = !((prediction.toLowerCase().includes('home') && outcome.toLowerCase().includes('home')) ||
+                         (prediction.toLowerCase().includes('away') && outcome.toLowerCase().includes('away')) ||
+                         (prediction.toLowerCase().includes('draw') && outcome.toLowerCase().includes('draw')));
+            }
+
+            if(isLoss) {
+                acc.totalProfit -= 100;
+            } else {
+                acc.totalProfit += (potentialWin - stake);
+                acc.totalPotentialWin += potentialWin;
+            }
+
+            return acc;
+        }, { totalProfit: 0, totalPotentialWin: 0 });
+
+        footerRow.className = "font-extrabold text-text-primary dark:text-dark-text-primary text-sm";
+        footerRow.innerHTML = `
+            <td colspan="4" class="px-4 py-3 text-right">Totals:</td>
+            <td class="px-4 py-3 text-blue-600 dark:text-blue-400">€${totalStake.toFixed(2)}</td>
+            <td class="px-4 py-3 text-green-600 dark:text-green-400">€${totalPotentialWin.toFixed(2)}</td>
+            <td class="px-4 py-3 ${totalProfit >= 0 ? 'text-accent-green' : 'text-red-500'}">€${totalProfit.toFixed(2)}</td>
+            <td></td>
+        `;
+    };
+
+    window.handleLossChange = (checkbox, uniqueId) => {
+        if (checkbox.checked) {
+            lostMatches.add(uniqueId);
+        } else {
+            lostMatches.delete(uniqueId);
+        }
+        updateTotals();
+    };
+    
+    const renderFavorites = () => {
         const container = document.getElementById('favorites-table-container');
         if (filteredFavorites.length === 0) {
-            container.innerHTML = `<div class="p-8 text-center"><p class="text-lg font-semibold text-dark-navy">You haven't favorited any matches yet.</p></div>`;
+            container.innerHTML = `<p class="text-center p-8 text-text-secondary dark:text-dark-text-secondary">You haven't added any matches to your favorites yet. Click the star icon (☆) on any match to add it.</p>`;
             return;
         }
-        const headers = ['Date', 'League', 'Match', 'Prediction', 'Outcome', 'Result', 'Score'];
-        const keys = ['Match Date', 'League', 'Match', 'Prediction', 'Outcome', 'Result', 'Correct Score'];
-        let tableHTML = `<table id="favorites-table" class="min-w-full"><thead class="sticky top-0 z-10"><tr><th></th>`;
-        headers.forEach(h => { tableHTML += `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">${h}</th>`; if (h === 'Date') { tableHTML += `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Actions</th>`; }});
-        tableHTML += `</tr></thead><tbody class="divide-y divide-gray-200/50">`;
+        const visibleCols = COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key));
+        let tableHTML = `<table class="min-w-full"><thead class="bg-filter-panel-bg dark:bg-dark-filter-panel-bg"><tr>`;
+        visibleCols.forEach(col => {
+            tableHTML += `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">${col.label}</th>`;
+        });
+        tableHTML += `<th></th></tr></thead><tbody class="divide-y divide-gray-200/50 dark:divide-gray-700">`;
         filteredFavorites.forEach(item => {
             const itemJSON = encodeURIComponent(JSON.stringify(item));
-            const viewButtonHTML = `<td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-primary-blue text-white rounded-full hover:bg-primary-purple interactive-glow">View</button></td>`;
-            tableHTML += `<tr class="transition-all duration-200 even:bg-white odd:bg-gray-50" onclick="handleRowClick(item, true)"><td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.uniqueId}')" class="star-icon text-2xl text-yellow-400 cursor-pointer">⭐</span></td>`;
-            keys.forEach(key => {
-                const value = item[key] || "N/A";
-                if (key === 'Outcome') { const [bgColor, text, isWin] = getOutcomeColor(item.Prediction, value); tableHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm"><span class="px-3 py-1 text-xs font-bold rounded-full text-white ${bgColor} shadow-md ${isWin ? 'glow-win' : ''}">${text}</span></td>`; } 
-                else { tableHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm">${value}</td>`; }
-                if (key === 'Match Date') { tableHTML += viewButtonHTML; }
+            tableHTML += `<tr class="transition-colors duration-200 even:bg-panel-bg odd:bg-gray-50 dark:even:bg-dark-panel-bg dark:odd:bg-gray-800/50" ondblclick="showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))">`;
+            visibleCols.forEach(col => {
+                const value = item[col.key] || "N/A";
+                if (col.key === 'Outcome') {
+                    const [bgColor, text, isWin] = getOutcomeColor(item.Prediction, value);
+                    tableHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm"><span class="px-2 py-1 text-xs font-bold rounded-full text-white ${bgColor} ${isWin ? 'glow-win' : ''}">${text}</span></td>`;
+                } else if (col.key === 'Match') {
+                    tableHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm font-semibold">${getLeagueLogo(item.League)} ${value}</td>`;
+                } else {
+                    tableHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm text-text-secondary dark:text-dark-text-secondary">${value}</td>`;
+                }
             });
             tableHTML += `</tr>`;
         });
         tableHTML += `</tbody></table>`;
         container.innerHTML = tableHTML;
     };
-    const handleRowClick = (item) => {
-        viewedRows.add(item.uniqueId);
-        renderSummaryTable(item);
-        if (['all', 'best', 'favorites', 'extrapolation'].includes(activeTab)) {
-            const tableToUpdate = document.querySelector(`[onclick*="${item.uniqueId}"]`).closest('tr');
-            if(tableToUpdate) tableToUpdate.classList.add('viewed-row');
-        }
-    };
-    window.showDetailsModal = (item) => {
-        const isFavorited = favorites.some(f => f.uniqueId === item.uniqueId);
-        const formatInt = (val) => val !== null && !isNaN(val) ? Math.round(val) : "N/A";
-        const formatAvg = (val) => val !== null && !isNaN(val) ? val.toFixed(2) : "N/A";
-        const statRow = (category, homeVal, awayVal) => `<div class="grid grid-cols-3 gap-4 text-sm items-center py-2"><div class="text-right font-semibold">${homeVal}</div><div class="text-center text-dark-navy/80 font-medium">${category}</div><div class="text-left font-semibold">${awayVal}</div></div>`;
-        const analysisBlock = (title, content) => content ? `<div class="mt-4"><h4 class="font-bold text-center mb-2">${title}</h4><p class="text-xs text-center bg-black/5 p-3 rounded-md">${content}</p></div>` : '';
-        dom.detailsModal.innerHTML = `<div class="modal-content bg-filter-panel-bg w-full max-w-lg mx-4 rounded-xl shadow-2xl text-dark-navy relative"><button onclick="hideDetailsModal()" class="absolute top-3 right-3 text-dark-navy/50 hover:text-dark-navy hover:bg-black/10 rounded-full p-2 transition z-10"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button><div class="p-6"><div class="flex justify-between items-start mb-4"><div class="flex-grow"><h3 class="text-2xl font-extrabold text-center">${item.Match}</h3><p class="text-center text-sm font-medium text-dark-navy/80">${item.League} - ${item['Match Date']}</p></div><button onclick="toggleFavorite('${item.uniqueId}', true)" class="text-3xl transition-transform duration-200 hover:scale-125 -mt-1 ml-4">${isFavorited ? '⭐' : '☆'}</button></div><div class="bg-white/50 p-4 rounded-lg"><div class="grid grid-cols-3 gap-4 text-sm font-bold text-dark-navy/80 mb-2 border-b-2 border-dark-navy/10 pb-2"><div class="text-right">${item['Home Team']}</div><div class="text-center">Stats</div><div class="text-left">${item['Away Team']}</div></div><div class="divide-y divide-dark-navy/10">${statRow('Wins', formatInt(item['Home Wins']), formatInt(item['Away Wins']))}${statRow('Draws', formatInt(item['Home Draws']), formatInt(item['Away Draws']))}${statRow('Losses', formatInt(item['Home Losses']), formatInt(item['Away Losses']))}${statRow('Avg Scored', formatAvg(item['Home Avg Scored']), formatAvg(item['Away Avg Scored']))}${statRow('Avg Conceded', formatAvg(item['Home Avg Conceded']), formatAvg(item['Away Avg Conceded']))}</div>${analysisBlock('Match Analysis', item['Match Analysis'])}${analysisBlock('Goals Analysis', item['Goals Analysis'])}</div></div></div>`;
-        dom.detailsModal.classList.add('active');
-        setTimeout(() => document.querySelector('#details-modal .modal-content').classList.add('active'), 10);
-    };
-    const renderSummaryTable = (item) => {
-        const container = activeTab === 'favorites' ? dom.favoritesSummaryContainer : dom.summaryContainer;
-        const contentEl = activeTab === 'favorites' ? dom.favoritesSummaryContent : dom.summaryContent;
-        const summaryItem = (category, value) => value ? `<div class="p-4 bg-white/50 rounded-lg text-center"><p class="text-xs font-bold text-dark-navy/70 mt-1">${category}</p><p class="text-lg font-extrabold text-dark-navy mt-1">${value}</p></div>` : '';
-        const analysisItem = (category, value) => value ? `<div class="p-4 bg-white/50 rounded-lg col-span-1 md:col-span-2"><p class="text-sm font-bold text-dark-navy/70">${category}</p><p class="text-sm text-dark-navy mt-1">${value}</p></div>` : '';
-        const oddsValue = `1: ${item['Home Odds']} | X: ${item['Draw Odds']} | 2: ${item['Away Odds']}`;
-        contentEl.innerHTML = `<h3 class="text-2xl font-extrabold text-dark-navy text-center mb-4">${item.Match} - Summary</h3><div class="grid grid-cols-2 md:grid-cols-4 gap-4">${summaryItem('Prediction', item.Prediction)}${summaryItem('Outcome', item.Outcome)}${summaryItem('Result', item.Result)}${summaryItem('Correct Score', item['Correct Score'])}${summaryItem('Odds', oddsValue)}${summaryItem('Stake', item.Stake)}${analysisItem('Match Analysis', item['Match Analysis'])}${analysisItem('Goals Analysis', item['Goals Analysis'])}</div>`;
-        container.classList.add('active');
-    };
-    window.hideDetailsModal = (event) => { if (event && event.target !== dom.detailsModal && !event.target.closest('button[onclick^="hideDetailsModal"]')) return; const content = document.querySelector('#details-modal .modal-content'); if (content) content.classList.remove('active'); dom.detailsModal.classList.remove('active'); };
-    window.showFilterModal = () => { dom.filtersModal.classList.add('active'); setTimeout(() => document.querySelector('#more-filters-modal .modal-content').classList.add('active'), 10); };
-    window.hideFilterModal = (event) => { if (event && event.target !== dom.filtersModal && !event.target.closest('.modal-content')) return; const content = document.querySelector('#more-filters-modal .modal-content'); if (content) content.classList.remove('active'); dom.filtersModal.classList.remove('active'); };
-    window.toggleFavorite = (uniqueId, fromModal = false) => {
-        const matchIndex = favorites.findIndex(f => f.uniqueId === uniqueId);
-        if (matchIndex > -1) { favorites.splice(matchIndex, 1); } 
-        else { const matchToAdd = allData.find(d => d.uniqueId === uniqueId); if (matchToAdd) favorites.push(matchToAdd); }
-        localStorage.setItem('favorites', JSON.stringify(favorites.map(f => f.uniqueId)));
-        if (fromModal) { const matchData = allData.find(d => d.uniqueId === uniqueId); if (matchData) showDetailsModal(matchData); }
-        applyFilters();
-    };
-    const populateFilterDropdowns = () => {
-        const uniqueValues = (key) => [...new Set(allData.map(item => item[key]).filter(Boolean))].sort();
-        const populate = (id, options, defaultLabel) => {
-            const select = document.getElementById(id);
-            if(select) { select.innerHTML = `<option>${defaultLabel}</option>${options.map(o => `<option>${o}</option>`).join('')}`; }
-        };
-        populate('filter-league', uniqueValues('League'), 'All');
-        populate('filter-prediction', uniqueValues('Prediction'), 'All');
-        const dateOptions = ['All Dates', ...[...new Set(allData.map(item => item['Match Date']))].sort((a,b) => new Date(b.split('/').reverse().join('-')) - new Date(a.split('/').reverse().join('-')))];
-        document.getElementById('filter-date').innerHTML = dateOptions.map(o => `<option>${o}</option>`).join('');
-    };
+    
+    // --- FEATURE IMPLEMENTATIONS ---
     const renderDashboard = (data) => {
+        if (!document.getElementById('stat-win-rate')) return;
         const completed = data.filter(d => d.Outcome && d.Outcome !== 'N/A' && d.Outcome.trim() !== '');
         const totalCompleted = completed.length;
         const wins = completed.filter(d => getOutcomeColor(d.Prediction, d.Outcome)[2]).length;
@@ -760,19 +674,259 @@
         document.getElementById('stat-top-tip').textContent = topTip ? topTip.Match : 'N/A';
         const outcomeCounts = completed.reduce((acc, d) => { const outcomeText = getOutcomeColor(d.Prediction, d.Outcome)[2] ? 'Win' : 'Loss'; acc[outcomeText] = (acc[outcomeText] || 0) + 1; return acc; }, {});
         if (outcomeChart) outcomeChart.destroy();
-        outcomeChart = new Chart(document.getElementById('outcome-pie-chart').getContext('2d'), { type: 'pie', data: { labels: Object.keys(outcomeCounts), datasets: [{ data: Object.values(outcomeCounts), backgroundColor: ['#00c853', '#ef4444'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+        const isDark = dom.html.classList.contains('dark');
+        const chartTextColor = isDark ? 'white' : 'black';
+        outcomeChart = new Chart(document.getElementById('outcome-pie-chart').getContext('2d'), { type: 'pie', data: { labels: Object.keys(outcomeCounts), datasets: [{ data: Object.values(outcomeCounts), backgroundColor: ['#00c853', '#ef4444'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: chartTextColor } } } } });
         const predictionCounts = data.reduce((acc, d) => { acc[d.Prediction] = (acc[d.Prediction] || 0) + 1; return acc; }, {});
         if (predictionChart) predictionChart.destroy();
-        predictionChart = new Chart(document.getElementById('prediction-bar-chart').getContext('2d'), { type: 'bar', data: { labels: Object.keys(predictionCounts), datasets: [{ label: 'Prediction Count', data: Object.values(predictionCounts), backgroundColor: '#0a0a2a' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
+        predictionChart = new Chart(document.getElementById('prediction-bar-chart').getContext('2d'), { type: 'bar', data: { labels: Object.keys(predictionCounts), datasets: [{ label: 'Prediction Count', data: Object.values(predictionCounts), backgroundColor: '#0a0a2a' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: chartTextColor } }, y: { ticks: { color: chartTextColor, beginAtZero: true } } }, plugins: { legend: { labels: { color: chartTextColor } } } } });
     };
-    window.downloadFavoritesPDF = () => {
-        if (filteredFavorites.length === 0) { showDetailsModal({Match: "No Favorites", League: "Please add some favorite matches before downloading."}); return; }
-        const doc = new jsPDF();
-        doc.text("My Favorite Matches", 14, 16);
-        doc.autoTable({ startY: 20, head: [['Date', 'Match', 'Prediction', 'Outcome', 'Result']], body: filteredFavorites.map(fav => [fav['Match Date'], fav.Match, fav.Prediction, fav.Outcome, fav.Result]), });
-        doc.save('DataCompass360_Favorites.pdf');
+
+    window.togglePin = (uniqueId) => {
+        const index = pinnedMatches.indexOf(uniqueId);
+        if (index > -1) pinnedMatches.splice(index, 1);
+        else pinnedMatches.push(uniqueId);
+        localStorage.setItem('pinnedMatches', JSON.stringify(pinnedMatches));
+        applySort();
+    };
+
+    const showQuickStats = (event, item) => {
+        dom.tooltip.style.display = 'block';
+        const forms = ['W', 'D', 'L', 'W', 'W'].map(f => `<span class="px-2 py-1 rounded text-xs ${f==='W'?'bg-green-500':f==='D'?'bg-gray-500':'bg-red-500'}">${f}</span>`).join(' ');
+        dom.tooltip.innerHTML = `<strong>Last 5:</strong><div class="flex space-x-1 mt-1">${forms}</div>`;
+        setTimeout(() => dom.tooltip.style.opacity = 1, 10);
+        moveQuickStats(event);
+    };
+    const hideQuickStats = () => { dom.tooltip.style.opacity = 0; setTimeout(() => dom.tooltip.style.display = 'none', 300); };
+    const moveQuickStats = (event) => { dom.tooltip.style.left = `${event.pageX + 15}px`; dom.tooltip.style.top = `${event.pageY + 15}px`; };
+
+    window.showDetailsModal = (item) => {
+        const homeTeam = item['Home Team'] || 'Home';
+        const awayTeam = item['Away Team'] || 'Away';
+        const isFavorited = favorites.some(f => f.uniqueId === item.uniqueId);
+
+        const modalContentHTML = `
+            <div class="modal-content bg-[#eef6fb] dark:bg-dark-panel-bg w-full max-w-4xl mx-4 rounded-xl shadow-2xl text-text-primary dark:text-dark-text-primary relative" onclick="event.stopPropagation()">
+                <button onclick="hideDetailsModal(event)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 dark:hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <button onclick="toggleFavorite('${item.uniqueId}'); showDetailsModal(allData.find(d => d.uniqueId === '${item.uniqueId}'));" class="absolute top-4 right-12 text-2xl ${isFavorited ? 'text-yellow-400' : 'text-gray-400'}">
+                    ${isFavorited ? ICONS.star : ICONS.starOutline}
+                </button>
+
+                <div class="p-8">
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-center border-b-2 border-primary-blue pb-2 mb-4">${homeTeam} (Home)</h3>
+                            <div class="space-y-3">
+                                <h4 class="font-bold text-lg mb-2 flex items-center">🏆 Results</h4>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Wins:</span> <span class="font-bold">${item['Home Wins'] || 0}</span></div>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Draws:</span> <span class="font-bold">${item['Home Draws'] || 0}</span></div>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Losses:</span> <span class="font-bold">${item['Home Losses'] || 0}</span></div>
+                                
+                                <h4 class="font-bold text-lg mb-2 mt-4 flex items-center">⚽ Scoring</h4>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Scored:</span> <span class="font-bold">${item['Home Team Scored'] || 0}</span></div>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Avg Scored:</span> <span class="font-bold text-green-500">${item['Home Avg Scored']?.toFixed(2) || '0.00'}</span></div>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Conceded:</span> <span class="font-bold">${item['Home Conceded'] || 0}</span></div>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Avg Conceded:</span> <span class="font-bold text-red-500">${item['Home Avg Conceded']?.toFixed(2) || '0.00'}</span></div>
+                            </div>
+                        </div>
+                        <div>
+                             <h3 class="text-xl font-bold text-center border-b-2 border-accent-orange pb-2 mb-4">${awayTeam} (Away)</h3>
+                            <div class="space-y-3">
+                                <h4 class="font-bold text-lg mb-2 flex items-center">🏆 Results</h4>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Wins:</span> <span class="font-bold">${item['Away Wins'] || 0}</span></div>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Draws:</span> <span class="font-bold">${item['Away Draws'] || 0}</span></div>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Losses:</span> <span class="font-bold">${item['Away Losses'] || 0}</span></div>
+                                
+                                <h4 class="font-bold text-lg mb-2 mt-4 flex items-center">⚽ Scoring</h4>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Scored:</span> <span class="font-bold">${item['Away Team Scored'] || 0}</span></div>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Avg Scored:</span> <span class="font-bold text-green-500">${item['Away Avg Scored']?.toFixed(2) || '0.00'}</span></div>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Conceded:</span> <span class="font-bold">${item['Away Conceded'] || 0}</span></div>
+                                <div class="flex justify-between text-sm"><span class="font-semibold text-text-secondary dark:text-dark-text-secondary">Avg Conceded:</span> <span class="font-bold text-red-500">${item['Away Avg Conceded']?.toFixed(2) || '0.00'}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Analysis Section -->
+                    <div class="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <h4 class="font-bold text-lg mb-2 flex items-center">📊 Analysis</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <p class="text-sm text-text-secondary dark:text-dark-text-secondary bg-filter-panel-bg dark:bg-dark-filter-panel-bg p-4 rounded-md"><strong>Match Analysis:</strong> ${item['Match Analysis'] || 'No analysis available.'}</p>
+                            <p class="text-sm text-text-secondary dark:text-dark-text-secondary bg-filter-panel-bg dark:bg-dark-filter-panel-bg p-4 rounded-md"><strong>Goals Analysis:</strong> ${item['Goals Analysis'] || 'No analysis available.'}</p>
+                            <p class="text-sm text-text-secondary dark:text-dark-text-secondary bg-filter-panel-bg dark:bg-dark-filter-panel-bg p-4 rounded-md"><strong>Winning Streak:</strong> ${item['Winning Streak'] || 0}</p>
+                            <p class="text-sm text-text-secondary dark:text-dark-text-secondary bg-filter-panel-bg dark:bg-dark-filter-panel-bg p-4 rounded-md"><strong>Losing Streak:</strong> ${item['Losing Streak'] || 0}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        dom.detailsModal.innerHTML = modalContentHTML;
+        dom.detailsModal.classList.add('active');
+        setTimeout(() => {
+            const modalContent = document.querySelector('#details-modal .modal-content');
+            if(modalContent) {
+                modalContent.classList.add('active');
+            }
+        }, 10);
+    };
+
+    const getLeagueLogo = (leagueName) => '⚽';
+    window.exportFavorites = (format) => {
+        if (favorites.length === 0) return;
+        const headers = COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key)).map(c => c.label);
+        const body = favorites.map(item => {
+            return COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key)).map(c => item[c.key] || '');
+        });
+
+        if (format === 'pdf') {
+            const doc = new jsPDF();
+            doc.autoTable({ head: [headers], body: body });
+            doc.save('favorites.pdf');
+        } else if (format === 'csv') {
+            let csvContent = "data:text/csv;charset=utf-8," 
+                + headers.join(",") + "\n" 
+                + body.map(e => e.join(",")).join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "favorites.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else if (format === 'xlsx') {
+            const worksheet = XLSX.utils.aoa_to_sheet([headers, ...body]);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Favorites");
+            XLSX.writeFile(workbook, 'favorites.xlsx');
+        }
+    };
+
+    // --- All other handlers and utility functions ---
+    window.handleTabClick = (tab, element) => {
+        activeTab = tab;
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active', 'bg-gradient-to-r', 'from-primary-blue', 'to-primary-purple', 'text-white', 'shadow-lg'));
+        element.classList.add('active', 'bg-gradient-to-r', 'from-primary-blue', 'to-primary-purple', 'text-white', 'shadow-lg');
+        const container = document.getElementById('nav-tabs');
+        const containerRect = container.getBoundingClientRect();
+        const elRect = element.getBoundingClientRect();
+        dom.navUnderline.style.width = `${elRect.width}px`;
+        dom.navUnderline.style.left = `${elRect.left - containerRect.left}px`;
+        updateUiForTab();
+    };
+    const updateUiForTab = () => {
+        const isDashboard = activeTab === 'dashboard', isFavorites = activeTab === 'favorites';
+        dom.dashboardContent.classList.toggle('hidden', !isDashboard);
+        dom.favoritesContent.classList.toggle('hidden', !isFavorites);
+        dom.mainContent.classList.toggle('hidden', isDashboard || isFavorites);
+        dom.filtersContainer.classList.toggle('hidden', isDashboard);
+
+        if (isFavorites) {
+            document.querySelectorAll('#favorites-content button').forEach(btn => {
+                btn.disabled = favorites.length === 0;
+                if(btn.disabled) {
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            });
+        }
+        applyFilters();
+    };
+    window.handleFilterChange = () => {
+        filters.league = document.getElementById("filter-league").value; 
+        filters.prediction = document.getElementById("filter-prediction").value; 
+        filters.teamSearch = document.getElementById("team-search-input").value;
+        filters.matchDate = document.getElementById("filter-date").value;
+        filters.homeOddsMin = parseFloat(document.getElementById("filter-home-odds").value) || null;
+        applyFilters(); 
+    };
+    window.handleAdvancedFilterChange = () => {
+        const getMinMax = id => ({
+            min: document.getElementById(`${id}-min`).value ? parseFloat(document.getElementById(`${id}-min`).value) : null,
+            max: document.getElementById(`${id}-max`).value ? parseFloat(document.getElementById(`${id}-max`).value) : null,
+        });
+        filters.homeWins = getMinMax('adv-home-wins');
+        filters.homeDraws = getMinMax('adv-home-draws');
+        filters.homeLosses = getMinMax('adv-home-losses');
+        filters.awayWins = getMinMax('adv-away-wins');
+        filters.awayDraws = getMinMax('adv-away-draws');
+        filters.awayLosses = getMinMax('adv-away-losses');
+        filters.homeAvgScored = getMinMax('adv-home-avg-scored');
+        filters.homeAvgConceded = getMinMax('adv-home-avg-conceded');
+        filters.awayAvgScored = getMinMax('adv-away-avg-scored');
+        filters.awayAvgConceded = getMinMax('adv-away-avg-conceded');
+        filters.homeOdds = getMinMax('adv-home-odds');
+        filters.drawOdds = getMinMax('adv-draw-odds');
+        filters.awayOdds = getMinMax('adv-away-odds');
+        filters.predictionOdds = getMinMax('adv-prediction-odds');
+        hideFilterModal();
+        applyFilters();
+    };
+    window.clearAdvancedFilters = () => {
+        document.querySelectorAll('#more-filters-modal input[type="number"]').forEach(input => input.value = '');
+    };
+    window.clearFilters = () => {
+        filters = { ...initialFilters };
+        document.querySelectorAll('#filters-panel input, #filters-panel select').forEach(el => {
+            if (el.tagName === 'SELECT') el.selectedIndex = 0;
+            else el.value = '';
+        });
+        clearAdvancedFilters();
+        applyFilters();
+    };
+    const buildAdvancedFiltersModal = () => {
+        const createMinMaxInput = (id, label) => `<div class="grid grid-cols-2 gap-2 items-center"><label for="${id}-min" class="text-sm font-medium text-text-secondary dark:text-dark-text-secondary">${label}</label><div class="grid grid-cols-2 gap-2"><input type="number" id="${id}-min" placeholder="Min" class="w-full bg-panel-bg dark:bg-dark-panel-bg p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm"><input type="number" id="${id}-max" placeholder="Max" class="w-full bg-panel-bg dark:bg-dark-panel-bg p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm"></div></div>`;
+        dom.filtersModal.innerHTML = `<div class="modal-content bg-panel-bg dark:bg-dark-panel-bg w-full max-w-4xl mx-4 p-8 rounded-xl shadow-2xl relative" onclick="event.stopPropagation()"><button onclick="hideFilterModal(event)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button><h3 class="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-6">Advanced Filters</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-6"><div class="space-y-4 p-4 rounded-lg bg-filter-panel-bg dark:bg-dark-filter-panel-bg"><h4 class="font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 mb-3">Performance Stats</h4>${createMinMaxInput('adv-home-wins', 'Home Wins')}${createMinMaxInput('adv-home-draws', 'Home Draws')}${createMinMaxInput('adv-home-losses', 'Home Losses')}${createMinMaxInput('adv-away-wins', 'Away Wins')}${createMinMaxInput('adv-away-draws', 'Away Draws')}${createMinMaxInput('adv-away-losses', 'Away Losses')}</div><div class="space-y-4 p-4 rounded-lg bg-filter-panel-bg dark:bg-dark-filter-panel-bg"><h4 class="font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 mb-3">Scoring Stats</h4>${createMinMaxInput('adv-home-avg-scored', 'Home Avg Scored')}${createMinMaxInput('adv-home-avg-conceded', 'Home Avg Conceded')}${createMinMaxInput('adv-away-avg-scored', 'Away Avg Scored')}${createMinMaxInput('adv-away-avg-conceded', 'Away Avg Conceded')}</div><div class="space-y-4 p-4 rounded-lg bg-filter-panel-bg dark:bg-dark-filter-panel-bg"><h4 class="font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 mb-3">Odds Filters</h4>${createMinMaxInput('adv-home-odds', 'Home Odds')}${createMinMaxInput('adv-draw-odds', 'Draw Odds')}${createMinMaxInput('adv-away-odds', 'Away Odds')}${createMinMaxInput('adv-prediction-odds', 'Prediction Odds')}</div></div><div class="mt-8 flex justify-between items-center"><button onclick="clearAdvancedFilters()" class="px-6 py-3 bg-gray-500 text-white font-bold rounded-lg shadow-md hover:bg-gray-600 transition">Clear All Filters</button><button onclick="handleAdvancedFilterChange()" class="px-6 py-3 bg-gradient-to-r from-primary-blue to-primary-purple text-white font-bold rounded-lg shadow-md interactive-glow">Apply Filters</button></div></div>`;
+    };
+    const populateFilterDropdowns = () => {
+        const leagues = ['All', ...new Set(allData.map(item => item.League).filter(Boolean))];
+        const dates = ['All Dates', ...new Set(allData.map(item => item['Match Date']).filter(Boolean))];
+        const predictions = ['All', ...new Set(allData.map(item => item.Prediction).filter(Boolean))];
+        const leagueSelect = document.getElementById('filter-league');
+        leagueSelect.innerHTML = leagues.map(l => `<option value="${l}">${l}</option>`).join('');
+        const dateSelect = document.getElementById('filter-date');
+        dateSelect.innerHTML = dates.map(d => `<option value="${d}">${d}</option>`).join('');
+        const predictionSelect = document.getElementById('filter-prediction');
+        predictionSelect.innerHTML = predictions.map(p => `<option value="${p}">${p}</option>`).join('');
+    };
+    window.handleSort = (key) => { sortColumn === key ? sortDirection = (sortDirection === 'asc' ? 'desc' : 'asc') : (sortColumn = key, sortDirection = 'asc'); applySort(); };
+    window.handlePrevPage = () => { if (currentPage > 1) { currentPage--; renderPage(); } };
+    window.handleNextPage = () => { if (currentPage < Math.ceil(currentData.length / rowsPerPage)) { currentPage++; renderPage(); } };
+    window.hideDetailsModal = (event) => {
+        if (event.target === dom.detailsModal || event.target.closest('button')) {
+             dom.detailsModal.classList.remove('active');
+        }
+    };
+    window.hideFilterModal = (event) => { if (event && event.target !== dom.filtersModal && !event.target.closest('.modal-content')) return; dom.filtersModal.classList.remove('active'); };
+    window.showFilterModal = () => { dom.filtersModal.classList.add('active'); setTimeout(() => document.querySelector('#more-filters-modal .modal-content').classList.add('active'), 10);};
+    window.toggleFavorite = (uniqueId) => {
+        const index = favorites.findIndex(fav => fav.uniqueId === uniqueId);
+        if (index > -1) {
+            favorites.splice(index, 1);
+        } else {
+            const itemToAdd = allData.find(item => item.uniqueId === uniqueId);
+            if (itemToAdd) favorites.push(itemToAdd);
+        }
+        localStorage.setItem('favorites', JSON.stringify(favorites.map(f => f.uniqueId)));
+        if (activeTab === 'favorites') {
+            applyFilters();
+        } else {
+            const row = Array.from(dom.tableBody.querySelectorAll('tr')).find(r => r.innerHTML.includes(uniqueId));
+            if(row){
+                const star = row.querySelector('.text-2xl');
+                if(star){
+                    star.innerHTML = index === -1 ? ICONS.star : ICONS.starOutline;
+                    star.classList.toggle('text-yellow-400', index === -1);
+                    star.classList.toggle('text-gray-300', index > -1);
+                    star.classList.toggle('dark:text-gray-600', index > -1);
+                }
+            }
+        }
     };
 
     </script>
 </body>
 </html>
+
