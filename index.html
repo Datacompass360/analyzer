@@ -51,7 +51,7 @@
         .pill-switcher { display: inline-flex; padding: 0.35rem; border-radius: 9999px; position: relative; }
         .pill-switcher button { transition: color 0.3s ease, transform 0.2s ease; z-index: 10; }
         .pill-switcher button.active-tab { color: white; transform: scale(1.05); text-shadow: 0 0 10px rgba(0,0,0,0.5); }
-        .pill-switcher .glider { position: absolute; height: 100%; top: 0; left: 0; width: 25%; background-image: linear-gradient(to right, var(--accent-green), #059669); border-radius: 9999px; box-shadow: 0 4px 15px -3px rgba(16, 185, 129, 0.5); transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); z-index: 5; }
+        .pill-switcher .glider { position: absolute; height: 100%; top: 0; left: 0; background-image: linear-gradient(to right, var(--accent-green), #059669); border-radius: 9999px; box-shadow: 0 4px 15px -3px rgba(16, 185, 129, 0.5); transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); z-index: 5; }
         
         .interactive-scale:hover { transform: translateY(-3px) scale(1.03); }
         
@@ -127,6 +127,7 @@
             <button id="tab-dashboard" onclick="handleTabClick('dashboard')" class="flex-1 py-3 px-6 rounded-full text-sm font-bold">Dashboard</button>
             <button id="tab-all" onclick="handleTabClick('all')" class="flex-1 py-3 px-6 rounded-full text-sm font-bold">All Matches</button>
             <button id="tab-best" onclick="handleTabClick('best')" class="flex-1 py-3 px-6 rounded-full text-sm font-bold">Best Tips</button>
+            <button id="tab-extrapolation" onclick="handleTabClick('extrapolation')" class="flex-1 py-3 px-6 rounded-full text-sm font-bold text-center">Winning Extrapolation</button>
             <button id="tab-favorites" onclick="handleTabClick('favorites')" class="flex-1 py-3 px-6 rounded-full text-sm font-bold">Favorites</button>
         </div>
         <div class="w-16 h-16"></div> <!-- Spacer to balance the logo -->
@@ -145,11 +146,13 @@
                  <h2 class="text-2xl font-extrabold text-gray-800 flex items-center"><svg class="w-6 h-6 mr-3 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414A1 1 0 0012 15.586V21h-2v-5.414a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>Refine Insights</h2>
                  <button onclick="clearFilters()" class="px-4 py-2 text-sm font-bold bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Clear Filters</button>
              </div>
-             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
                   <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Search</label><input type="text" id="team-search-input" placeholder="e.g., Chelsea" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm" oninput="handleFilterChange()"></div>
                   <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Match Date</label><select id="filter-date" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
                   <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">League</label><select id="filter-league" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
                   <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Prediction</label><select id="filter-prediction" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
+                  <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Match Analysis</label><select id="main-filter-match-analysis" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
+                  <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Goals Analysis</label><select id="main-filter-goals-analysis" onchange="handleFilterChange()" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm"></select></div>
                   <div class="relative"><label class="block text-sm font-semibold text-gray-700 mb-2">Home Odds (Min)</label><input type="number" id="filter-home-odds" placeholder="e.g., 1.5" class="w-full p-3 border border-gray-300 rounded-xl shadow-sm" oninput="handleFilterChange()"></div>
              </div>
              <button onclick="showFilterModal()" class="absolute -bottom-5 right-6 px-5 py-3 bg-accent-green text-white font-bold rounded-full shadow-lg hover:bg-accent-green/90 transition flex items-center" style="animation: glowing 3s infinite ease-in-out;"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 16v-2m8-6h2m-16 0H4m14.243-7.757l1.414-1.414M5.343 18.657l-1.414 1.414m14.142 0l-1.414-1.414M6.757 5.343l-1.414-1.414M12 18a6 6 0 100-12 6 6 0 000 12z"></path></svg>More Filters</button>
@@ -160,7 +163,7 @@
                 <div id="upcoming-matches-scroller" class="match-scroller"><div class="scroller-inner"></div></div>
             </div>
             <div id="table-container" class="bg-white shadow-2xl rounded-2xl overflow-hidden mt-12">
-                <div class="overflow-x-auto"><table id="data-table" class="min-w-full"><thead class="sticky top-0 z-10"><tr></tr></thead><tbody id="table-body" class="divide-y divide-gray-100"></tbody></table></div>
+                <div class="overflow-x-auto"><table id="data-table" class="min-w-full"><thead class="sticky top-0 z-10"><tr></tr></thead><tbody id="table-body" class="divide-y divide-gray-100"></tbody><tfoot id="table-footer" class="hidden bg-gray-50"></tfoot></table></div>
                 <div id="message-box" class="p-8 text-center hidden"><p class="text-lg font-semibold text-naviblue">No data found.</p></div>
             </div>
              <!-- Summary Table Container -->
@@ -218,11 +221,11 @@
     const HIDDEN_COLUMNS = ['Home Team', 'Away Team', 'Home Wins', 'Home Draws', 'Home Losses', 'Away Wins', 'Away Draws', 'Away Losses', 'Home Avg Scored', 'Home Conceded', 'Home Avg Conceded', 'Away Avg Scored', 'Away Conceded', 'Away Avg Conceded', 'Match Analysis', 'Goals Analysis'];
     
     const COLUMN_MAP = [
-        { key: 'Match Date', label: 'Date' }, { key: 'League', label: 'League' }, { key: 'Match', label: 'Match' }, { key: 'Prediction', label: 'Prediction' }, { key: 'Outcome', label: 'Outcome' }, { key: 'Result', label: 'Result' }, { key: 'Correct Score', label: 'Score' }, { key: 'Home Odds', label: '1' }, { key: 'Draw Odds', label: 'X' }, { key: 'Away Odds', label: '2' }, 
+        { key: 'Match Date', label: 'Date' }, { key: 'League', label: 'League' }, { key: 'Match', label: 'Match' }, { key: 'Prediction', label: 'Prediction' }, { key: 'Outcome', label: 'Outcome' }, { key: 'Result', label: 'Result' }, { key: 'Correct Score', label: 'Score' }, { key: 'Home Odds', label: '1', type: 'number' }, { key: 'Draw Odds', label: 'X', type: 'number' }, { key: 'Away Odds', label: '2', type: 'number' }, 
         { key: 'Home Team', type: 'string' }, { key: 'Away Team', type: 'string' }, { key: 'Winning Streak', type: 'number' }, { key: 'Losing Streak', type: 'number' }, { key: 'Stake', type: 'number' }, { key: 'Home Wins', type: 'number' }, { key: 'Home Draws', type: 'number' }, { key: 'Home Losses', type: 'number' }, { key: 'Away Wins', type: 'number' }, { key: 'Away Draws', type: 'number' }, { key: 'Away Losses', type: 'number' }, { key: 'Home Team Scored', type: 'number' }, { key: 'Home Avg Scored', type: 'number' }, { key: 'Home Conceded', type: 'number' }, { key: 'Home Avg Conceded', type: 'number' }, { key: 'Away Team Scored', type: 'number' }, { key: 'Away Avg Scored', type: 'number' }, { key: 'Away Conceded', type: 'number' }, { key: 'Away Avg Conceded', type: 'number' }, { key: 'Match Analysis', type: 'string' }, { key: 'Goals Analysis', type: 'string' }
     ];
 
-    let allData = [], currentData = [], favorites = [], viewedRows = new Set(), outcomeChart, predictionChart, filteredFavorites = [];
+    let allData = [], currentData = [], favorites = [], viewedRows = new Set(), outcomeChart, predictionChart, filteredFavorites = [], lostMatches = new Set();
     let sortColumn = 'Match Date', sortDirection = 'desc', rowsPerPage = 30, currentPage = 1, activeTab = 'dashboard';
     const initialFilters = { 
         league: 'All', prediction: 'All', teamSearch: '', matchAnalysis: 'All', goalsAnalysis: 'All',
@@ -241,6 +244,7 @@
         favoritesContent: document.getElementById('favorites-content'),
         tableBody: document.getElementById('table-body'),
         tableHeadRow: document.querySelector('#data-table thead tr'),
+        tableFooter: document.getElementById('table-footer'),
         messageBox: document.getElementById('message-box'),
         pagination: document.getElementById('pagination-controls'),
         glider: document.getElementById('glider'),
@@ -279,6 +283,8 @@
                     rowObject[col.key] = col.type === 'number' ? null : "";
                 }
             });
+            // Assign a unique ID for tracking state
+            rowObject.uniqueId = `${rowObject.Match}-${rowObject['Match Date']}`;
             return rowObject;
         }).filter(row => row && row.Match);
     };
@@ -291,6 +297,12 @@
         if (activeTab === 'best') {
             const bestTipsValues = ["Best Away Tip", "Best Home Tip", "Home Tip", "Good Away Tip", "Home Good Tip", "Away Tip"];
             filteredData = filteredData.filter(item => bestTipsValues.includes(item["Match Analysis"]));
+        }
+        
+        if (activeTab === 'extrapolation') {
+            const extrapolationValues = ["Best Away Tip", "Best Home Tip", "Home Good Tip"];
+            filteredData = filteredData.filter(item => extrapolationValues.includes(item["Match Analysis"]));
+            lostMatches.clear(); // Clear losses when filters change
         }
 
         const searchTerm = filters.teamSearch.toLowerCase().trim();
@@ -313,6 +325,45 @@
             if (f.min) filteredData = filteredData.filter(item => item[f.key] >= f.min);
             if (f.max) filteredData = filteredData.filter(item => item[f.key] <= f.max);
         });
+        
+        if (activeTab === 'extrapolation') {
+             // First pass: determine initial loss status based on rules
+            filteredData.forEach(item => {
+                const prediction = (item.Prediction || '').toLowerCase();
+                const outcome = (item.Outcome || '').toLowerCase();
+                
+                let isLoss = true;
+                if (!outcome || outcome === 'n/a') isLoss = false;
+                if (prediction.includes('home') && outcome.includes('home')) isLoss = false;
+                if (prediction.includes('away') && outcome.includes('away')) isLoss = false;
+                if (prediction.includes('draw') && outcome.includes('draw')) isLoss = false;
+
+                if (isLoss) {
+                    lostMatches.add(item.uniqueId);
+                }
+            });
+
+            // Second pass: calculate all values for each item
+            filteredData.forEach(item => {
+                let oddsPrediction = null;
+                const prediction = (item.Prediction || '').toLowerCase();
+                if (prediction.includes('home')) oddsPrediction = item['Home Odds'];
+                else if (prediction.includes('away')) oddsPrediction = item['Away Odds'];
+                else if (prediction.includes('draw')) oddsPrediction = item['Draw Odds'];
+                
+                item.oddsPrediction = oddsPrediction;
+                item.totalStake = item.Match ? 100 : 0;
+
+                const isLost = lostMatches.has(item.uniqueId);
+                if (isLost) {
+                    item.potentialWinning = 0;
+                    item.profit = -100;
+                } else {
+                    item.potentialWinning = oddsPrediction ? (oddsPrediction * 100) : 0;
+                    item.profit = item.potentialWinning - item.totalStake;
+                }
+            });
+        }
 
         if (activeTab === 'dashboard') renderDashboard(filteredData);
         else if (activeTab === 'favorites') { filteredFavorites = filteredData; renderFavorites(); }
@@ -335,14 +386,41 @@
     };
 
     const renderTableHead = () => {
-        const visibleCols = COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key));
-        let headHTML = '<th></th>'; // For the star icon
-        visibleCols.forEach(col => {
-            headHTML += `<th onclick="handleSort('${col.key}')" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"><div class="flex items-center">${col.label}${col.key === sortColumn ? `<svg class="w-4 h-4 ml-2 sort-icon ${sortDirection === 'desc' ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"></path></svg>` : ''}</div></th>`;
-            if (col.key === 'Match Date') {
-                headHTML += '<th>Actions</th>';
-            }
-        });
+        let headHTML = '';
+        if (activeTab === 'extrapolation') {
+            const extrapolationCols = [
+                { key: 'Match Date', label: 'Date' },
+                { key: 'League', label: 'League' },
+                { key: 'Match', label: 'Match' },
+                { key: 'Prediction', label: 'Prediction' },
+                { key: 'Outcome', label: 'Outcome' },
+                { key: 'oddsPrediction', label: 'Odds'},
+                { key: 'totalStake', label: 'Stake'},
+                { key: 'potentialWinning', label: 'Potential Win'},
+                { key: 'profit', label: 'Profit'},
+                { key: 'isLoss', label: 'Loss?'} // Not sortable
+            ];
+            headHTML += '<th></th>'; // Star
+            extrapolationCols.forEach(col => {
+                if (col.key === 'isLoss') {
+                    headHTML += `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">${col.label}</th>`;
+                } else {
+                    headHTML += `<th onclick="handleSort('${col.key}')" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"><div class="flex items-center">${col.label}${col.key === sortColumn ? `<svg class="w-4 h-4 ml-2 sort-icon ${sortDirection === 'desc' ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"></path></svg>` : ''}</div></th>`;
+                }
+                if (col.key === 'Match Date') {
+                    headHTML += '<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Actions</th>'; // View button header
+                }
+            });
+        } else {
+            const visibleCols = COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key));
+            headHTML += '<th></th>'; // Star
+            visibleCols.forEach(col => {
+                headHTML += `<th onclick="handleSort('${col.key}')" class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer"><div class="flex items-center">${col.label}${col.key === sortColumn ? `<svg class="w-4 h-4 ml-2 sort-icon ${sortDirection === 'desc' ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"></path></svg>` : ''}</div></th>`;
+                if (col.key === 'Match Date') {
+                     headHTML += '<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Actions</th>'; // View button header
+                }
+            });
+        }
         dom.tableHeadRow.innerHTML = headHTML;
     };
 
@@ -352,6 +430,8 @@
         renderTableBody(currentData.slice(start, start + rowsPerPage));
         dom.pagination.innerHTML = currentData.length > rowsPerPage ? `<button onclick="handlePrevPage()" class="px-4 py-2 text-sm font-medium rounded-full bg-white shadow" ${currentPage === 1 ? 'disabled' : ''}>Prev</button><span class="text-sm font-semibold">Page ${currentPage} of ${totalPages}</span><button onclick="handleNextPage()" class="px-4 py-2 text-sm font-medium rounded-full bg-white shadow" ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}>Next</button>` : "";
         dom.pagination.classList.toggle('hidden', currentData.length <= rowsPerPage);
+        dom.tableFooter.classList.toggle('hidden', activeTab !== 'extrapolation');
+        if (activeTab === 'extrapolation') updateTotals();
     };
 
     const renderTableBody = (data) => {
@@ -362,14 +442,25 @@
             return;
         }
         dom.messageBox.classList.add("hidden");
+
+        if (activeTab === 'extrapolation') {
+            renderExtrapolationTable(data);
+        } else {
+            renderStandardTable(data);
+        }
+    };
+    
+    const renderStandardTable = (data) => {
         const visibleCols = COLUMN_MAP.filter(c => c.label && !HIDDEN_COLUMNS.includes(c.key));
         data.forEach(item => {
             const row = document.createElement("tr");
             const itemJSON = encodeURIComponent(JSON.stringify(item));
-            row.className = `transition-all duration-200 ${viewedRows.has(item.Match) ? "viewed-row" : ""}`;
+            row.className = `transition-all duration-200 ${viewedRows.has(item.uniqueId) ? "viewed-row" : ""}`;
             row.onclick = () => handleRowClick(item);
 
-            let rowHTML = `<td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.Match}')" class="star-icon text-2xl ${favorites.some(f => f.Match === item.Match) ? "favorited" : ""}">${favorites.some(f => f.Match === item.Match) ? '⭐' : '☆'}</span></td>`;
+            let rowHTML = `<td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.uniqueId}')" class="star-icon text-2xl ${favorites.some(f => f.uniqueId === item.uniqueId) ? "favorited" : ""}">${favorites.some(f => f.uniqueId === item.uniqueId) ? '⭐' : '☆'}</span></td>`;
+            const viewButtonHTML = `<td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-blue-500 text-white rounded-full hover:bg-blue-600">View</button></td>`;
+
             visibleCols.forEach(col => {
                 const value = item[col.key] || "N/A";
                 if (col.key === 'Outcome') {
@@ -379,15 +470,45 @@
                     rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm">${value}</td>`;
                 }
                 if (col.key === 'Match Date') {
-                     rowHTML += `<td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-blue-500 text-white rounded-full hover:bg-blue-600">View</button></td>`;
+                    rowHTML += viewButtonHTML;
                 }
             });
-            
             row.innerHTML = rowHTML;
             dom.tableBody.appendChild(row);
         });
     };
     
+    const renderExtrapolationTable = (data) => {
+        data.forEach(item => {
+            const row = document.createElement("tr");
+            const itemJSON = encodeURIComponent(JSON.stringify(item));
+            row.className = `transition-all duration-200 ${viewedRows.has(item.uniqueId) ? "viewed-row" : ""}`;
+            row.onclick = () => handleRowClick(item);
+
+            const isFavorited = favorites.some(f => f.uniqueId === item.uniqueId);
+            const isLost = lostMatches.has(item.uniqueId);
+
+            let rowHTML = `
+                <td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.uniqueId}')" class="star-icon text-2xl ${isFavorited ? "favorited" : ""}">${isFavorited ? '⭐' : '☆'}</span></td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm">${item['Match Date'] || 'N/A'}</td>
+                <td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-blue-500 text-white rounded-full hover:bg-blue-600">View</button></td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm">${item.League || 'N/A'}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm">${item.Match || 'N/A'}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm">${item.Prediction || 'N/A'}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm">${item.Outcome || 'N/A'}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm font-bold">${(item.oddsPrediction && typeof item.oddsPrediction === 'number') ? item.oddsPrediction.toFixed(2) : 'N/A'}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm font-bold">${(item.totalStake || 0).toFixed(2)}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-accent-green">${(item.potentialWinning || 0).toFixed(2)}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm font-bold ${item.profit >= 0 ? 'text-green-600' : 'text-red-500'}">${(item.profit || 0).toFixed(2)}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-center">
+                    <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-red-600 focus:ring-red-500" ${isLost ? 'checked' : ''} onclick="event.stopPropagation(); handleLossToggle('${item.uniqueId}', this.checked)">
+                </td>
+            `;
+            row.innerHTML = rowHTML;
+            dom.tableBody.appendChild(row);
+        });
+    }
+
     const getOutcomeColor = (prediction, outcome) => {
         if (!prediction || !outcome || outcome === "N/A" || outcome.trim() === '') return ["bg-gray-400", "Pending", false];
         const p = prediction.toLowerCase(), o = outcome.toLowerCase();
@@ -408,9 +529,9 @@
         const keys = ['Match Date', 'League', 'Match', 'Prediction', 'Outcome', 'Result', 'Correct Score'];
 
         let tableHTML = `<table id="favorites-table" class="min-w-full"><thead class="sticky top-0 z-10"><tr>`;
-        tableHTML += `<th></th>`
-        headers.forEach(h => {
-            tableHTML += `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">${h}</th>`;
+        tableHTML += `<th></th>` // Star icon
+        headers.forEach(h => { 
+            tableHTML += `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">${h}</th>`; 
             if (h === 'Date') {
                 tableHTML += `<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Actions</th>`;
             }
@@ -419,8 +540,10 @@
 
         filteredFavorites.forEach(item => {
             const itemJSON = encodeURIComponent(JSON.stringify(item));
+            const viewButtonHTML = `<td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-blue-500 text-white rounded-full hover:bg-blue-600">View</button></td>`;
+
             tableHTML += `<tr class="transition-all duration-200" onclick="handleRowClick(item, true)">`;
-            tableHTML += `<td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.Match}')" class="star-icon text-2xl favorited">⭐</span></td>`;
+            tableHTML += `<td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.uniqueId}')" class="star-icon text-2xl favorited">⭐</span></td>`;
             keys.forEach(key => {
                 const value = item[key] || "N/A";
                 if (key === 'Outcome') {
@@ -430,7 +553,7 @@
                     tableHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm">${value}</td>`;
                 }
                 if (key === 'Match Date') {
-                    tableHTML += `<td class="px-4 py-3"><button onclick="event.stopPropagation(); showDetailsModal(JSON.parse(decodeURIComponent('${itemJSON}')))" class="px-3 py-1 text-xs font-bold bg-blue-500 text-white rounded-full hover:bg-blue-600">View</button></td>`;
+                    tableHTML += viewButtonHTML;
                 }
             });
             tableHTML += `</tr>`;
@@ -442,17 +565,17 @@
 
 
     const handleRowClick = (item) => {
-        viewedRows.add(item.Match);
+        viewedRows.add(item.uniqueId);
         renderSummaryTable(item);
-        if (['all', 'best', 'favorites'].includes(activeTab)) {
-            if (activeTab === 'favorites') renderFavorites();
-            else renderPage();
+        if (['all', 'best', 'favorites', 'extrapolation'].includes(activeTab)) {
+            // Re-render the correct table to show the 'viewed-row' style
+            const tableToUpdate = document.querySelector(`[onclick*="${item.uniqueId}"]`).closest('tr');
+            if(tableToUpdate) tableToUpdate.classList.add('viewed-row');
         }
     };
     window.handleSort = (key) => { sortColumn === key ? sortDirection = (sortDirection === 'asc' ? 'desc' : 'asc') : (sortColumn = key, sortDirection = 'asc'); applySort(); };
     window.handleTabClick = (tab) => {
         activeTab = tab;
-        // Hide summary tables when switching tabs
         dom.summaryContainer.classList.remove('active');
         dom.favoritesSummaryContainer.classList.remove('active');
         updateUiForTab();
@@ -463,11 +586,11 @@
         filters.teamSearch = document.getElementById("team-search-input").value;
         filters.matchDate = document.getElementById("filter-date").value;
         filters.homeOddsMin = parseFloat(document.getElementById("filter-home-odds").value) || null;
+        filters.matchAnalysis = document.getElementById("main-filter-match-analysis").value;
+        filters.goalsAnalysis = document.getElementById("main-filter-goals-analysis").value;
         applyFilters(); 
     };
     window.handleAdvancedFilterChange = () => {
-        filters.matchAnalysis = document.getElementById("filter-match-analysis").value;
-        filters.goalsAnalysis = document.getElementById("filter-goals-analysis").value;
         filters.winningStreak = parseFloat(document.getElementById("adv-filter-win-streak").value) || null;
         filters.losingStreak = parseFloat(document.getElementById("adv-filter-lose-streak").value) || null;
         filters.homeOddsAdvancedMin = parseFloat(document.getElementById("home-odds-min").value) || null;
@@ -481,9 +604,52 @@
     };
     window.handlePrevPage = () => { if (currentPage > 1) { currentPage--; renderPage(); } };
     window.handleNextPage = () => { if (currentPage < Math.ceil(currentData.length / rowsPerPage)) { currentPage++; renderPage(); } };
+    window.handleLossToggle = (uniqueId, isChecked) => {
+        const item = currentData.find(d => d.uniqueId === uniqueId);
+        if (!item) return;
+
+        if (isChecked) {
+            lostMatches.add(uniqueId);
+            item.potentialWinning = 0;
+            item.profit = -100;
+        } else {
+            lostMatches.delete(uniqueId);
+            // Recalculate based on original odds
+            item.potentialWinning = item.oddsPrediction ? (item.oddsPrediction * 100) : 0;
+            item.profit = item.potentialWinning - item.totalStake;
+        }
+        renderPage(); // Re-render the table and totals
+    };
+    const updateTotals = () => {
+        const totals = currentData.reduce((acc, item) => {
+            const isLost = lostMatches.has(item.uniqueId);
+            const stake = item.totalStake || 0;
+            // Use the item's current values which are updated by handleLossToggle
+            const potentialWinning = item.potentialWinning || 0;
+            const profit = item.profit || 0;
+            
+            acc.stake += stake;
+            acc.potentialWinning += potentialWinning;
+            acc.profit += profit;
+            
+            return acc;
+        }, { stake: 0, potentialWinning: 0, profit: 0 });
+
+        // Total columns: Star, Date, Actions, League, Match, Prediction, Outcome, Odds, Stake, Win, Profit, Checkbox = 12
+        dom.tableFooter.innerHTML = `
+            <tr>
+                <td colspan="8" class="px-4 py-4 text-right font-bold text-lg text-naviblue">Totals:</td>
+                <td class="px-4 py-4 font-extrabold text-lg text-gray-700">${totals.stake.toFixed(2)}</td>
+                <td class="px-4 py-4 font-extrabold text-lg text-accent-green">${totals.potentialWinning.toFixed(2)}</td>
+                <td class="px-4 py-4 font-extrabold text-lg ${totals.profit >= 0 ? 'text-green-600' : 'text-red-500'}">${totals.profit.toFixed(2)}</td>
+                <td></td>
+            </tr>`;
+    };
 
     const updateUiForTab = () => {
-        const tabPositions = { dashboard: 0, all: 1, best: 2, favorites: 3 };
+        const tabPositions = { dashboard: 0, all: 1, best: 2, extrapolation: 3, favorites: 4 };
+        const numTabs = Object.keys(tabPositions).length;
+        dom.glider.style.width = `${100 / numTabs}%`;
         dom.glider.style.transform = `translateX(${100 * tabPositions[activeTab]}%)`;
         Object.keys(tabPositions).forEach(t => document.getElementById(`tab-${t}`).classList.toggle("active-tab", t === activeTab));
         const isDashboard = activeTab === 'dashboard', isFavorites = activeTab === 'favorites';
@@ -495,7 +661,7 @@
     };
     
     window.showDetailsModal = (item) => {
-        const isFavorited = favorites.some(f => f.Match === item.Match);
+        const isFavorited = favorites.some(f => f.uniqueId === item.uniqueId);
         const formatInt = (val) => val !== null && !isNaN(val) ? Math.round(val) : "N/A";
         const formatAvg = (val) => val !== null && !isNaN(val) ? val.toFixed(2) : "N/A";
 
@@ -512,7 +678,6 @@
                 <p class="text-xs text-center bg-black/5 p-3 rounded-md">${content}</p>
             </div>` : '';
 
-        const itemJSON = encodeURIComponent(JSON.stringify(item));
         dom.detailsModal.innerHTML = `
             <div class="modal-content bg-popup-bg w-full max-w-lg mx-4 rounded-2xl shadow-2xl text-popup-text relative">
                 <button onclick="hideDetailsModal()" class="absolute top-3 right-3 text-popup-text/50 hover:text-popup-text hover:bg-black/10 rounded-full p-2 transition z-10">
@@ -524,7 +689,7 @@
                              <h3 class="text-2xl font-extrabold text-center">${item.Match}</h3>
                              <p class="text-center text-sm font-medium text-popup-text/80">${item.League} - ${item['Match Date']}</p>
                         </div>
-                        <button onclick="toggleFavorite('${item.Match}', true)" class="text-3xl transition-transform duration-200 hover:scale-125 -mt-1 ml-4">${isFavorited ? '⭐' : '☆'}</button>
+                        <button onclick="toggleFavorite('${item.uniqueId}', true)" class="text-3xl transition-transform duration-200 hover:scale-125 -mt-1 ml-4">${isFavorited ? '⭐' : '☆'}</button>
                     </div>
                     
                     <div class="bg-white/50 p-4 rounded-lg">
@@ -547,7 +712,7 @@
                 </div>
             </div>`;
         dom.detailsModal.classList.add('active');
-        setTimeout(() => document.querySelector('.modal-content').classList.add('active'), 10);
+        setTimeout(() => document.querySelector('#details-modal .modal-content').classList.add('active'), 10);
     };
 
     const renderSummaryTable = (item) => {
@@ -595,7 +760,7 @@
 
     window.hideDetailsModal = (event) => {
         if (event && event.target !== dom.detailsModal && !event.target.closest('button[onclick^="hideDetailsModal"]')) return;
-        const content = document.querySelector('.modal-content');
+        const content = document.querySelector('#details-modal .modal-content');
         if (content) content.classList.remove('active');
         dom.detailsModal.classList.remove('active');
     };
@@ -609,15 +774,13 @@
         document.getElementById('draw-odds-max').value = filters.drawOddsMax || '';
         document.getElementById('away-odds-min').value = filters.awayOddsMin || '';
         document.getElementById('away-odds-max').value = filters.awayOddsMax || '';
-        document.getElementById('filter-match-analysis').value = filters.matchAnalysis;
-        document.getElementById('filter-goals-analysis').value = filters.goalsAnalysis;
-
+        
         dom.filtersModal.classList.add('active');
          setTimeout(() => document.querySelector('#more-filters-modal .modal-content').classList.add('active'), 10);
     };
 
     window.hideFilterModal = (event) => {
-        if (event && event.target !== dom.filtersModal && !event.target.closest('button')) return;
+        if (event && event.target !== dom.filtersModal && !event.target.closest('.modal-content')) return;
          const content = document.querySelector('#more-filters-modal .modal-content');
         if (content) content.classList.remove('active');
         dom.filtersModal.classList.remove('active');
@@ -630,20 +793,22 @@
         document.getElementById("team-search-input").value = '';
         document.getElementById("filter-date").value = 'All Dates';
         document.getElementById("filter-home-odds").value = '';
+        document.getElementById("main-filter-match-analysis").value = 'All';
+        document.getElementById("main-filter-goals-analysis").value = 'All';
         applyFilters();
     };
 
-    window.toggleFavorite = (matchIdentifier, fromModal = false) => {
-        const matchIndex = favorites.findIndex(f => f.Match === matchIdentifier);
+    window.toggleFavorite = (uniqueId, fromModal = false) => {
+        const matchIndex = favorites.findIndex(f => f.uniqueId === uniqueId);
         if (matchIndex > -1) {
             favorites.splice(matchIndex, 1);
         } else {
-            const matchToAdd = allData.find(d => d.Match === matchIdentifier);
+            const matchToAdd = allData.find(d => d.uniqueId === uniqueId);
             if (matchToAdd) favorites.push(matchToAdd);
         }
-        localStorage.setItem('favorites', JSON.stringify(favorites.map(f => f.Match)));
+        localStorage.setItem('favorites', JSON.stringify(favorites.map(f => f.uniqueId)));
         if (fromModal) {
-            const matchData = allData.find(d => d.Match === matchIdentifier);
+            const matchData = allData.find(d => d.uniqueId === uniqueId);
             if (matchData) showDetailsModal(matchData);
         }
         applyFilters();
@@ -658,8 +823,9 @@
             allData = parseCSV(csvText);
 
             const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-            favorites = allData.filter(item => savedFavorites.includes(item.Match));
+            favorites = allData.filter(item => savedFavorites.includes(item.uniqueId));
 
+            buildAdvancedFiltersModal(); // Build modal after DOM is ready
             populateFilterDropdowns();
             populateUpcomingMatchesScroller();
             
@@ -677,12 +843,14 @@
         const uniqueValues = (key) => [...new Set(allData.map(item => item[key]).filter(Boolean))].sort();
         const populate = (id, options, defaultLabel) => {
             const select = document.getElementById(id);
-            select.innerHTML = `<option>${defaultLabel}</option>${options.map(o => `<option>${o}</option>`).join('')}`;
+            if(select) {
+              select.innerHTML = `<option>${defaultLabel}</option>${options.map(o => `<option>${o}</option>`).join('')}`;
+            }
         };
         populate('filter-league', uniqueValues('League'), 'All');
         populate('filter-prediction', uniqueValues('Prediction'), 'All');
-        populate('filter-match-analysis', uniqueValues('Match Analysis'), 'All');
-        populate('filter-goals-analysis', uniqueValues('Goals Analysis'), 'All');
+        populate('main-filter-match-analysis', uniqueValues('Match Analysis'), 'All');
+        populate('main-filter-goals-analysis', uniqueValues('Goals Analysis'), 'All');
 
         const dateOptions = ['All Dates', ...[...new Set(allData.map(item => item['Match Date']))].sort((a,b) => {
             const dateA = new Date(a.split('/').reverse().join('-'));
@@ -761,7 +929,8 @@
 
     window.downloadFavoritesPDF = () => {
         if (filteredFavorites.length === 0) {
-            alert('No favorites to download.');
+            // Using a custom message box instead of alert
+            showDetailsModal({Match: "No Favorites", League: "Please add some favorite matches before downloading."});
             return;
         }
         const doc = new jsPDF();
@@ -781,22 +950,13 @@
     };
 
     const buildAdvancedFiltersModal = () => {
-        const modal = document.createElement('div');
-        modal.id = 'more-filters-modal';
-        modal.className = 'modal-backdrop';
-        modal.onclick = (e) => hideFilterModal(e);
-        modal.innerHTML = `
-            <div class="modal-content bg-white w-full max-w-4xl mx-4 p-6 rounded-2xl shadow-2xl relative">
-                <button onclick="hideFilterModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        // The modal is already in the HTML, we just need to ensure its logic is sound.
+        // This function will create the content dynamically to keep the initial HTML clean.
+        dom.filtersModal.innerHTML = `
+            <div class="modal-content bg-white w-full max-w-4xl mx-4 p-6 rounded-2xl shadow-2xl relative" onclick="event.stopPropagation()">
+                <button onclick="hideFilterModal(event)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button>
                 <h3 class="text-2xl font-bold text-naviblue mb-6">Advanced Filters</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <h4 class="font-semibold mb-2 text-gray-700">Analysis Type</h4>
-                        <label class="block text-sm mb-1">Match Analysis</label>
-                        <select id="filter-match-analysis" class="w-full p-2 border rounded-md"></select>
-                        <label class="block text-sm mt-3 mb-1">Goals Analysis</label>
-                        <select id="filter-goals-analysis" class="w-full p-2 border rounded-md"></select>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <h4 class="font-semibold mb-2 text-gray-700">Team Streaks (Min)</h4>
                         <label class="block text-sm mb-1">Winning Streak</label>
@@ -817,12 +977,7 @@
                     <button onclick="handleAdvancedFilterChange()" class="px-6 py-3 bg-accent-green text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition">Apply Filters</button>
                 </div>
             </div>`;
-        document.body.appendChild(modal);
     };
-    buildAdvancedFiltersModal();
     </script>
 </body>
 </html>
-
-
-
