@@ -188,17 +188,40 @@
                 <svg class="w-6 h-6 collapse-icon text-text-secondary dark:text-dark-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </div>
             <div id="filters-panel" class="collapsible-content p-6 pt-0">
-                <div class="flex justify-between items-center mb-6">
+                 <div class="flex justify-between items-center mb-6">
                     <div></div> <!-- Spacer -->
                     <button onclick="clearFilters()" class="px-4 py-2 text-sm font-bold bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center interactive-glow"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Clear Filters</button>
                 </div>
-                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Search</label><input type="text" id="team-search-input" placeholder="e.g., Chelsea" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()"></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Match Date</label><select id="filter-date" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">League</label><select id="filter-league" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Prediction</label><select id="filter-prediction" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Correct Score</label><select id="filter-correct-score" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Match Analysis</label><select id="filter-match-analysis" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Goals Analysis</label><select id="filter-goals-analysis" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Home Odds (Min)</label><input type="number" id="filter-home-odds" placeholder="e.g., 1.5" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()"></div>
+                      <div class="relative col-span-1 md:col-span-1">
+                        <label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Stake</label>
+                        <div class="flex space-x-2">
+                            <input type="number" id="filter-stake-min" placeholder="Min" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                            <input type="number" id="filter-stake-max" placeholder="Max" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                        </div>
+                      </div>
+                      <div class="relative col-span-1 md:col-span-1">
+                        <label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Winning Streak</label>
+                        <div class="flex space-x-2">
+                            <input type="number" id="filter-winning-streak-min" placeholder="Min" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                            <input type="number" id="filter-winning-streak-max" placeholder="Max" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                        </div>
+                      </div>
+                      <div class="relative col-span-1 md:col-span-1">
+                        <label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Losing Streak</label>
+                        <div class="flex space-x-2">
+                            <input type="number" id="filter-losing-streak-min" placeholder="Min" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                            <input type="number" id="filter-losing-streak-max" placeholder="Max" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                        </div>
+                      </div>
                  </div>
              </div>
              <button onclick="showFilterModal()" class="absolute -bottom-5 right-6 px-5 py-3 bg-accent-orange text-white font-bold rounded-full shadow-lg hover:bg-accent-orange/90 transition flex items-center interactive-glow"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 16v-2m8-6h2m-16 0H4m14.243-7.757l1.414-1.414M5.343 18.657l-1.414 1.414m14.142 0l-1.414-1.414M6.757 5.343l-1.414-1.414M12 18a6 6 0 100-12 6 6 0 000 12z"></path></svg>More Filters</button>
@@ -277,6 +300,11 @@
     const initialFilters = { 
         league: 'All', prediction: 'All', teamSearch: '', matchDate: 'All Dates', homeOddsMin: null,
         correctScore: 'All',
+        stake: {min: null, max: null},
+        winningStreak: {min: null, max: null},
+        losingStreak: {min: null, max: null},
+        matchAnalysis: 'All',
+        goalsAnalysis: 'All',
         homeWins: {min: null, max: null}, homeDraws: {min: null, max: null}, homeLosses: {min: null, max: null},
         awayWins: {min: null, max: null}, awayDraws: {min: null, max: null}, awayLosses: {min: null, max: null},
         homeAvgScored: {min: null, max: null}, homeAvgConceded: {min: null, max: null},
@@ -321,11 +349,11 @@
     document.addEventListener('DOMContentLoaded', async () => {
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             dom.html.classList.add('dark');
-            dom.sunIcon.classList.add('hidden');
-            dom.moonIcon.classList.remove('hidden');
+            if(dom.sunIcon) dom.sunIcon.classList.add('hidden');
+            if(dom.moonIcon) dom.moonIcon.classList.remove('hidden');
         }
-        dom.darkModeToggle.addEventListener('click', toggleDarkMode);
-        dom.filtersHeader.addEventListener('click', () => {
+        if(dom.darkModeToggle) dom.darkModeToggle.addEventListener('click', toggleDarkMode);
+        if(dom.filtersHeader) dom.filtersHeader.addEventListener('click', () => {
             dom.filtersContainer.classList.toggle('collapsed');
             dom.filtersPanel.classList.toggle('collapsed');
         });
@@ -399,6 +427,18 @@
         if (filters.matchDate !== 'All Dates') filteredData = filteredData.filter(item => item['Match Date'] === filters.matchDate);
         if (filters.correctScore !== 'All') filteredData = filteredData.filter(item => item['Correct Score'] === filters.correctScore);
         if (filters.homeOddsMin) filteredData = filteredData.filter(item => item['Home Odds'] >= filters.homeOddsMin);
+
+        if (filters.matchAnalysis !== 'All') filteredData = filteredData.filter(item => item['Match Analysis'] === filters.matchAnalysis);
+        if (filters.goalsAnalysis !== 'All') filteredData = filteredData.filter(item => item['Goals Analysis'] === filters.goalsAnalysis);
+        
+        if (filters.stake.min !== null) filteredData = filteredData.filter(item => (item['Stake'] || 0) >= filters.stake.min);
+        if (filters.stake.max !== null) filteredData = filteredData.filter(item => (item['Stake'] || 0) <= filters.stake.max);
+
+        if (filters.winningStreak.min !== null) filteredData = filteredData.filter(item => (item['Winning Streak'] || 0) >= filters.winningStreak.min);
+        if (filters.winningStreak.max !== null) filteredData = filteredData.filter(item => (item['Winning Streak'] || 0) <= filters.winningStreak.max);
+        
+        if (filters.losingStreak.min !== null) filteredData = filteredData.filter(item => (item['Losing Streak'] || 0) >= filters.losingStreak.min);
+        if (filters.losingStreak.max !== null) filteredData = filteredData.filter(item => (item['Losing Streak'] || 0) <= filters.losingStreak.max);
 
         const rangeFilters = [
             { key: 'homeWins', dataKey: 'Home Wins' }, { key: 'homeDraws', dataKey: 'Home Draws' }, { key: 'homeLosses', dataKey: 'Home Losses' },
@@ -855,6 +895,22 @@
         filters.matchDate = document.getElementById("filter-date").value;
         filters.correctScore = document.getElementById("filter-correct-score").value;
         filters.homeOddsMin = parseFloat(document.getElementById("filter-home-odds").value) || null;
+        
+        filters.matchAnalysis = document.getElementById("filter-match-analysis").value;
+        filters.goalsAnalysis = document.getElementById("filter-goals-analysis").value;
+        filters.stake = {
+            min: parseFloat(document.getElementById("filter-stake-min").value) || null,
+            max: parseFloat(document.getElementById("filter-stake-max").value) || null
+        };
+        filters.winningStreak = {
+            min: parseFloat(document.getElementById("filter-winning-streak-min").value) || null,
+            max: parseFloat(document.getElementById("filter-winning-streak-max").value) || null
+        };
+        filters.losingStreak = {
+            min: parseFloat(document.getElementById("filter-losing-streak-min").value) || null,
+            max: parseFloat(document.getElementById("filter-losing-streak-max").value) || null
+        };
+
         applyFilters(); 
     };
     window.handleAdvancedFilterChange = () => {
@@ -900,6 +956,8 @@
         const dates = ['All Dates', ...new Set(allData.map(item => item['Match Date']).filter(Boolean))];
         const predictions = ['All', ...new Set(allData.map(item => item.Prediction).filter(Boolean))];
         const correctScores = ['All', ...new Set(allData.map(item => item['Correct Score']).filter(Boolean))];
+        const matchAnalyses = ['All', ...new Set(allData.map(item => item['Match Analysis']).filter(Boolean))];
+        const goalsAnalyses = ['All', ...new Set(allData.map(item => item['Goals Analysis']).filter(Boolean))];
         
         const leagueSelect = document.getElementById('filter-league');
         leagueSelect.innerHTML = leagues.map(l => `<option value="${l}">${l}</option>`).join('');
@@ -909,6 +967,10 @@
         predictionSelect.innerHTML = predictions.map(p => `<option value="${p}">${p}</option>`).join('');
         const correctScoreSelect = document.getElementById('filter-correct-score');
         correctScoreSelect.innerHTML = correctScores.map(s => `<option value="${s}">${s}</option>`).join('');
+        const matchAnalysisSelect = document.getElementById('filter-match-analysis');
+        matchAnalysisSelect.innerHTML = matchAnalyses.map(m => `<option value="${m}">${m}</option>`).join('');
+        const goalsAnalysisSelect = document.getElementById('filter-goals-analysis');
+        goalsAnalysisSelect.innerHTML = goalsAnalyses.map(g => `<option value="${g}">${g}</option>`).join('');
     };
     window.handleSort = (key) => { sortColumn === key ? sortDirection = (sortDirection === 'asc' ? 'desc' : 'asc') : (sortColumn = key, sortDirection = 'asc'); applySort(); };
     window.handlePrevPage = () => { if (currentPage > 1) { currentPage--; renderPage(); } };
@@ -948,3 +1010,4 @@
     </script>
 </body>
 </html>
+
