@@ -134,6 +134,32 @@
             pointer-events: none;
             z-index: 100;
         }
+        
+        /* Less Risky Table Styling */
+        .less-risky-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .less-risky-table th, .less-risky-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .less-risky-table th {
+            background-color: #004d40; /* Dark green */
+            color: white;
+            font-weight: bold;
+        }
+        .less-risky-table tr:nth-child(even) {
+            background-color: #f2f2f2; /* Light gray */
+        }
+        .dark .less-risky-table tr:nth-child(even) {
+            background-color: #374151;
+        }
+        .dark .less-risky-table th, .dark .less-risky-table td {
+             border-color: #4a5568;
+        }
+
 
     </style>
 </head>
@@ -154,6 +180,7 @@
             <div id="nav-tabs" class="flex space-x-2 p-1 bg-gray-200/50 dark:bg-gray-700/50 rounded-full">
                 <!-- Navigation Tabs -->
                 <button id="tab-dashboard" onclick="handleTabClick('dashboard', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>📊 Dashboard</button>
+                <button id="tab-less-risky" onclick="handleTabClick('less-risky', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>🛡️ Less Risky</button>
                 <button id="tab-all" onclick="handleTabClick('all', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>⚽ All Matches</button>
                 <button id="tab-best" onclick="handleTabClick('best', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>🎯 Best Tips</button>
                 <button id="tab-extrapolation" onclick="handleTabClick('extrapolation', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>📈 Winning Extrapolation</button>
@@ -260,6 +287,62 @@
             </div>
         </div>
         
+        <!-- Less Risky Content -->
+        <div id="less-risky-content" class="hidden p-4 md:p-6 bg-panel-bg dark:bg-dark-panel-bg rounded-xl shadow-2xl">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-4xl font-extrabold text-text-primary dark:text-dark-text-primary">Less Risky Picks Dashboard</h1>
+                <p class="text-text-secondary dark:text-dark-text-secondary mt-2">Filtered daily insights from WinnersPredict & HeroPredict</p>
+            </div>
+
+            <!-- Date Filter and Navigation -->
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 p-4 bg-filter-panel-bg dark:bg-dark-filter-panel-bg rounded-lg shadow">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <button onclick="filterLessRiskyByDate('yesterday')" class="px-4 py-2 text-sm font-bold bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition">Yesterday</button>
+                    <button onclick="filterLessRiskyByDate('today')" class="px-4 py-2 text-sm font-bold bg-primary-blue text-white rounded-lg hover:bg-primary-purple transition">Today</button>
+                    <button onclick="filterLessRiskyByDate('tomorrow')" class="px-4 py-2 text-sm font-bold bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition">Tomorrow</button>
+                </div>
+                <div class="relative">
+                    <label for="less-risky-date-filter" class="text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mr-2">Select Date:</label>
+                    <select id="less-risky-date-filter" onchange="filterLessRiskyByDate(this.value)" class="p-2 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg flex items-center space-x-4"><div class="text-3xl">🏟️</div><div><h3 class="text-sm font-bold text-text-secondary dark:text-dark-text-secondary">TOTAL MATCHES TODAY</h3><p id="lr-stat-total-matches" class="text-3xl font-extrabold text-primary-blue mt-1">0</p></div></div>
+                <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg flex items-center space-x-4"><div class="text-3xl">📊</div><div><h3 class="text-sm font-bold text-text-secondary dark:text-dark-text-secondary">TIPS DISTRIBUTION</h3><p id="lr-stat-tips-dist" class="text-lg font-bold text-text-primary dark:text-dark-text-primary mt-1">N/A</p></div></div>
+                <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg flex items-center space-x-4"><div class="text-3xl">📈</div><div><h3 class="text-sm font-bold text-text-secondary dark:text-dark-text-secondary">WIN RATE YESTERDAY</h3><p id="lr-stat-win-rate" class="text-3xl font-extrabold text-accent-green mt-1">0%</p></div></div>
+            </div>
+
+            <!-- Tables Side by Side -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 text-text-primary dark:text-dark-text-primary">Winners</h2>
+                    <div class="overflow-x-auto rounded-lg shadow">
+                        <table id="winners-table" class="less-risky-table min-w-full">
+                            <thead><tr><th>Date</th><th>League</th><th>Time</th><th>Home Team</th><th>Away Team</th><th>Tip</th><th>Score</th></tr></thead>
+                            <tbody id="winners-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 text-text-primary dark:text-dark-text-primary">Hero</h2>
+                    <div class="overflow-x-auto rounded-lg shadow">
+                         <table id="hero-table" class="less-risky-table min-w-full">
+                            <thead><tr><th>Date</th><th>League</th><th>Time</th><th>Home Team</th><th>Away Team</th><th>Tip</th><th>Score</th></tr></thead>
+                            <tbody id="hero-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+             <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg w-full flex flex-col items-center"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4">Distribution of Tips</h3><div class="relative w-full max-w-[400px] aspect-square"><canvas id="lr-tip-pie-chart"></canvas></div></div>
+                <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg w-full flex flex-col items-center"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4">Daily Matches (Last 7 Days)</h3><div class="relative w-full h-64"><canvas id="lr-daily-matches-chart"></canvas></div></div>
+            </div>
+        </div>
+
         <!-- Favorites Content -->
         <div id="favorites-content" class="hidden">
             <div class="bg-panel-bg dark:bg-dark-panel-bg shadow-2xl rounded-xl overflow-hidden p-6">
@@ -288,6 +371,8 @@
 
     // --- Configuration ---
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQH-Uue5Ctuo4aU-4S81U9QvoXxslOq6YjKHnVkPjyOeJqci4p19cs2iZ8y5GgzsSh_vQHxPYb-gl-5/pub?gid=0&single=true&output=csv';
+    const LESS_RISKY_XLSX_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQjoi3SalPo7WPlbc67fZ16gWU98v7ctwZeQ5zfiFOJGqwzPGfnV_cu_Em6hPazADOAgH6pEeXWE-yw/pub?output=xlsx';
+
     const HIDDEN_COLUMNS = ['Home Team', 'Away Team', 'Home Wins', 'Home Draws', 'Home Losses', 'Away Wins', 'Away Draws', 'Away Losses', 'Home Avg Scored', 'Home Conceded', 'Home Avg Conceded', 'Away Avg Scored', 'Away Conceded', 'Away Avg Conceded', 'Match Analysis', 'Goals Analysis'];
     const COLUMN_MAP = [
         { key: 'Match Date', label: 'Date' }, { key: 'League', label: 'League' }, { key: 'Match', label: 'Match' }, { key: 'Prediction', label: 'Prediction' }, { key: 'Outcome', label: 'Outcome' }, { key: 'Result', label: 'Result' }, { key: 'Correct Score', label: 'Score' }, { key: 'Home Odds', label: '1', type: 'number' }, { key: 'Draw Odds', label: 'X', type: 'number' }, { key: 'Away Odds', label: '2', type: 'number' }, 
@@ -296,6 +381,8 @@
     
     // --- STATE MANAGEMENT ---
     let allData = [], currentData = [], favorites = [], pinnedMatches = [], viewedRows = new Set(), outcomeChart, predictionChart, filteredFavorites = [], lostMatches = new Set();
+    let winnersData = [], heroData = [];
+    let lrTipPieChart, lrDailyMatchesChart;
     let sortColumn = 'Match Date', sortDirection = 'desc', rowsPerPage = 30, currentPage = 1, activeTab = 'dashboard';
     const initialFilters = { 
         league: 'All', prediction: 'All', teamSearch: '', matchDate: 'All Dates', homeOddsMin: null,
@@ -320,6 +407,7 @@
         loading: document.getElementById('loading-indicator'),
         mainContent: document.getElementById('main-content'),
         dashboardContent: document.getElementById('dashboard-content'),
+        lessRiskyContent: document.getElementById('less-risky-content'),
         favoritesContent: document.getElementById('favorites-content'),
         tableBody: document.getElementById('table-body'),
         tableHeadRow: document.querySelector('#data-table thead tr'),
@@ -359,9 +447,13 @@
         });
         dom.loading.classList.remove('hidden');
         try {
-            const response = await fetch(CSV_URL);
-            if (!response.ok) throw new Error('Network response was not ok');
-            const csvText = await response.text();
+            const [csvResponse, _] = await Promise.all([
+                fetch(CSV_URL),
+                loadLessRiskyData() // Fire and forget, will update UI when done
+            ]);
+            
+            if (!csvResponse.ok) throw new Error('Network response was not ok for main data');
+            const csvText = await csvResponse.text();
             allData = parseCSV(csvText);
             const savedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
             favorites = allData.filter(item => savedFavorites.includes(item.uniqueId));
@@ -387,6 +479,9 @@
         dom.moonIcon.classList.toggle('hidden');
         localStorage.setItem('theme', dom.html.classList.contains('dark') ? 'dark' : 'light');
         if (activeTab === 'dashboard' && allData.length > 0) renderDashboard(currentData);
+        if (activeTab === 'less-risky') {
+            filterLessRiskyByDate(document.getElementById('less-risky-date-filter').value);
+        }
     }
     
     // --- PARSING & FILTERING ---
@@ -412,7 +507,19 @@
 
     const applyFilters = () => {
         currentPage = 1;
-        let sourceData = (activeTab === 'favorites') ? favorites : allData;
+        let sourceData;
+        
+        switch(activeTab) {
+            case 'favorites':
+                sourceData = favorites;
+                break;
+            case 'less-risky':
+                // This tab has its own filtering logic
+                return; 
+            default:
+                sourceData = allData;
+        }
+
         let filteredData = sourceData;
 
         if (activeTab === 'best') {
@@ -735,6 +842,262 @@
         if (predictionChart) predictionChart.destroy();
         predictionChart = new Chart(document.getElementById('prediction-bar-chart').getContext('2d'), { type: 'bar', data: { labels: Object.keys(predictionCounts), datasets: [{ label: 'Prediction Count', data: Object.values(predictionCounts), backgroundColor: '#0a0a2a' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: chartTextColor } }, y: { ticks: { color: chartTextColor, beginAtZero: true } } }, plugins: { legend: { labels: { color: chartTextColor } } } } });
     };
+    
+    // --- Less Risky Tab Functions ---
+    async function loadLessRiskyData() {
+        try {
+            const response = await fetch(LESS_RISKY_XLSX_URL);
+            const arrayBuffer = await response.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, { type: 'buffer' });
+
+            const winnersSheetName = 'winnerspredict';
+            const heroSheetName = 'heropredict';
+
+            if (workbook.SheetNames.includes(winnersSheetName)) {
+                const winnersSheet = workbook.Sheets[winnersSheetName];
+                winnersData = XLSX.utils.sheet_to_json(winnersSheet, {
+                    raw: false, // Format dates
+                    defval: ""
+                });
+            } else {
+                console.warn(`Sheet "${winnersSheetName}" not found.`);
+            }
+
+            if (workbook.SheetNames.includes(heroSheetName)) {
+                const heroSheet = workbook.Sheets[heroSheetName];
+                heroData = XLSX.utils.sheet_to_json(heroSheet, {
+                    raw: false,
+                    defval: ""
+                });
+            } else {
+                console.warn(`Sheet "${heroSheetName}" not found.`);
+            }
+            
+            // Normalize data and extract team names
+            const toProperCase = (str) => {
+                if (!str) return '';
+                return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+            };
+
+            const processLessRiskyRow = (row) => {
+                // Normalize Date from Excel serial number
+                if (row.Date && typeof row.Date === 'number') {
+                    const date = new Date(Math.round((row.Date - 25569) * 86400 * 1000));
+                    row.Date = date.toISOString().split('T')[0];
+                }
+
+                // Extract Home and Away teams from MatchID
+                if (row.MatchID && typeof row.MatchID === 'string') {
+                    const parts = row.MatchID.split('_vs_');
+                    if (parts.length === 2) {
+                        const homePart = parts[0];
+                        // Assumes format is YYYY-MM-DD_home_team, gets everything after first underscore
+                        const homeTeamRaw = homePart.substring(homePart.indexOf('_') + 1);
+                        row['Home Team'] = toProperCase(homeTeamRaw.replace(/_/g, ' '));
+
+                        const awayTeamRaw = parts[1];
+                        row['Away Team'] = toProperCase(awayTeamRaw.replace(/_/g, ' '));
+                    }
+                }
+                return row;
+            };
+
+            winnersData = winnersData.map(processLessRiskyRow);
+            heroData = heroData.map(processLessRiskyRow);
+
+            populateLessRiskyDateFilter();
+            filterLessRiskyByDate('today');
+
+        } catch (error) {
+            console.error("Error loading Less Risky data:", error);
+        }
+    }
+
+    function populateLessRiskyDateFilter() {
+        const allDates = [...new Set([...winnersData.map(r => r.Date), ...heroData.map(r => r.Date)])];
+        const sortedDates = allDates.filter(Boolean).sort((a,b) => new Date(b) - new Date(a));
+        
+        const dateFilter = document.getElementById('less-risky-date-filter');
+        dateFilter.innerHTML = sortedDates.map(date => `<option value="${date}">${date}</option>`).join('');
+    }
+
+    function filterLessRiskyByDate(date) {
+        let targetDate;
+        const today = new Date();
+        const yyyy_mm_dd = (d) => d.toISOString().split('T')[0];
+
+        if (date === 'today') {
+            targetDate = yyyy_mm_dd(today);
+        } else if (date === 'yesterday') {
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            targetDate = yyyy_mm_dd(yesterday);
+        } else if (date === 'tomorrow') {
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            targetDate = yyyy_mm_dd(tomorrow);
+        } else {
+            targetDate = date;
+        }
+        
+        const dateFilterSelect = document.getElementById('less-risky-date-filter');
+        if (dateFilterSelect) {
+             dateFilterSelect.value = targetDate;
+        }
+
+        const filteredWinners = winnersData.filter(row => row.Date === targetDate);
+        const filteredHero = heroData.filter(row => row.Date === targetDate);
+
+        renderLessRiskyTables(filteredWinners, filteredHero);
+        updateLessRiskySummaryCards(targetDate);
+        updateLessRiskyCharts(targetDate);
+    }
+
+    function renderLessRiskyTables(winners, hero) {
+        const winnersBody = document.getElementById('winners-table-body');
+        const heroBody = document.getElementById('hero-table-body');
+
+        const createRow = (row) => {
+            const tr = document.createElement('tr');
+            const tip = row.Tip || '-';
+            let tipColorClass = '';
+            if (tip === '1' || tip === '1x') {
+                tipColorClass = 'bg-green-100 dark:bg-green-900 font-bold text-green-700 dark:text-green-300';
+            } else if (['Over 1.5', 'Home ov 1.5', '2+'].includes(tip)) {
+                tipColorClass = 'bg-orange-100 dark:bg-orange-900 font-bold text-orange-700 dark:text-orange-300';
+            } else if (tip === '-') {
+                tipColorClass = 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300';
+            }
+            
+            tr.innerHTML = `
+                <td>${row.Date || ''}</td>
+                <td>${row.League || ''}</td>
+                <td>${row.Time || ''}</td>
+                <td>${row['Home Team'] || ''}</td>
+                <td>${row['Away Team'] || ''}</td>
+                <td class="${tipColorClass}">${tip}</td>
+                <td>${row.Score || ''}</td>
+            `;
+            return tr;
+        };
+
+        winnersBody.innerHTML = '';
+        winners.forEach(row => winnersBody.appendChild(createRow(row)));
+        if(winners.length === 0) winnersBody.innerHTML = '<tr><td colspan="7" class="text-center p-4">No matches for this date.</td></tr>';
+
+
+        heroBody.innerHTML = '';
+        hero.forEach(row => heroBody.appendChild(createRow(row)));
+        if(hero.length === 0) heroBody.innerHTML = '<tr><td colspan="7" class="text-center p-4">No matches for this date.</td></tr>';
+    }
+    
+    function updateLessRiskySummaryCards(selectedDate) {
+        const winnersToday = winnersData.filter(r => r.Date === selectedDate);
+        const heroToday = heroData.filter(r => r.Date === selectedDate);
+        document.getElementById('lr-stat-total-matches').textContent = winnersToday.length + heroToday.length;
+        
+        const allToday = [...winnersToday, ...heroToday];
+        const tipCounts = allToday.reduce((acc, row) => {
+            const tip = row.Tip || '-';
+            acc[tip] = (acc[tip] || 0) + 1;
+            return acc;
+        }, {});
+        
+        const tipsDistText = Object.entries(tipCounts).map(([tip, count]) => `${tip}: ${count}`).join(', ');
+        document.getElementById('lr-stat-tips-dist').textContent = tipsDistText || 'N/A';
+
+        // Win Rate Yesterday
+        const today = new Date(selectedDate);
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        
+        const winnersYesterday = winnersData.filter(r => r.Date === yesterdayStr && r.Score);
+        const heroYesterday = heroData.filter(r => r.Date === yesterdayStr && r.Score);
+        const allYesterday = [...winnersYesterday, ...heroYesterday];
+        
+        let correctCount = 0;
+        allYesterday.forEach(match => {
+           // Basic win rate logic, can be expanded
+           const [homeScore, awayScore] = (match.Score || "0-0").split('-').map(Number);
+           const tip = match.Tip;
+           let win = false;
+           if(tip === '1' && homeScore > awayScore) win = true;
+           if(tip === '2' && awayScore > homeScore) win = true;
+           if(tip === 'x' && homeScore === awayScore) win = true;
+           if(tip === '1x' && (homeScore > awayScore || homeScore === awayScore)) win = true;
+           if(tip === '2x' && (awayScore > homeScore || homeScore === awayScore)) win = true;
+           if(tip === 'Over 1.5' && (homeScore + awayScore) > 1.5) win = true;
+           if(tip === 'Home ov 1.5' && homeScore > 1.5) win = true;
+
+           if(win) correctCount++;
+        });
+
+        const winRate = allYesterday.length > 0 ? ((correctCount / allYesterday.length) * 100).toFixed(1) : 0;
+        document.getElementById('lr-stat-win-rate').textContent = `${winRate}%`;
+    }
+    
+    function updateLessRiskyCharts(selectedDate) {
+        const allToday = [...winnersData.filter(r => r.Date === selectedDate), ...heroData.filter(r => r.Date === selectedDate)];
+        const tipCounts = allToday.reduce((acc, row) => {
+            const tip = row.Tip || '-';
+            acc[tip] = (acc[tip] || 0) + 1;
+            return acc;
+        }, {});
+        
+        const isDark = dom.html.classList.contains('dark');
+        const chartTextColor = isDark ? 'white' : 'black';
+
+        if(lrTipPieChart) lrTipPieChart.destroy();
+        lrTipPieChart = new Chart(document.getElementById('lr-tip-pie-chart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: Object.keys(tipCounts),
+                datasets: [{
+                    data: Object.values(tipCounts),
+                    backgroundColor: ['#3f51b5', '#673ab7', '#00c853', '#ff9800', '#f44336', '#9e9e9e'],
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: chartTextColor } } } }
+        });
+
+        const last7DaysData = {};
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(selectedDate);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            last7DaysData[dateStr] = 0;
+        }
+
+        [...winnersData, ...heroData].forEach(row => {
+            if(last7DaysData.hasOwnProperty(row.Date)) {
+                last7DaysData[row.Date]++;
+            }
+        });
+
+        if(lrDailyMatchesChart) lrDailyMatchesChart.destroy();
+        lrDailyMatchesChart = new Chart(document.getElementById('lr-daily-matches-chart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: Object.keys(last7DaysData),
+                datasets: [{
+                    label: 'Total Matches',
+                    data: Object.values(last7DaysData),
+                    borderColor: '#3f51b5',
+                    backgroundColor: 'rgba(63, 81, 181, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { x: { ticks: { color: chartTextColor } }, y: { ticks: { color: chartTextColor, beginAtZero: true } } },
+                plugins: { legend: { labels: { color: chartTextColor } } }
+            }
+        });
+    }
+
 
     window.togglePin = (uniqueId) => {
         const index = pinnedMatches.indexOf(uniqueId);
@@ -870,11 +1233,12 @@
         updateUiForTab();
     };
     const updateUiForTab = () => {
-        const isDashboard = activeTab === 'dashboard', isFavorites = activeTab === 'favorites';
+        const isDashboard = activeTab === 'dashboard', isFavorites = activeTab === 'favorites', isLessRisky = activeTab === 'less-risky';
         dom.dashboardContent.classList.toggle('hidden', !isDashboard);
         dom.favoritesContent.classList.toggle('hidden', !isFavorites);
-        dom.mainContent.classList.toggle('hidden', isDashboard || isFavorites);
-        dom.filtersContainer.classList.toggle('hidden', isDashboard);
+        dom.lessRiskyContent.classList.toggle('hidden', !isLessRisky);
+        dom.mainContent.classList.toggle('hidden', isDashboard || isFavorites || isLessRisky);
+        dom.filtersContainer.classList.toggle('hidden', isDashboard || isLessRisky);
 
         if (isFavorites) {
             document.querySelectorAll('#favorites-content button').forEach(btn => {
