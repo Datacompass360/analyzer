@@ -224,6 +224,10 @@
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Match Date</label><select id="filter-date" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">League</label><select id="filter-league" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Prediction</label><select id="filter-prediction" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
+                      <!-- START: New Filters -->
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Winning Chance</label><select id="filter-winning-chance" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Over 3 Goals</label><select id="filter-over-3-goals" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
+                      <!-- END: New Filters -->
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Correct Score</label><select id="filter-correct-score" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Match Analysis</label><select id="filter-match-analysis" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Goals Analysis</label><select id="filter-goals-analysis" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
@@ -373,10 +377,45 @@
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQH-Uue5Ctuo4aU-4S81U9QvoXxslOq6YjKHnVkPjyOeJqci4p19cs2iZ8y5GgzsSh_vQHxPYb-gl-5/pub?gid=0&single=true&output=csv';
     const LESS_RISKY_XLSX_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQjoi3SalPo7WPlbc67fZ16gWU98v7ctwZeQ5zfiFOJGqwzPGfnV_cu_Em6hPazADOAgH6pEeXWE-yw/pub?output=xlsx';
 
-    const HIDDEN_COLUMNS = ['Home Team', 'Away Team', 'Home Wins', 'Home Draws', 'Home Losses', 'Away Wins', 'Away Draws', 'Away Losses', 'Home Avg Scored', 'Home Conceded', 'Home Avg Conceded', 'Away Avg Scored', 'Away Conceded', 'Away Avg Conceded', 'Match Analysis', 'Goals Analysis'];
+    const HIDDEN_COLUMNS = ['League', 'Home Team', 'Away Team', 'Home Wins', 'Home Draws', 'Home Losses', 'Away Wins', 'Away Draws', 'Away Losses', 'Home Avg Scored', 'Home Conceded', 'Home Avg Conceded', 'Away Avg Scored', 'Away Conceded', 'Away Avg Conceded', 'Match Analysis', 'Goals Analysis'];
+    
     const COLUMN_MAP = [
-        { key: 'Match Date', label: 'Date' }, { key: 'League', label: 'League' }, { key: 'Match', label: 'Match' }, { key: 'Prediction', label: 'Prediction' }, { key: 'Outcome', label: 'Outcome' }, { key: 'Result', label: 'Result' }, { key: 'Correct Score', label: 'Score' }, { key: 'Home Odds', label: '1', type: 'number' }, { key: 'Draw Odds', label: 'X', type: 'number' }, { key: 'Away Odds', label: '2', type: 'number' }, 
-        { key: 'Home Team', type: 'string' }, { key: 'Away Team', type: 'string' }, { key: 'Winning Streak', type: 'number' }, { key: 'Losing Streak', type: 'number' }, { key: 'Stake', type: 'number' }, { key: 'Home Wins', type: 'number' }, { key: 'Home Draws', type: 'number' }, { key: 'Home Losses', type: 'number' }, { key: 'Away Wins', type: 'number' }, { key: 'Away Draws', type: 'number' }, { key: 'Away Losses', type: 'number' }, { key: 'Home Team Scored', type: 'number' }, { key: 'Home Avg Scored', type: 'number' }, { key: 'Home Conceded', type: 'number' }, { key: 'Home Avg Conceded', type: 'number' }, { key: 'Away Team Scored', type: 'number' }, { key: 'Away Avg Scored', type: 'number' }, { key: 'Away Conceded', type: 'number' }, { key: 'Away Avg Conceded', type: 'number' }, { key: 'Match Analysis', type: 'string' }, { key: 'Goals Analysis', type: 'string' }
+        { key: 'Match Date', label: 'Date' },
+        { key: 'League', label: 'League' },
+        { key: 'Match', label: 'Match' },
+        { key: 'Prediction', label: 'Prediction' },
+        { key: 'Winning Probability', label: 'Win %', type: 'number' },
+        { key: 'Probability of 3 Goals', label: 'P(3+ Gls)', type: 'number' },
+        { key: 'Winning Chance', label: 'Win Chance', type: 'string' },
+        { key: 'Over 3 Goals', label: 'O/3 Gls', type: 'string' },
+        { key: 'Outcome', label: 'Outcome' },
+        { key: 'Result', label: 'Result' },
+        { key: 'Correct Score', label: 'Score' },
+        { key: 'Home Odds', label: '1', type: 'number' },
+        { key: 'Draw Odds', label: 'X', type: 'number' },
+        { key: 'Away Odds', label: '2', type: 'number' },
+        // All columns, including new and hidden ones, must be listed for the parser to work correctly.
+        { key: 'Home Team', type: 'string' },
+        { key: 'Away Team', type: 'string' },
+        { key: 'Winning Streak', type: 'number' },
+        { key: 'Losing Streak', type: 'number' },
+        { key: 'Stake', type: 'number' },
+        { key: 'Home Wins', type: 'number' },
+        { key: 'Home Draws', type: 'number' },
+        { key: 'Home Losses', type: 'number' },
+        { key: 'Away Wins', type: 'number' },
+        { key: 'Away Draws', type: 'number' },
+        { key: 'Away Losses', type: 'number' },
+        { key: 'Home Team Scored', type: 'number' },
+        { key: 'Home Avg Scored', type: 'number' },
+        { key: 'Home Conceded', type: 'number' },
+        { key: 'Home Avg Conceded', type: 'number' },
+        { key: 'Away Team Scored', type: 'number' },
+        { key: 'Away Avg Scored', type: 'number' },
+        { key: 'Away Conceded', type: 'number' },
+        { key: 'Away Avg Conceded', type: 'number' },
+        { key: 'Match Analysis', type: 'string' },
+        { key: 'Goals Analysis', type: 'string' }
     ];
     
     // --- STATE MANAGEMENT ---
@@ -384,9 +423,12 @@
     let winnersData = [], heroData = [];
     let lrTipPieChart, lrDailyMatchesChart;
     let sortColumn = 'Match Date', sortDirection = 'desc', rowsPerPage = 30, currentPage = 1, activeTab = 'dashboard';
+    
     const initialFilters = { 
         league: 'All', prediction: 'All', teamSearch: '', matchDate: 'All Dates', homeOddsMin: null,
         correctScore: 'All',
+        winningChance: 'All',
+        over3Goals: 'All',
         stake: {min: null, max: null},
         winningStreak: {min: null, max: null},
         losingStreak: {min: null, max: null},
@@ -399,6 +441,7 @@
         homeOdds: {min: null, max: null}, drawOdds: {min: null, max: null}, awayOdds: {min: null, max: null},
         predictionOdds: {min: null, max: null}
     };
+    
     let filters = { ...initialFilters };
 
     // --- DOM ELEMENTS ---
@@ -535,6 +578,11 @@
         if (filters.correctScore !== 'All') filteredData = filteredData.filter(item => item['Correct Score'] === filters.correctScore);
         if (filters.homeOddsMin) filteredData = filteredData.filter(item => item['Home Odds'] >= filters.homeOddsMin);
 
+        
+        if (filters.winningChance !== 'All') filteredData = filteredData.filter(item => item['Winning Chance'] === filters.winningChance);
+        if (filters.over3Goals !== 'All') filteredData = filteredData.filter(item => item['Over 3 Goals'] === filters.over3Goals);
+        
+
         if (filters.matchAnalysis !== 'All') filteredData = filteredData.filter(item => item['Match Analysis'] === filters.matchAnalysis);
         if (filters.goalsAnalysis !== 'All') filteredData = filteredData.filter(item => item['Goals Analysis'] === filters.goalsAnalysis);
         
@@ -660,14 +708,21 @@
                 <td class="px-2 py-3 text-center"><span onclick="event.stopPropagation(); toggleFavorite('${item.uniqueId}')" class="text-2xl cursor-pointer transition transform hover:scale-125 ${isFavorited ? "text-yellow-400" : "text-gray-300 dark:text-gray-600"}">${isFavorited ? ICONS.star : ICONS.starOutline}</span></td>`;
             
             visibleCols.forEach(col => {
-                const value = item[col.key] || "N/A";
+                const value = item[col.key];
+                let displayValue = (value === null || value === undefined || value === '') ? "N/A" : value;
+
                 if (col.key === 'Outcome') {
-                    const [bgColor, text, isWin] = getOutcomeColor(item.Prediction, value);
+                    const [bgColor, text, isWin] = getOutcomeColor(item.Prediction, displayValue);
                     rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm"><span class="px-3 py-1 text-xs font-bold rounded-full text-white ${bgColor} shadow-md ${isWin ? 'glow-win' : ''}">${text}</span></td>`;
                 } else if (col.key === 'Match') {
-                    rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-text-primary dark:text-dark-text-primary">${getLeagueLogo(item.League)} ${value}</td>`;
+                    rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-text-primary dark:text-dark-text-primary">${getLeagueLogo(item.League)} ${displayValue}</td>`;
+                } else if (col.key === 'Winning Probability' || col.key === 'Probability of 3 Goals') {
+                    
+                    const percentage = typeof value === 'number' ? `${(value * 100).toFixed(1)}%` : 'N/A';
+                    rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm text-text-secondary dark:text-dark-text-secondary">${percentage}</td>`;
+                    
                 } else {
-                    rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm text-text-secondary dark:text-dark-text-secondary">${value}</td>`;
+                    rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm text-text-secondary dark:text-dark-text-secondary">${displayValue}</td>`;
                 }
                  if (col.key === 'Match Date') {
                     rowHTML += `<td class="px-4 py-3 whitespace-nowrap text-sm text-center">
@@ -1260,6 +1315,11 @@
         filters.correctScore = document.getElementById("filter-correct-score").value;
         filters.homeOddsMin = parseFloat(document.getElementById("filter-home-odds").value) || null;
         
+        
+        filters.winningChance = document.getElementById("filter-winning-chance").value;
+        filters.over3Goals = document.getElementById("filter-over-3-goals").value;
+        
+        
         filters.matchAnalysis = document.getElementById("filter-match-analysis").value;
         filters.goalsAnalysis = document.getElementById("filter-goals-analysis").value;
         filters.stake = {
@@ -1323,6 +1383,10 @@
         const matchAnalyses = ['All', ...new Set(allData.map(item => item['Match Analysis']).filter(Boolean))];
         const goalsAnalyses = ['All', ...new Set(allData.map(item => item['Goals Analysis']).filter(Boolean))];
         
+        const winningChances = ['All', ...new Set(allData.map(item => item['Winning Chance']).filter(Boolean))];
+        const over3Goals = ['All', ...new Set(allData.map(item => item['Over 3 Goals']).filter(Boolean))];
+        
+        
         const leagueSelect = document.getElementById('filter-league');
         leagueSelect.innerHTML = leagues.map(l => `<option value="${l}">${l}</option>`).join('');
         const dateSelect = document.getElementById('filter-date');
@@ -1335,6 +1399,13 @@
         matchAnalysisSelect.innerHTML = matchAnalyses.map(m => `<option value="${m}">${m}</option>`).join('');
         const goalsAnalysisSelect = document.getElementById('filter-goals-analysis');
         goalsAnalysisSelect.innerHTML = goalsAnalyses.map(g => `<option value="${g}">${g}</option>`).join('');
+
+        
+        const winningChanceSelect = document.getElementById('filter-winning-chance');
+        winningChanceSelect.innerHTML = winningChances.map(v => `<option value="${v}">${v}</option>`).join('');
+        const over3GoalsSelect = document.getElementById('filter-over-3-goals');
+        over3GoalsSelect.innerHTML = over3Goals.map(v => `<option value="${v}">${v}</option>`).join('');
+        
     };
     window.handleSort = (key) => { sortColumn === key ? sortDirection = (sortDirection === 'asc' ? 'desc' : 'asc') : (sortColumn = key, sortDirection = 'asc'); applySort(); };
     window.handlePrevPage = () => { if (currentPage > 1) { currentPage--; renderPage(); } };
