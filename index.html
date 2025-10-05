@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Load Chart.js for Dashboard & In-depth Analysis -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <!-- PDF & Excel Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -184,6 +185,7 @@
                 <button id="tab-all" onclick="handleTabClick('all', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>⚽ All Matches</button>
                 <button id="tab-best" onclick="handleTabClick('best', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>🎯 Best Tips</button>
                 <button id="tab-extrapolation" onclick="handleTabClick('extrapolation', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>📈 Winning Extrapolation</button>
+                <button id="tab-prediction-analysis" onclick="handleTabClick('prediction-analysis', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>🔬 Prediction Analysis</button>
                 <button id="tab-favorites" onclick="handleTabClick('favorites', this)" class="nav-tab flex items-center py-2 px-5 text-sm font-bold bg-panel-bg text-text-primary dark:bg-dark-panel-bg dark:text-dark-text-primary rounded-full shadow-sm"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>⭐ Favorites</button>
             </div>
             <div id="nav-underline" class="absolute bottom-[-8px] h-[3px] bg-gradient-to-r from-primary-blue to-primary-purple rounded-full"></div>
@@ -219,40 +221,41 @@
                     <div></div> <!-- Spacer -->
                     <button onclick="clearFilters()" class="px-4 py-2 text-sm font-bold bg-red-500 text-white rounded-lg hover:bg-red-600 transition flex items-center interactive-glow"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Clear Filters</button>
                 </div>
-                 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Search</label><input type="text" id="team-search-input" placeholder="e.g., Chelsea" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()"></div>
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Search Match</label><input type="text" id="team-search-input" placeholder="e.g., Chelsea" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()"></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Match Date</label><select id="filter-date" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">League</label><select id="filter-league" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Prediction</label><select id="filter-prediction" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
-                      <!-- START: New Filters -->
-                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Winning Chance</label><select id="filter-winning-chance" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
-                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Over 3 Goals</label><select id="filter-over-3-goals" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
-                      <!-- END: New Filters -->
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Correct Score</label><select id="filter-correct-score" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Match Analysis</label><select id="filter-match-analysis" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
                       <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Goals Analysis</label><select id="filter-goals-analysis" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
-                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Home Odds (Min)</label><input type="number" id="filter-home-odds" placeholder="e.g., 1.5" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()"></div>
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Match Prediction</label><select id="filter-match-prediction" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
+                      <div class="relative"><label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Total Goals Prediction</label><select id="filter-total-goals-prediction" onchange="handleFilterChange()" class="w-full p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select></div>
+
                       <div class="relative col-span-1 md:col-span-1">
-                        <label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Stake</label>
+                        <label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Winning Probability</label>
                         <div class="flex space-x-2">
-                            <input type="number" id="filter-stake-min" placeholder="Min" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
-                            <input type="number" id="filter-stake-max" placeholder="Max" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                            <input type="number" step="0.01" id="filter-winning-prob-min" placeholder="Min (0-1)" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                            <input type="number" step="0.01" id="filter-winning-prob-max" placeholder="Max (0-1)" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
                         </div>
                       </div>
+
                       <div class="relative col-span-1 md:col-span-1">
-                        <label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Winning Streak</label>
+                        <label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Prob. of 3+ Goals</label>
                         <div class="flex space-x-2">
-                            <input type="number" id="filter-winning-streak-min" placeholder="Min" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
-                            <input type="number" id="filter-winning-streak-max" placeholder="Max" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                            <input type="number" step="0.01" id="filter-prob-3-goals-min" placeholder="Min (0-1)" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                            <input type="number" step="0.01" id="filter-prob-3-goals-max" placeholder="Max (0-1)" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
                         </div>
                       </div>
+
                       <div class="relative col-span-1 md:col-span-1">
-                        <label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Losing Streak</label>
+                        <label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">Outcome Probability</label>
                         <div class="flex space-x-2">
-                            <input type="number" id="filter-losing-streak-min" placeholder="Min" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
-                            <input type="number" id="filter-losing-streak-max" placeholder="Max" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                            <input type="number" step="0.01" id="filter-outcome-prob-min" placeholder="Min (0-1)" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
+                            <input type="number" step="0.01" id="filter-outcome-prob-max" placeholder="Max (0-1)" class="w-1/2 p-3 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm" oninput="handleFilterChange()">
                         </div>
                       </div>
+
                  </div>
              </div>
              <button onclick="showFilterModal()" class="absolute -bottom-5 right-6 px-5 py-3 bg-accent-orange text-white font-bold rounded-full shadow-lg hover:bg-accent-orange/90 transition flex items-center interactive-glow"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 16v-2m8-6h2m-16 0H4m14.243-7.757l1.414-1.414M5.343 18.657l-1.414 1.414m14.142 0l-1.414-1.414M6.757 5.343l-1.414-1.414M12 18a6 6 0 100-12 6 6 0 000 12z"></path></svg>More Filters</button>
@@ -292,58 +295,85 @@
         </div>
         
         <!-- Less Risky Content -->
-        <div id="less-risky-content" class="hidden p-4 md:p-6 bg-panel-bg dark:bg-dark-panel-bg rounded-xl shadow-2xl">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl md:text-4xl font-extrabold text-text-primary dark:text-dark-text-primary">Less Risky Picks Dashboard</h1>
-                <p class="text-text-secondary dark:text-dark-text-secondary mt-2">Filtered daily insights from WinnersPredict & HeroPredict</p>
-            </div>
-
-            <!-- Date Filter and Navigation -->
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 p-4 bg-filter-panel-bg dark:bg-dark-filter-panel-bg rounded-lg shadow">
-                <div class="flex items-center space-x-2 mb-4 md:mb-0">
-                    <button onclick="filterLessRiskyByDate('yesterday')" class="px-4 py-2 text-sm font-bold bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition">Yesterday</button>
-                    <button onclick="filterLessRiskyByDate('today')" class="px-4 py-2 text-sm font-bold bg-primary-blue text-white rounded-lg hover:bg-primary-purple transition">Today</button>
-                    <button onclick="filterLessRiskyByDate('tomorrow')" class="px-4 py-2 text-sm font-bold bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition">Tomorrow</button>
+        <div id="less-risky-content" class="hidden">
+            <div class="p-4 md:p-6 bg-panel-bg dark:bg-dark-panel-bg rounded-xl shadow-2xl">
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-text-primary dark:text-dark-text-primary">Less Risky Picks Dashboard</h1>
+                    <p class="text-text-secondary dark:text-dark-text-secondary mt-2">Filtered daily insights from WinnersPredict & HeroPredict</p>
                 </div>
-                <div class="relative">
-                    <label for="less-risky-date-filter" class="text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mr-2">Select Date:</label>
-                    <select id="less-risky-date-filter" onchange="filterLessRiskyByDate(this.value)" class="p-2 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select>
-                </div>
-            </div>
 
-            <!-- Summary Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg flex items-center space-x-4"><div class="text-3xl">🏟️</div><div><h3 class="text-sm font-bold text-text-secondary dark:text-dark-text-secondary">TOTAL MATCHES TODAY</h3><p id="lr-stat-total-matches" class="text-3xl font-extrabold text-primary-blue mt-1">0</p></div></div>
-                <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg flex items-center space-x-4"><div class="text-3xl">📊</div><div><h3 class="text-sm font-bold text-text-secondary dark:text-dark-text-secondary">TIPS DISTRIBUTION</h3><p id="lr-stat-tips-dist" class="text-lg font-bold text-text-primary dark:text-dark-text-primary mt-1">N/A</p></div></div>
-                <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg flex items-center space-x-4"><div class="text-3xl">📈</div><div><h3 class="text-sm font-bold text-text-secondary dark:text-dark-text-secondary">WIN RATE YESTERDAY</h3><p id="lr-stat-win-rate" class="text-3xl font-extrabold text-accent-green mt-1">0%</p></div></div>
-            </div>
-
-            <!-- Tables Side by Side -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <div>
-                    <h2 class="text-2xl font-bold mb-4 text-text-primary dark:text-dark-text-primary">Winners</h2>
-                    <div class="overflow-x-auto rounded-lg shadow">
-                        <table id="winners-table" class="less-risky-table min-w-full">
-                            <thead><tr><th>Date</th><th>League</th><th>Time</th><th>Home Team</th><th>Away Team</th><th>Tip</th><th>Score</th></tr></thead>
-                            <tbody id="winners-table-body"></tbody>
-                        </table>
+                <!-- Date Filter and Navigation -->
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 p-4 bg-filter-panel-bg dark:bg-dark-filter-panel-bg rounded-lg shadow">
+                    <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                        <button onclick="filterLessRiskyByDate('yesterday')" class="px-4 py-2 text-sm font-bold bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition">Yesterday</button>
+                        <button onclick="filterLessRiskyByDate('today')" class="px-4 py-2 text-sm font-bold bg-primary-blue text-white rounded-lg hover:bg-primary-purple transition">Today</button>
+                        <button onclick="filterLessRiskyByDate('tomorrow')" class="px-4 py-2 text-sm font-bold bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition">Tomorrow</button>
+                    </div>
+                    <div class="relative">
+                        <label for="less-risky-date-filter" class="text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mr-2">Select Date:</label>
+                        <select id="less-risky-date-filter" onchange="filterLessRiskyByDate(this.value)" class="p-2 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm"></select>
                     </div>
                 </div>
-                <div>
-                    <h2 class="text-2xl font-bold mb-4 text-text-primary dark:text-dark-text-primary">Hero</h2>
-                    <div class="overflow-x-auto rounded-lg shadow">
-                         <table id="hero-table" class="less-risky-table min-w-full">
-                            <thead><tr><th>Date</th><th>League</th><th>Time</th><th>Home Team</th><th>Away Team</th><th>Tip</th><th>Score</th></tr></thead>
-                            <tbody id="hero-table-body"></tbody>
-                        </table>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg flex items-center space-x-4"><div class="text-3xl">🏟️</div><div><h3 class="text-sm font-bold text-text-secondary dark:text-dark-text-secondary">TOTAL MATCHES TODAY</h3><p id="lr-stat-total-matches" class="text-3xl font-extrabold text-primary-blue mt-1">0</p></div></div>
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg flex items-center space-x-4"><div class="text-3xl">📊</div><div><h3 class="text-sm font-bold text-text-secondary dark:text-dark-text-secondary">TIPS DISTRIBUTION</h3><p id="lr-stat-tips-dist" class="text-lg font-bold text-text-primary dark:text-dark-text-primary mt-1">N/A</p></div></div>
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg flex items-center space-x-4"><div class="text-3xl">📈</div><div><h3 class="text-sm font-bold text-text-secondary dark:text-dark-text-secondary">WIN RATE YESTERDAY</h3><p id="lr-stat-win-rate" class="text-3xl font-extrabold text-accent-green mt-1">0%</p></div></div>
+                </div>
+
+                <!-- Tables Side by Side -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4 text-text-primary dark:text-dark-text-primary">Winners</h2>
+                        <div class="overflow-x-auto rounded-lg shadow">
+                            <table id="winners-table" class="less-risky-table min-w-full">
+                                <thead><tr><th>Date</th><th>League</th><th>Time</th><th>Home Team</th><th>Away Team</th><th>Tip</th><th>Score</th></tr></thead>
+                                <tbody id="winners-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold mb-4 text-text-primary dark:text-dark-text-primary">Hero</h2>
+                        <div class="overflow-x-auto rounded-lg shadow">
+                             <table id="hero-table" class="less-risky-table min-w-full">
+                                <thead><tr><th>Date</th><th>League</th><th>Time</th><th>Home Team</th><th>Away Team</th><th>Tip</th><th>Score</th></tr></thead>
+                                <tbody id="hero-table-body"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
+                
+                 <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg w-full flex flex-col items-center"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4">Distribution of Tips</h3><div class="relative w-full max-w-[400px] aspect-square"><canvas id="lr-tip-pie-chart"></canvas></div></div>
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg w-full flex flex-col items-center"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4">Daily Matches (Last 7 Days)</h3><div class="relative w-full h-64"><canvas id="lr-daily-matches-chart"></canvas></div></div>
+                </div>
             </div>
-            
-             <!-- Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg w-full flex flex-col items-center"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4">Distribution of Tips</h3><div class="relative w-full max-w-[400px] aspect-square"><canvas id="lr-tip-pie-chart"></canvas></div></div>
-                <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg w-full flex flex-col items-center"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4">Daily Matches (Last 7 Days)</h3><div class="relative w-full h-64"><canvas id="lr-daily-matches-chart"></canvas></div></div>
+        </div>
+        
+        <!-- Prediction Analysis Content -->
+        <div id="prediction-analysis-content" class="hidden">
+            <div class="p-4 md:p-6 bg-panel-bg dark:bg-dark-panel-bg rounded-xl shadow-2xl">
+                 <div class="text-center mb-8">
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-text-primary dark:text-dark-text-primary">Prediction Performance Analysis</h1>
+                    <p class="text-text-secondary dark:text-dark-text-secondary mt-2">Comparing predicted metrics against actual match outcomes.</p>
+                </div>
+                <!-- Filters for Prediction Analysis Tab -->
+                <div id="prediction-analysis-filters" class="mb-8 p-4 bg-filter-panel-bg dark:bg-dark-filter-panel-bg rounded-lg shadow grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <!-- Filters will be dynamically inserted here -->
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4 text-center">Winning Probability vs. Actual Win Rate</h3><canvas id="pa-chart-win-prob"></canvas></div>
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4 text-center">Probability of 3+ Goals vs. Actual</h3><canvas id="pa-chart-prob-3-goals"></canvas></div>
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4 text-center">Winning Chance vs. Outcome</h3><canvas id="pa-chart-win-chance"></canvas></div>
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4 text-center">"Over 3 Goals" vs. Actual Goals</h3><canvas id="pa-chart-over-3-goals"></canvas></div>
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4 text-center">Match Prediction vs. Outcome</h3><canvas id="pa-chart-match-prediction"></canvas></div>
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4 text-center">Outcome Probability vs. Actual Result</h3><canvas id="pa-chart-outcome-prob"></canvas></div>
+                    <div class="p-6 bg-white dark:bg-dark-panel-bg rounded-xl shadow-lg col-span-1 lg:col-span-2"><h3 class="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4 text-center">Total Goals Prediction vs. Actual Goals</h3><canvas id="pa-chart-total-goals-pred"></canvas></div>
+                </div>
             </div>
         </div>
 
@@ -377,7 +407,7 @@
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQH-Uue5Ctuo4aU-4S81U9QvoXxslOq6YjKHnVkPjyOeJqci4p19cs2iZ8y5GgzsSh_vQHxPYb-gl-5/pub?gid=0&single=true&output=csv';
     const LESS_RISKY_XLSX_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQjoi3SalPo7WPlbc67fZ16gWU98v7ctwZeQ5zfiFOJGqwzPGfnV_cu_Em6hPazADOAgH6pEeXWE-yw/pub?output=xlsx';
 
-    const HIDDEN_COLUMNS = ['League', 'Home Team', 'Away Team', 'Home Wins', 'Home Draws', 'Home Losses', 'Away Wins', 'Away Draws', 'Away Losses', 'Home Avg Scored', 'Home Conceded', 'Home Avg Conceded', 'Away Avg Scored', 'Away Conceded', 'Away Avg Conceded', 'Match Analysis', 'Goals Analysis'];
+    const HIDDEN_COLUMNS = ['League', 'Home Team', 'Away Team', 'Home Wins', 'Home Draws', 'Home Losses', 'Away Wins', 'Away Draws', 'Away Losses', 'Home Avg Scored', 'Home Conceded', 'Home Avg Conceded', 'Away Avg Scored', 'Away Conceded', 'Away Avg Conceded', 'Match Analysis', 'Goals Analysis', 'Winning Chance', 'Over 3 Goals'];
     
     const COLUMN_MAP = [
         { key: 'Match Date', label: 'Date' },
@@ -394,7 +424,6 @@
         { key: 'Home Odds', label: '1', type: 'number' },
         { key: 'Draw Odds', label: 'X', type: 'number' },
         { key: 'Away Odds', label: '2', type: 'number' },
-        // All columns, including new and hidden ones, must be listed for the parser to work correctly.
         { key: 'Home Team', type: 'string' },
         { key: 'Away Team', type: 'string' },
         { key: 'Winning Streak', type: 'number' },
@@ -415,34 +444,42 @@
         { key: 'Away Conceded', type: 'number' },
         { key: 'Away Avg Conceded', type: 'number' },
         { key: 'Match Analysis', type: 'string' },
-        { key: 'Goals Analysis', type: 'string' }
+        { key: 'Goals Analysis', type: 'string' },
+        { key: 'Match Prediction', type: 'string' },
+        { key: 'Outcome Probability', type: 'number' },
+        { key: 'Total Goals Prediction', type: 'string' }
     ];
     
     // --- STATE MANAGEMENT ---
     let allData = [], currentData = [], favorites = [], pinnedMatches = [], viewedRows = new Set(), outcomeChart, predictionChart, filteredFavorites = [], lostMatches = new Set();
     let winnersData = [], heroData = [];
     let lrTipPieChart, lrDailyMatchesChart;
+    let predictionAnalysisCharts = {};
     let sortColumn = 'Match Date', sortDirection = 'desc', rowsPerPage = 30, currentPage = 1, activeTab = 'dashboard';
     
     const initialFilters = { 
-        league: 'All', prediction: 'All', teamSearch: '', matchDate: 'All Dates', homeOddsMin: null,
-        correctScore: 'All',
-        winningChance: 'All',
-        over3Goals: 'All',
+        league: 'All', prediction: 'All', teamSearch: '', matchDate: 'All Dates', correctScore: 'All', matchAnalysis: 'All', goalsAnalysis: 'All',
+        winningProbability: {min: null, max: null},
+        prob3Goals: {min: null, max: null},
+        matchPrediction: 'All',
+        outcomeProbability: {min: null, max: null},
+        totalGoalsPrediction: 'All',
+        // Advanced Filters that were moved
+        homeOdds: {min: null, max: null},
         stake: {min: null, max: null},
         winningStreak: {min: null, max: null},
         losingStreak: {min: null, max: null},
-        matchAnalysis: 'All',
-        goalsAnalysis: 'All',
+        // Other advanced filters
         homeWins: {min: null, max: null}, homeDraws: {min: null, max: null}, homeLosses: {min: null, max: null},
         awayWins: {min: null, max: null}, awayDraws: {min: null, max: null}, awayLosses: {min: null, max: null},
         homeAvgScored: {min: null, max: null}, homeAvgConceded: {min: null, max: null},
         awayAvgScored: {min: null, max: null}, awayAvgConceded: {min: null, max: null},
-        homeOdds: {min: null, max: null}, drawOdds: {min: null, max: null}, awayOdds: {min: null, max: null},
+        drawOdds: {min: null, max: null}, awayOdds: {min: null, max: null},
         predictionOdds: {min: null, max: null}
     };
     
     let filters = { ...initialFilters };
+    let paFilters = {}; // Filters specific to Prediction Analysis tab
 
     // --- DOM ELEMENTS ---
     const dom = {
@@ -451,6 +488,7 @@
         mainContent: document.getElementById('main-content'),
         dashboardContent: document.getElementById('dashboard-content'),
         lessRiskyContent: document.getElementById('less-risky-content'),
+        predictionAnalysisContent: document.getElementById('prediction-analysis-content'),
         favoritesContent: document.getElementById('favorites-content'),
         tableBody: document.getElementById('table-body'),
         tableHeadRow: document.querySelector('#data-table thead tr'),
@@ -504,6 +542,7 @@
             pinnedMatches = allData.filter(item => savedPins.includes(item.uniqueId)).map(i => i.uniqueId);
             buildAdvancedFiltersModal();
             populateFilterDropdowns();
+            buildPredictionAnalysisFilters();
             const initialTab = document.getElementById('tab-dashboard');
             if (initialTab) handleTabClick('dashboard', initialTab);
             else updateUiForTab();
@@ -522,9 +561,8 @@
         dom.moonIcon.classList.toggle('hidden');
         localStorage.setItem('theme', dom.html.classList.contains('dark') ? 'dark' : 'light');
         if (activeTab === 'dashboard' && allData.length > 0) renderDashboard(currentData);
-        if (activeTab === 'less-risky') {
-            filterLessRiskyByDate(document.getElementById('less-risky-date-filter').value);
-        }
+        if (activeTab === 'less-risky') filterLessRiskyByDate(document.getElementById('less-risky-date-filter').value);
+        if (activeTab === 'prediction-analysis') updatePredictionAnalysisTab();
     }
     
     // --- PARSING & FILTERING ---
@@ -553,14 +591,10 @@
         let sourceData;
         
         switch(activeTab) {
-            case 'favorites':
-                sourceData = favorites;
-                break;
-            case 'less-risky':
-                // This tab has its own filtering logic
-                return; 
-            default:
-                sourceData = allData;
+            case 'favorites': sourceData = favorites; break;
+            case 'less-risky': return; // This tab has its own filtering logic
+            case 'prediction-analysis': updatePredictionAnalysisTab(); return;
+            default: sourceData = allData;
         }
 
         let filteredData = sourceData;
@@ -576,33 +610,36 @@
         if (filters.prediction !== 'All') filteredData = filteredData.filter(item => item.Prediction === filters.prediction);
         if (filters.matchDate !== 'All Dates') filteredData = filteredData.filter(item => item['Match Date'] === filters.matchDate);
         if (filters.correctScore !== 'All') filteredData = filteredData.filter(item => item['Correct Score'] === filters.correctScore);
-        if (filters.homeOddsMin) filteredData = filteredData.filter(item => item['Home Odds'] >= filters.homeOddsMin);
-
-        
-        if (filters.winningChance !== 'All') filteredData = filteredData.filter(item => item['Winning Chance'] === filters.winningChance);
-        if (filters.over3Goals !== 'All') filteredData = filteredData.filter(item => item['Over 3 Goals'] === filters.over3Goals);
-        
-
         if (filters.matchAnalysis !== 'All') filteredData = filteredData.filter(item => item['Match Analysis'] === filters.matchAnalysis);
         if (filters.goalsAnalysis !== 'All') filteredData = filteredData.filter(item => item['Goals Analysis'] === filters.goalsAnalysis);
+        if (filters.matchPrediction !== 'All') filteredData = filteredData.filter(item => item['Match Prediction'] === filters.matchPrediction);
+        if (filters.totalGoalsPrediction !== 'All') filteredData = filteredData.filter(item => item['Total Goals Prediction'] === filters.totalGoalsPrediction);
         
-        if (filters.stake.min !== null) filteredData = filteredData.filter(item => (item['Stake'] || 0) >= filters.stake.min);
-        if (filters.stake.max !== null) filteredData = filteredData.filter(item => (item['Stake'] || 0) <= filters.stake.max);
-
-        if (filters.winningStreak.min !== null) filteredData = filteredData.filter(item => (item['Winning Streak'] || 0) >= filters.winningStreak.min);
-        if (filters.winningStreak.max !== null) filteredData = filteredData.filter(item => (item['Winning Streak'] || 0) <= filters.winningStreak.max);
+        // Range filters from main panel
+        const mainRangeFilters = [
+            { key: 'winningProbability', dataKey: 'Winning Probability' },
+            { key: 'prob3Goals', dataKey: 'Probability of 3 Goals' },
+            { key: 'outcomeProbability', dataKey: 'Outcome Probability' }
+        ];
+        mainRangeFilters.forEach(f => {
+            const range = filters[f.key];
+            if (range) {
+                if (range.min !== null) filteredData = filteredData.filter(item => (item[f.dataKey] || 0) >= range.min);
+                if (range.max !== null) filteredData = filteredData.filter(item => (item[f.dataKey] || 0) <= range.max);
+            }
+        });
         
-        if (filters.losingStreak.min !== null) filteredData = filteredData.filter(item => (item['Losing Streak'] || 0) >= filters.losingStreak.min);
-        if (filters.losingStreak.max !== null) filteredData = filteredData.filter(item => (item['Losing Streak'] || 0) <= filters.losingStreak.max);
-
-        const rangeFilters = [
+        // Range filters from advanced modal
+        const advancedRangeFilters = [
+            { key: 'homeOdds', dataKey: 'Home Odds' }, { key: 'stake', dataKey: 'Stake' }, 
+            { key: 'winningStreak', dataKey: 'Winning Streak' }, { key: 'losingStreak', dataKey: 'Losing Streak' },
             { key: 'homeWins', dataKey: 'Home Wins' }, { key: 'homeDraws', dataKey: 'Home Draws' }, { key: 'homeLosses', dataKey: 'Home Losses' },
             { key: 'awayWins', dataKey: 'Away Wins' }, { key: 'awayDraws', dataKey: 'Away Draws' }, { key: 'awayLosses', dataKey: 'Away Losses' },
             { key: 'homeAvgScored', dataKey: 'Home Avg Scored' }, { key: 'homeAvgConceded', dataKey: 'Home Avg Conceded' },
             { key: 'awayAvgScored', dataKey: 'Away Avg Scored' }, { key: 'awayAvgConceded', dataKey: 'Away Avg Conceded' },
-            { key: 'homeOdds', dataKey: 'Home Odds' }, { key: 'drawOdds', dataKey: 'Draw Odds' }, { key: 'awayOdds', dataKey: 'Away Odds' }
+            { key: 'drawOdds', dataKey: 'Draw Odds' }, { key: 'awayOdds', dataKey: 'Away Odds' }
         ];
-        rangeFilters.forEach(f => {
+        advancedRangeFilters.forEach(f => {
             const range = filters[f.key];
             if (range) {
                 if (range.min !== null) filteredData = filteredData.filter(item => (item[f.dataKey] || 0) >= range.min);
@@ -910,48 +947,27 @@
 
             if (workbook.SheetNames.includes(winnersSheetName)) {
                 const winnersSheet = workbook.Sheets[winnersSheetName];
-                winnersData = XLSX.utils.sheet_to_json(winnersSheet, {
-                    raw: false, // Format dates
-                    defval: ""
-                });
-            } else {
-                console.warn(`Sheet "${winnersSheetName}" not found.`);
-            }
+                winnersData = XLSX.utils.sheet_to_json(winnersSheet, { raw: false, defval: "" });
+            } else { console.warn(`Sheet "${winnersSheetName}" not found.`); }
 
             if (workbook.SheetNames.includes(heroSheetName)) {
                 const heroSheet = workbook.Sheets[heroSheetName];
-                heroData = XLSX.utils.sheet_to_json(heroSheet, {
-                    raw: false,
-                    defval: ""
-                });
-            } else {
-                console.warn(`Sheet "${heroSheetName}" not found.`);
-            }
+                heroData = XLSX.utils.sheet_to_json(heroSheet, { raw: false, defval: "" });
+            } else { console.warn(`Sheet "${heroSheetName}" not found.`); }
             
-            // Normalize data and extract team names
-            const toProperCase = (str) => {
-                if (!str) return '';
-                return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
-            };
+            const toProperCase = (str) => str ? str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()) : '';
 
             const processLessRiskyRow = (row) => {
-                // Normalize Date from Excel serial number
                 if (row.Date && typeof row.Date === 'number') {
-                    const date = new Date(Math.round((row.Date - 25569) * 86400 * 1000));
-                    row.Date = date.toISOString().split('T')[0];
+                    row.Date = new Date(Math.round((row.Date - 25569) * 86400 * 1000)).toISOString().split('T')[0];
                 }
-
-                // Extract Home and Away teams from MatchID
                 if (row.MatchID && typeof row.MatchID === 'string') {
                     const parts = row.MatchID.split('_vs_');
                     if (parts.length === 2) {
                         const homePart = parts[0];
-                        // Assumes format is YYYY-MM-DD_home_team, gets everything after first underscore
                         const homeTeamRaw = homePart.substring(homePart.indexOf('_') + 1);
                         row['Home Team'] = toProperCase(homeTeamRaw.replace(/_/g, ' '));
-
-                        const awayTeamRaw = parts[1];
-                        row['Away Team'] = toProperCase(awayTeamRaw.replace(/_/g, ' '));
+                        row['Away Team'] = toProperCase(parts[1].replace(/_/g, ' '));
                     }
                 }
                 return row;
@@ -963,9 +979,7 @@
             populateLessRiskyDateFilter();
             filterLessRiskyByDate('today');
 
-        } catch (error) {
-            console.error("Error loading Less Risky data:", error);
-        }
+        } catch (error) { console.error("Error loading Less Risky data:", error); }
     }
 
     function populateLessRiskyDateFilter() {
@@ -981,24 +995,13 @@
         const today = new Date();
         const yyyy_mm_dd = (d) => d.toISOString().split('T')[0];
 
-        if (date === 'today') {
-            targetDate = yyyy_mm_dd(today);
-        } else if (date === 'yesterday') {
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() - 1);
-            targetDate = yyyy_mm_dd(yesterday);
-        } else if (date === 'tomorrow') {
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
-            targetDate = yyyy_mm_dd(tomorrow);
-        } else {
-            targetDate = date;
-        }
+        if (date === 'today') targetDate = yyyy_mm_dd(today);
+        else if (date === 'yesterday') { const d = new Date(today); d.setDate(today.getDate() - 1); targetDate = yyyy_mm_dd(d); }
+        else if (date === 'tomorrow') { const d = new Date(today); d.setDate(today.getDate() + 1); targetDate = yyyy_mm_dd(d); }
+        else targetDate = date;
         
         const dateFilterSelect = document.getElementById('less-risky-date-filter');
-        if (dateFilterSelect) {
-             dateFilterSelect.value = targetDate;
-        }
+        if (dateFilterSelect) dateFilterSelect.value = targetDate;
 
         const filteredWinners = winnersData.filter(row => row.Date === targetDate);
         const filteredHero = heroData.filter(row => row.Date === targetDate);
@@ -1011,146 +1014,305 @@
     function renderLessRiskyTables(winners, hero) {
         const winnersBody = document.getElementById('winners-table-body');
         const heroBody = document.getElementById('hero-table-body');
-
         const createRow = (row) => {
-            const tr = document.createElement('tr');
             const tip = row.Tip || '-';
             let tipColorClass = '';
-            if (tip === '1' || tip === '1x') {
-                tipColorClass = 'bg-green-100 dark:bg-green-900 font-bold text-green-700 dark:text-green-300';
-            } else if (['Over 1.5', 'Home ov 1.5', '2+'].includes(tip)) {
-                tipColorClass = 'bg-orange-100 dark:bg-orange-900 font-bold text-orange-700 dark:text-orange-300';
-            } else if (tip === '-') {
-                tipColorClass = 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300';
-            }
-            
-            tr.innerHTML = `
-                <td>${row.Date || ''}</td>
-                <td>${row.League || ''}</td>
-                <td>${row.Time || ''}</td>
-                <td>${row['Home Team'] || ''}</td>
-                <td>${row['Away Team'] || ''}</td>
-                <td class="${tipColorClass}">${tip}</td>
-                <td>${row.Score || ''}</td>
-            `;
-            return tr;
+            if (tip === '1' || tip === '1x') tipColorClass = 'bg-green-100 dark:bg-green-900 font-bold text-green-700 dark:text-green-300';
+            else if (['Over 1.5', 'Home ov 1.5', '2+'].includes(tip)) tipColorClass = 'bg-orange-100 dark:bg-orange-900 font-bold text-orange-700 dark:text-orange-300';
+            else if (tip === '-') tipColorClass = 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300';
+            return `<tr><td>${row.Date || ''}</td><td>${row.League || ''}</td><td>${row.Time || ''}</td><td>${row['Home Team'] || ''}</td><td>${row['Away Team'] || ''}</td><td class="${tipColorClass}">${tip}</td><td>${row.Score || ''}</td></tr>`;
         };
-
-        winnersBody.innerHTML = '';
-        winners.forEach(row => winnersBody.appendChild(createRow(row)));
-        if(winners.length === 0) winnersBody.innerHTML = '<tr><td colspan="7" class="text-center p-4">No matches for this date.</td></tr>';
-
-
-        heroBody.innerHTML = '';
-        hero.forEach(row => heroBody.appendChild(createRow(row)));
-        if(hero.length === 0) heroBody.innerHTML = '<tr><td colspan="7" class="text-center p-4">No matches for this date.</td></tr>';
+        winnersBody.innerHTML = winners.length > 0 ? winners.map(createRow).join('') : '<tr><td colspan="7" class="text-center p-4">No matches for this date.</td></tr>';
+        heroBody.innerHTML = hero.length > 0 ? hero.map(createRow).join('') : '<tr><td colspan="7" class="text-center p-4">No matches for this date.</td></tr>';
     }
     
     function updateLessRiskySummaryCards(selectedDate) {
         const winnersToday = winnersData.filter(r => r.Date === selectedDate);
         const heroToday = heroData.filter(r => r.Date === selectedDate);
         document.getElementById('lr-stat-total-matches').textContent = winnersToday.length + heroToday.length;
-        
         const allToday = [...winnersToday, ...heroToday];
-        const tipCounts = allToday.reduce((acc, row) => {
-            const tip = row.Tip || '-';
-            acc[tip] = (acc[tip] || 0) + 1;
-            return acc;
-        }, {});
-        
-        const tipsDistText = Object.entries(tipCounts).map(([tip, count]) => `${tip}: ${count}`).join(', ');
-        document.getElementById('lr-stat-tips-dist').textContent = tipsDistText || 'N/A';
+        const tipCounts = allToday.reduce((acc, row) => { const tip = row.Tip || '-'; acc[tip] = (acc[tip] || 0) + 1; return acc; }, {});
+        document.getElementById('lr-stat-tips-dist').textContent = Object.entries(tipCounts).map(([tip, count]) => `${tip}: ${count}`).join(', ') || 'N/A';
 
-        // Win Rate Yesterday
-        const today = new Date(selectedDate);
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().split('T')[0];
-        
-        const winnersYesterday = winnersData.filter(r => r.Date === yesterdayStr && r.Score);
-        const heroYesterday = heroData.filter(r => r.Date === yesterdayStr && r.Score);
-        const allYesterday = [...winnersYesterday, ...heroYesterday];
+        const yest = new Date(selectedDate);
+        yest.setDate(yest.getDate() - 1);
+        const yesterdayStr = yest.toISOString().split('T')[0];
+        const allYesterday = [...winnersData, ...heroData].filter(r => r.Date === yesterdayStr && r.Score);
         
         let correctCount = 0;
         allYesterday.forEach(match => {
-           // Basic win rate logic, can be expanded
            const [homeScore, awayScore] = (match.Score || "0-0").split('-').map(Number);
            const tip = match.Tip;
            let win = false;
            if(tip === '1' && homeScore > awayScore) win = true;
            if(tip === '2' && awayScore > homeScore) win = true;
            if(tip === 'x' && homeScore === awayScore) win = true;
-           if(tip === '1x' && (homeScore > awayScore || homeScore === awayScore)) win = true;
-           if(tip === '2x' && (awayScore > homeScore || homeScore === awayScore)) win = true;
+           if(tip === '1x' && (homeScore >= awayScore)) win = true;
+           if(tip === '2x' && (awayScore >= homeScore)) win = true;
            if(tip === 'Over 1.5' && (homeScore + awayScore) > 1.5) win = true;
            if(tip === 'Home ov 1.5' && homeScore > 1.5) win = true;
-
            if(win) correctCount++;
         });
-
         const winRate = allYesterday.length > 0 ? ((correctCount / allYesterday.length) * 100).toFixed(1) : 0;
         document.getElementById('lr-stat-win-rate').textContent = `${winRate}%`;
     }
     
     function updateLessRiskyCharts(selectedDate) {
         const allToday = [...winnersData.filter(r => r.Date === selectedDate), ...heroData.filter(r => r.Date === selectedDate)];
-        const tipCounts = allToday.reduce((acc, row) => {
-            const tip = row.Tip || '-';
-            acc[tip] = (acc[tip] || 0) + 1;
-            return acc;
-        }, {});
-        
+        const tipCounts = allToday.reduce((acc, row) => { const tip = row.Tip || '-'; acc[tip] = (acc[tip] || 0) + 1; return acc; }, {});
         const isDark = dom.html.classList.contains('dark');
         const chartTextColor = isDark ? 'white' : 'black';
 
         if(lrTipPieChart) lrTipPieChart.destroy();
-        lrTipPieChart = new Chart(document.getElementById('lr-tip-pie-chart').getContext('2d'), {
-            type: 'pie',
-            data: {
-                labels: Object.keys(tipCounts),
-                datasets: [{
-                    data: Object.values(tipCounts),
-                    backgroundColor: ['#3f51b5', '#673ab7', '#00c853', '#ff9800', '#f44336', '#9e9e9e'],
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: chartTextColor } } } }
-        });
+        lrTipPieChart = new Chart(document.getElementById('lr-tip-pie-chart').getContext('2d'), { type: 'pie', data: { labels: Object.keys(tipCounts), datasets: [{ data: Object.values(tipCounts), backgroundColor: ['#3f51b5', '#673ab7', '#00c853', '#ff9800', '#f44336', '#9e9e9e'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: chartTextColor } } } } });
 
         const last7DaysData = {};
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date(selectedDate);
-            d.setDate(d.getDate() - i);
-            const dateStr = d.toISOString().split('T')[0];
-            last7DaysData[dateStr] = 0;
-        }
-
-        [...winnersData, ...heroData].forEach(row => {
-            if(last7DaysData.hasOwnProperty(row.Date)) {
-                last7DaysData[row.Date]++;
-            }
-        });
+        for (let i = 6; i >= 0; i--) { const d = new Date(selectedDate); d.setDate(d.getDate() - i); last7DaysData[d.toISOString().split('T')[0]] = 0; }
+        [...winnersData, ...heroData].forEach(row => { if(last7DaysData.hasOwnProperty(row.Date)) last7DaysData[row.Date]++; });
 
         if(lrDailyMatchesChart) lrDailyMatchesChart.destroy();
-        lrDailyMatchesChart = new Chart(document.getElementById('lr-daily-matches-chart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: Object.keys(last7DaysData),
-                datasets: [{
-                    label: 'Total Matches',
-                    data: Object.values(last7DaysData),
-                    borderColor: '#3f51b5',
-                    backgroundColor: 'rgba(63, 81, 181, 0.2)',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: { x: { ticks: { color: chartTextColor } }, y: { ticks: { color: chartTextColor, beginAtZero: true } } },
-                plugins: { legend: { labels: { color: chartTextColor } } }
+        lrDailyMatchesChart = new Chart(document.getElementById('lr-daily-matches-chart').getContext('2d'), { type: 'line', data: { labels: Object.keys(last7DaysData), datasets: [{ label: 'Total Matches', data: Object.values(last7DaysData), borderColor: '#3f51b5', backgroundColor: 'rgba(63, 81, 181, 0.2)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: chartTextColor } }, y: { ticks: { color: chartTextColor, beginAtZero: true } } }, plugins: { legend: { labels: { color: chartTextColor } } } } });
+    }
+
+    // --- Prediction Analysis Tab Functions ---
+    function buildPredictionAnalysisFilters() {
+        const container = document.getElementById('prediction-analysis-filters');
+        const filtersToBuild = [
+            { id: 'pa-filter-date', label: 'Match Date', key: 'Match Date', type: 'select' },
+            { id: 'pa-filter-home-scored', label: 'Home Scored', key: 'Home Team Scored', type: 'minmax' },
+            { id: 'pa-filter-away-scored', label: 'Away Scored', key: 'Away Team Scored', type: 'minmax' },
+            { id: 'pa-filter-outcome', label: 'Outcome', key: 'Outcome', type: 'select' },
+            { id: 'pa-filter-winning-chance', label: 'Winning Chance', key: 'Winning Chance', type: 'select' },
+            { id: 'pa-filter-over-3-goals', label: 'Over 3 Goals', key: 'Over 3 Goals', type: 'select' },
+            { id: 'pa-filter-match-prediction', label: 'Match Prediction', key: 'Match Prediction', type: 'select' },
+            { id: 'pa-filter-outcome-prob', label: 'Outcome Probability', key: 'Outcome Probability', type: 'minmax' },
+            { id: 'pa-filter-total-goals-prediction', label: 'Total Goals Prediction', key: 'Total Goals Prediction', type: 'select' }
+        ];
+
+        let html = '';
+        filtersToBuild.forEach(f => {
+            html += '<div class="relative">';
+            html += `<label class="block text-sm font-semibold text-text-secondary dark:text-dark-text-secondary mb-2">${f.label}</label>`;
+            if (f.type === 'select') {
+                html += `<select id="${f.id}" data-key="${f.key}" onchange="handlePaFilterChange()" class="w-full p-2 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm"></select>`;
+            } else if (f.type === 'minmax') {
+                html += `<div class="flex space-x-1"><input type="number" id="${f.id}-min" data-key="${f.key}" placeholder="Min" class="w-1/2 p-2 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm" oninput="handlePaFilterChange()"><input type="number" id="${f.id}-max" data-key="${f.key}" placeholder="Max" class="w-1/2 p-2 bg-panel-bg dark:bg-dark-panel-bg border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm" oninput="handlePaFilterChange()"></div>`;
+            }
+            html += '</div>';
+        });
+        container.innerHTML = html;
+
+        // Populate dropdowns
+        filtersToBuild.filter(f => f.type === 'select').forEach(f => {
+            const options = ['All', ...new Set(allData.map(item => item[f.key]).filter(Boolean))];
+            document.getElementById(f.id).innerHTML = options.map(o => `<option value="${o}">${o}</option>`).join('');
+        });
+    }
+
+    function handlePaFilterChange() {
+        document.querySelectorAll('#prediction-analysis-filters select, #prediction-analysis-filters input').forEach(el => {
+            const key = el.dataset.key;
+            if (el.tagName === 'SELECT') {
+                paFilters[key] = el.value;
+            } else { // Min/Max input
+                if (!paFilters[key]) paFilters[key] = {};
+                if (el.id.endsWith('-min')) paFilters[key].min = el.value !== '' ? parseFloat(el.value) : null;
+                if (el.id.endsWith('-max')) paFilters[key].max = el.value !== '' ? parseFloat(el.value) : null;
             }
         });
+        updatePredictionAnalysisTab();
+    }
+
+    function updatePredictionAnalysisTab() {
+        let filteredData = allData.filter(d => d.Outcome && d.Outcome !== 'N/A'); // Only use completed matches
+
+        // Apply PA filters
+        Object.entries(paFilters).forEach(([key, value]) => {
+            if (value === 'All') return;
+            if (typeof value === 'object' && value !== null) { // Min/Max filter
+                if (value.min !== null) filteredData = filteredData.filter(item => (item[key] || 0) >= value.min);
+                if (value.max !== null) filteredData = filteredData.filter(item => (item[key] || 0) <= value.max);
+            } else { // Select filter
+                filteredData = filteredData.filter(item => item[key] === value);
+            }
+        });
+
+        renderPredictionAnalysisCharts(filteredData);
+    }
+    
+    function renderPredictionAnalysisCharts(data) {
+        const isDark = document.documentElement.classList.contains('dark');
+        const chartTextColor = isDark ? '#f7fafc' : '#2d3748';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+        const chartConfigs = {
+            'pa-chart-win-prob': () => {
+                const buckets = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+                const labels = buckets.slice(0, -1).map((b, i) => `${(b*100).toFixed(0)}-${(buckets[i+1]*100).toFixed(0)}%`);
+                const dataByBucket = buckets.slice(0,-1).map(() => ({ total: 0, wins: 0 }));
+                
+                data.forEach(item => {
+                    const prob = item['Winning Probability'];
+                    if (prob === null) return;
+                    const bucketIndex = buckets.findIndex(b => prob <= b) - 1;
+                    if (bucketIndex >= 0 && bucketIndex < dataByBucket.length) {
+                        dataByBucket[bucketIndex].total++;
+                        const [,,isWin] = getOutcomeColor(item.Prediction, item.Outcome);
+                        if (isWin) dataByBucket[bucketIndex].wins++;
+                    }
+                });
+
+                const winRates = dataByBucket.map(b => b.total > 0 ? (b.wins / b.total) * 100 : 0);
+                return { type: 'bar', data: { labels, datasets: [{ label: 'Actual Win Rate', data: winRates, backgroundColor: '#00c853' }] }, options: { scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%', color: chartTextColor }, grid: { color: gridColor } }, x: { ticks: { color: chartTextColor }, grid: { color: gridColor } } } } };
+            },
+             'pa-chart-prob-3-goals': () => {
+                const buckets = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+                const labels = buckets.slice(0, -1).map((b, i) => `${(b*100).toFixed(0)}-${(buckets[i+1]*100).toFixed(0)}%`);
+                const dataByBucket = buckets.slice(0,-1).map(() => ({ total: 0, over: 0 }));
+
+                data.forEach(item => {
+                    const prob = item['Probability of 3 Goals'];
+                    const totalGoals = (item['Home Team Scored'] || 0) + (item['Away Team Scored'] || 0);
+                    if (prob === null) return;
+                    const bucketIndex = buckets.findIndex(b => prob <= b) - 1;
+                    if (bucketIndex >= 0 && bucketIndex < dataByBucket.length) {
+                        dataByBucket[bucketIndex].total++;
+                        if (totalGoals >= 3) dataByBucket[bucketIndex].over++;
+                    }
+                });
+
+                const overRates = dataByBucket.map(b => b.total > 0 ? (b.over / b.total) * 100 : 0);
+                return { type: 'bar', data: { labels, datasets: [{ label: 'Actual Rate of 3+ Goals', data: overRates, backgroundColor: '#ff9800' }] }, options: { scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%', color: chartTextColor }, grid: { color: gridColor } }, x: { ticks: { color: chartTextColor }, grid: { color: gridColor } } } } };
+            },
+            'pa-chart-win-chance': () => {
+                const chances = [...new Set(data.map(d => d['Winning Chance']).filter(Boolean))];
+                const chanceData = {};
+                chances.forEach(c => chanceData[c] = { H: 0, D: 0, A: 0 });
+
+                data.forEach(item => {
+                    const chance = item['Winning Chance'];
+                    const outcome = item.Outcome;
+                    if(chance && chanceData[chance]) {
+                        if (outcome === 'Home' || outcome === 'H') {
+                            chanceData[chance].H++;
+                        } else if (outcome === 'Away' || outcome === 'A') {
+                            chanceData[chance].A++;
+                        } else if (outcome === 'HDraw' || outcome === 'Draw' || outcome === 'D') {
+                            chanceData[chance].D++;
+                        }
+                    }
+                });
+                
+                return { type: 'bar', data: { labels: chances, datasets: [
+                    { label: 'Home Win', data: chances.map(c => chanceData[c].H), backgroundColor: '#3f51b5' },
+                    { label: 'Draw', data: chances.map(c => chanceData[c].D), backgroundColor: '#9e9e9e' },
+                    { label: 'Away Win', data: chances.map(c => chanceData[c].A), backgroundColor: '#ef4444' }
+                ]}, options: { scales: { y: { stacked: true, ticks: { color: chartTextColor }, grid: { color: gridColor } }, x: { stacked: true, ticks: { color: chartTextColor }, grid: { color: gridColor } } } } };
+            },
+            'pa-chart-over-3-goals': () => {
+                const categories = [...new Set(data.map(d => d['Over 3 Goals']).filter(Boolean))];
+                const goalData = {};
+                categories.forEach(c => goalData[c] = { '0-2 Goals': 0, '3+ Goals': 0 });
+
+                data.forEach(item => {
+                    const category = item['Over 3 Goals'];
+                    const totalGoals = (item['Home Team Scored'] || 0) + (item['Away Team Scored'] || 0);
+                    if (category && goalData[category]) {
+                        if (totalGoals >= 3) goalData[category]['3+ Goals']++;
+                        else goalData[category]['0-2 Goals']++;
+                    }
+                });
+
+                return { type: 'bar', data: { labels: categories, datasets: [
+                    { label: '0-2 Goals', data: categories.map(c => goalData[c]['0-2 Goals']), backgroundColor: '#3f51b5' },
+                    { label: '3+ Goals', data: categories.map(c => goalData[c]['3+ Goals']), backgroundColor: '#ff9800' }
+                ]}, options: { scales: { y: { stacked: true, ticks: { color: chartTextColor }, grid: { color: gridColor } }, x: { stacked: true, ticks: { color: chartTextColor }, grid: { color: gridColor } } } } };
+            },
+             'pa-chart-match-prediction': () => {
+                const predictions = [...new Set(data.map(d => d['Match Prediction']).filter(Boolean))];
+                const outcomeData = {};
+                predictions.forEach(p => outcomeData[p] = { Win: 0, Loss: 0, Push: 0 });
+
+                data.forEach(item => {
+                    const pred = item['Match Prediction'];
+                    const [homeScore, awayScore] = (item.Result || '0-0').split('-').map(Number);
+                    if (!pred || !outcomeData[pred] || isNaN(homeScore)) return;
+
+                    let result;
+                    if (homeScore > awayScore) result = 'H';
+                    else if (awayScore > homeScore) result = 'A';
+                    else result = 'D';
+                    
+                    if (pred === result) outcomeData[pred].Win++;
+                    else outcomeData[pred].Loss++; // Simplified, no push logic for now
+                });
+                return { type: 'bar', data: { labels: predictions, datasets: [
+                    { label: 'Correct', data: predictions.map(p => outcomeData[p].Win), backgroundColor: '#00c853' },
+                    { label: 'Incorrect', data: predictions.map(p => outcomeData[p].Loss), backgroundColor: '#ef4444' }
+                ]}, options: { scales: { y: { stacked: true, ticks: { color: chartTextColor }, grid: { color: gridColor } }, x: { stacked: true, ticks: { color: chartTextColor }, grid: { color: gridColor } } } } };
+            },
+            'pa-chart-outcome-prob': () => {
+                 const buckets = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+                const labels = buckets.slice(0, -1).map((b, i) => `${(b*100).toFixed(0)}-${(buckets[i+1]*100).toFixed(0)}%`);
+                const dataByBucket = buckets.slice(0,-1).map(() => ({ total: 0, correct: 0 }));
+                
+                data.forEach(item => {
+                    const prob = item['Outcome Probability'];
+                    const pred = item['Match Prediction'];
+                    const [homeScore, awayScore] = (item.Result || '0-0').split('-').map(Number);
+
+                    if (prob === null || !pred || isNaN(homeScore)) return;
+
+                    let result;
+                    if (homeScore > awayScore) result = 'H';
+                    else if (awayScore > homeScore) result = 'A';
+                    else result = 'D';
+
+                    const bucketIndex = buckets.findIndex(b => prob <= b) - 1;
+                    if (bucketIndex >= 0 && bucketIndex < dataByBucket.length) {
+                        dataByBucket[bucketIndex].total++;
+                        if (pred === result) dataByBucket[bucketIndex].correct++;
+                    }
+                });
+
+                const successRates = dataByBucket.map(b => b.total > 0 ? (b.correct / b.total) * 100 : 0);
+                return { type: 'bar', data: { labels, datasets: [{ label: 'Actual Success Rate', data: successRates, backgroundColor: '#673ab7' }] }, options: { scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%', color: chartTextColor }, grid: { color: gridColor } }, x: { ticks: { color: chartTextColor }, grid: { color: gridColor } } } } };
+            },
+            'pa-chart-total-goals-pred': () => {
+                const predictions = [...new Set(data.map(d => d['Total Goals Prediction']).filter(Boolean))];
+                const goalData = {};
+                predictions.forEach(p => goalData[p] = { total: 0, correct: 0 });
+
+                data.forEach(item => {
+                    const pred = item['Total Goals Prediction'];
+                    const totalGoals = (item['Home Team Scored'] || 0) + (item['Away Team Scored'] || 0);
+
+                    if (!pred || goalData[pred] === undefined) return;
+
+                    goalData[pred].total++;
+                    let correct = false;
+                    if (pred === '0-2' && totalGoals <= 2) correct = true;
+                    if (pred === '3+' && totalGoals >= 3) correct = true;
+
+                    if(correct) goalData[pred].correct++;
+                });
+                
+                const rates = predictions.map(p => goalData[p].total > 0 ? (goalData[p].correct / goalData[p].total) * 100 : 0);
+                return { type: 'bar', data: { labels: predictions, datasets: [{ label: 'Prediction Accuracy', data: rates, backgroundColor: '#03a9f4' }] }, options: { scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%', color: chartTextColor }, grid: { color: gridColor } }, x: { ticks: { color: chartTextColor }, grid: { color: gridColor } } } } };
+            },
+        };
+
+        for (const [id, configFn] of Object.entries(chartConfigs)) {
+            if (predictionAnalysisCharts[id]) predictionAnalysisCharts[id].destroy();
+            const ctx = document.getElementById(id)?.getContext('2d');
+            if (ctx) {
+                 const config = configFn();
+                 // Common options
+                 config.options.plugins = { legend: { labels: { color: chartTextColor } } };
+                 config.options.responsive = true;
+                 predictionAnalysisCharts[id] = new Chart(ctx, config);
+            }
+        }
     }
 
 
@@ -1287,61 +1449,61 @@
         dom.navUnderline.style.left = `${elRect.left - containerRect.left}px`;
         updateUiForTab();
     };
+
     const updateUiForTab = () => {
-        const isDashboard = activeTab === 'dashboard', isFavorites = activeTab === 'favorites', isLessRisky = activeTab === 'less-risky';
+        const isDashboard = activeTab === 'dashboard';
+        const isFavorites = activeTab === 'favorites';
+        const isLessRisky = activeTab === 'less-risky';
+        const isPredictionAnalysis = activeTab === 'prediction-analysis';
+        
         dom.dashboardContent.classList.toggle('hidden', !isDashboard);
         dom.favoritesContent.classList.toggle('hidden', !isFavorites);
         dom.lessRiskyContent.classList.toggle('hidden', !isLessRisky);
-        dom.mainContent.classList.toggle('hidden', isDashboard || isFavorites || isLessRisky);
-        dom.filtersContainer.classList.toggle('hidden', isDashboard || isLessRisky);
+        dom.predictionAnalysisContent.classList.toggle('hidden', !isPredictionAnalysis);
+        
+        const showMainContent = !isDashboard && !isFavorites && !isLessRisky && !isPredictionAnalysis;
+        dom.mainContent.classList.toggle('hidden', !showMainContent);
+        dom.filtersContainer.classList.toggle('hidden', !showMainContent);
 
         if (isFavorites) {
             document.querySelectorAll('#favorites-content button').forEach(btn => {
                 btn.disabled = favorites.length === 0;
-                if(btn.disabled) {
-                    btn.classList.add('opacity-50', 'cursor-not-allowed');
-                } else {
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
+                btn.classList.toggle('opacity-50', favorites.length === 0);
+                btn.classList.toggle('cursor-not-allowed', favorites.length === 0);
             });
         }
         applyFilters();
     };
+
     window.handleFilterChange = () => {
         filters.league = document.getElementById("filter-league").value; 
         filters.prediction = document.getElementById("filter-prediction").value; 
         filters.teamSearch = document.getElementById("team-search-input").value;
         filters.matchDate = document.getElementById("filter-date").value;
         filters.correctScore = document.getElementById("filter-correct-score").value;
-        filters.homeOddsMin = parseFloat(document.getElementById("filter-home-odds").value) || null;
-        
-        
-        filters.winningChance = document.getElementById("filter-winning-chance").value;
-        filters.over3Goals = document.getElementById("filter-over-3-goals").value;
-        
-        
         filters.matchAnalysis = document.getElementById("filter-match-analysis").value;
         filters.goalsAnalysis = document.getElementById("filter-goals-analysis").value;
-        filters.stake = {
-            min: parseFloat(document.getElementById("filter-stake-min").value) || null,
-            max: parseFloat(document.getElementById("filter-stake-max").value) || null
-        };
-        filters.winningStreak = {
-            min: parseFloat(document.getElementById("filter-winning-streak-min").value) || null,
-            max: parseFloat(document.getElementById("filter-winning-streak-max").value) || null
-        };
-        filters.losingStreak = {
-            min: parseFloat(document.getElementById("filter-losing-streak-min").value) || null,
-            max: parseFloat(document.getElementById("filter-losing-streak-max").value) || null
-        };
+        filters.matchPrediction = document.getElementById("filter-match-prediction").value;
+        filters.totalGoalsPrediction = document.getElementById("filter-total-goals-prediction").value;
 
+        filters.winningProbability.min = parseFloat(document.getElementById("filter-winning-prob-min").value) || null;
+        filters.winningProbability.max = parseFloat(document.getElementById("filter-winning-prob-max").value) || null;
+        filters.prob3Goals.min = parseFloat(document.getElementById("filter-prob-3-goals-min").value) || null;
+        filters.prob3Goals.max = parseFloat(document.getElementById("filter-prob-3-goals-max").value) || null;
+        filters.outcomeProbability.min = parseFloat(document.getElementById("filter-outcome-prob-min").value) || null;
+        filters.outcomeProbability.max = parseFloat(document.getElementById("filter-outcome-prob-max").value) || null;
+        
         applyFilters(); 
     };
     window.handleAdvancedFilterChange = () => {
         const getMinMax = id => ({
-            min: document.getElementById(`${id}-min`).value ? parseFloat(document.getElementById(`${id}-min`).value) : null,
-            max: document.getElementById(`${id}-max`).value ? parseFloat(document.getElementById(`${id}-max`).value) : null,
+            min: document.getElementById(`${id}-min`)?.value ? parseFloat(document.getElementById(`${id}-min`).value) : null,
+            max: document.getElementById(`${id}-max`)?.value ? parseFloat(document.getElementById(`${id}-max`).value) : null,
         });
+        filters.homeOdds = getMinMax('adv-home-odds');
+        filters.stake = getMinMax('adv-stake');
+        filters.winningStreak = getMinMax('adv-winning-streak');
+        filters.losingStreak = getMinMax('adv-losing-streak');
         filters.homeWins = getMinMax('adv-home-wins');
         filters.homeDraws = getMinMax('adv-home-draws');
         filters.homeLosses = getMinMax('adv-home-losses');
@@ -1352,7 +1514,6 @@
         filters.homeAvgConceded = getMinMax('adv-home-avg-conceded');
         filters.awayAvgScored = getMinMax('adv-away-avg-scored');
         filters.awayAvgConceded = getMinMax('adv-away-avg-conceded');
-        filters.homeOdds = getMinMax('adv-home-odds');
         filters.drawOdds = getMinMax('adv-draw-odds');
         filters.awayOdds = getMinMax('adv-away-odds');
         filters.predictionOdds = getMinMax('adv-prediction-odds');
@@ -1373,50 +1534,59 @@
     };
     const buildAdvancedFiltersModal = () => {
         const createMinMaxInput = (id, label) => `<div class="grid grid-cols-2 gap-2 items-center"><label for="${id}-min" class="text-sm font-medium text-text-secondary dark:text-dark-text-secondary">${label}</label><div class="grid grid-cols-2 gap-2"><input type="number" id="${id}-min" placeholder="Min" class="w-full bg-panel-bg dark:bg-dark-panel-bg p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm"><input type="number" id="${id}-max" placeholder="Max" class="w-full bg-panel-bg dark:bg-dark-panel-bg p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm"></div></div>`;
-        dom.filtersModal.innerHTML = `<div class="modal-content bg-panel-bg dark:bg-dark-panel-bg w-full max-w-4xl mx-4 p-8 rounded-xl shadow-2xl relative" onclick="event.stopPropagation()"><button onclick="hideFilterModal(event)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button><h3 class="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-6">Advanced Filters</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-6"><div class="space-y-4 p-4 rounded-lg bg-filter-panel-bg dark:bg-dark-filter-panel-bg"><h4 class="font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 mb-3">Performance Stats</h4>${createMinMaxInput('adv-home-wins', 'Home Wins')}${createMinMaxInput('adv-home-draws', 'Home Draws')}${createMinMaxInput('adv-home-losses', 'Home Losses')}${createMinMaxInput('adv-away-wins', 'Away Wins')}${createMinMaxInput('adv-away-draws', 'Away Draws')}${createMinMaxInput('adv-away-losses', 'Away Losses')}</div><div class="space-y-4 p-4 rounded-lg bg-filter-panel-bg dark:bg-dark-filter-panel-bg"><h4 class="font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 mb-3">Scoring Stats</h4>${createMinMaxInput('adv-home-avg-scored', 'Home Avg Scored')}${createMinMaxInput('adv-home-avg-conceded', 'Home Avg Conceded')}${createMinMaxInput('adv-away-avg-scored', 'Away Avg Scored')}${createMinMaxInput('adv-away-avg-conceded', 'Away Avg Conceded')}</div><div class="space-y-4 p-4 rounded-lg bg-filter-panel-bg dark:bg-dark-filter-panel-bg"><h4 class="font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 mb-3">Odds Filters</h4>${createMinMaxInput('adv-home-odds', 'Home Odds')}${createMinMaxInput('adv-draw-odds', 'Draw Odds')}${createMinMaxInput('adv-away-odds', 'Away Odds')}${createMinMaxInput('adv-prediction-odds', 'Prediction Odds')}</div></div><div class="mt-8 flex justify-between items-center"><button onclick="clearAdvancedFilters()" class="px-6 py-3 bg-gray-500 text-white font-bold rounded-lg shadow-md hover:bg-gray-600 transition">Clear All Filters</button><button onclick="handleAdvancedFilterChange()" class="px-6 py-3 bg-gradient-to-r from-primary-blue to-primary-purple text-white font-bold rounded-lg shadow-md interactive-glow">Apply Filters</button></div></div>`;
+        dom.filtersModal.innerHTML = `<div class="modal-content bg-panel-bg dark:bg-dark-panel-bg w-full max-w-4xl mx-4 p-8 rounded-xl shadow-2xl relative" onclick="event.stopPropagation()"><button onclick="hideFilterModal(event)" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg></button><h3 class="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-6">Advanced Filters</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="space-y-4 p-4 rounded-lg bg-filter-panel-bg dark:bg-dark-filter-panel-bg">
+                <h4 class="font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 mb-3">Core Stats</h4>
+                ${createMinMaxInput('adv-stake', 'Stake')}
+                ${createMinMaxInput('adv-winning-streak', 'Winning Streak')}
+                ${createMinMaxInput('adv-losing-streak', 'Losing Streak')}
+            </div>
+            <div class="space-y-4 p-4 rounded-lg bg-filter-panel-bg dark:bg-dark-filter-panel-bg">
+                <h4 class="font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 mb-3">Performance Stats</h4>
+                ${createMinMaxInput('adv-home-wins', 'Home Wins')}
+                ${createMinMaxInput('adv-home-draws', 'Home Draws')}
+                ${createMinMaxInput('adv-home-losses', 'Home Losses')}
+                ${createMinMaxInput('adv-away-wins', 'Away Wins')}
+                ${createMinMaxInput('adv-away-draws', 'Away Draws')}
+                ${createMinMaxInput('adv-away-losses', 'Away Losses')}
+            </div>
+            <div class="space-y-4 p-4 rounded-lg bg-filter-panel-bg dark:bg-dark-filter-panel-bg">
+                <h4 class="font-semibold text-gray-800 dark:text-gray-200 border-b pb-2 mb-3">Scoring & Odds</h4>
+                ${createMinMaxInput('adv-home-avg-scored', 'Home Avg Scored')}
+                ${createMinMaxInput('adv-home-avg-conceded', 'Home Avg Conceded')}
+                ${createMinMaxInput('adv-away-avg-scored', 'Away Avg Scored')}
+                ${createMinMaxInput('adv-away-avg-conceded', 'Away Avg Conceded')}
+                ${createMinMaxInput('adv-home-odds', 'Home Odds')}
+                ${createMinMaxInput('adv-draw-odds', 'Draw Odds')}
+                ${createMinMaxInput('adv-away-odds', 'Away Odds')}
+            </div>
+        </div><div class="mt-8 flex justify-between items-center"><button onclick="clearAdvancedFilters()" class="px-6 py-3 bg-gray-500 text-white font-bold rounded-lg shadow-md hover:bg-gray-600 transition">Clear All Filters</button><button onclick="handleAdvancedFilterChange()" class="px-6 py-3 bg-gradient-to-r from-primary-blue to-primary-purple text-white font-bold rounded-lg shadow-md interactive-glow">Apply Filters</button></div></div>`;
     };
-    const populateFilterDropdowns = () => {
-        const leagues = ['All', ...new Set(allData.map(item => item.League).filter(Boolean))];
-        const dates = ['All Dates', ...new Set(allData.map(item => item['Match Date']).filter(Boolean))];
-        const predictions = ['All', ...new Set(allData.map(item => item.Prediction).filter(Boolean))];
-        const correctScores = ['All', ...new Set(allData.map(item => item['Correct Score']).filter(Boolean))];
-        const matchAnalyses = ['All', ...new Set(allData.map(item => item['Match Analysis']).filter(Boolean))];
-        const goalsAnalyses = ['All', ...new Set(allData.map(item => item['Goals Analysis']).filter(Boolean))];
-        
-        const winningChances = ['All', ...new Set(allData.map(item => item['Winning Chance']).filter(Boolean))];
-        const over3Goals = ['All', ...new Set(allData.map(item => item['Over 3 Goals']).filter(Boolean))];
-        
-        
-        const leagueSelect = document.getElementById('filter-league');
-        leagueSelect.innerHTML = leagues.map(l => `<option value="${l}">${l}</option>`).join('');
-        const dateSelect = document.getElementById('filter-date');
-        dateSelect.innerHTML = dates.map(d => `<option value="${d}">${d}</option>`).join('');
-        const predictionSelect = document.getElementById('filter-prediction');
-        predictionSelect.innerHTML = predictions.map(p => `<option value="${p}">${p}</option>`).join('');
-        const correctScoreSelect = document.getElementById('filter-correct-score');
-        correctScoreSelect.innerHTML = correctScores.map(s => `<option value="${s}">${s}</option>`).join('');
-        const matchAnalysisSelect = document.getElementById('filter-match-analysis');
-        matchAnalysisSelect.innerHTML = matchAnalyses.map(m => `<option value="${m}">${m}</option>`).join('');
-        const goalsAnalysisSelect = document.getElementById('filter-goals-analysis');
-        goalsAnalysisSelect.innerHTML = goalsAnalyses.map(g => `<option value="${g}">${g}</option>`).join('');
 
+    const populateFilterDropdowns = () => {
+        const createOptions = (key) => ['All', ...new Set(allData.map(item => item[key]).filter(Boolean))];
+        const populateSelect = (id, options) => {
+            const select = document.getElementById(id);
+            if (select) select.innerHTML = options.map(o => `<option value="${o}">${o}</option>`).join('');
+        };
         
-        const winningChanceSelect = document.getElementById('filter-winning-chance');
-        winningChanceSelect.innerHTML = winningChances.map(v => `<option value="${v}">${v}</option>`).join('');
-        const over3GoalsSelect = document.getElementById('filter-over-3-goals');
-        over3GoalsSelect.innerHTML = over3Goals.map(v => `<option value="${v}">${v}</option>`).join('');
-        
+        populateSelect('filter-league', createOptions('League'));
+        populateSelect('filter-date', createOptions('Match Date'));
+        populateSelect('filter-prediction', createOptions('Prediction'));
+        populateSelect('filter-correct-score', createOptions('Correct Score'));
+        populateSelect('filter-match-analysis', createOptions('Match Analysis'));
+        populateSelect('filter-goals-analysis', createOptions('Goals Analysis'));
+        populateSelect('filter-match-prediction', createOptions('Match Prediction'));
+        populateSelect('filter-total-goals-prediction', createOptions('Total Goals Prediction'));
     };
+
     window.handleSort = (key) => { sortColumn === key ? sortDirection = (sortDirection === 'asc' ? 'desc' : 'asc') : (sortColumn = key, sortDirection = 'asc'); applySort(); };
     window.handlePrevPage = () => { if (currentPage > 1) { currentPage--; renderPage(); } };
     window.handleNextPage = () => { if (currentPage < Math.ceil(currentData.length / rowsPerPage)) { currentPage++; renderPage(); } };
-    window.hideDetailsModal = (event) => {
-        if (event.target === dom.detailsModal || event.target.closest('button')) {
-             dom.detailsModal.classList.remove('active');
-        }
-    };
-    window.hideFilterModal = (event) => { if (event && event.target !== dom.filtersModal && !event.target.closest('.modal-content')) return; dom.filtersModal.classList.remove('active'); };
+    window.hideDetailsModal = (event) => { if (event.target === dom.detailsModal || event.target.closest('button')) dom.detailsModal.classList.remove('active'); };
+    window.hideFilterModal = (event) => { if (event && (event.target === dom.filtersModal || event.target.closest('button'))) dom.filtersModal.classList.remove('active'); };
     window.showFilterModal = () => { dom.filtersModal.classList.add('active'); setTimeout(() => document.querySelector('#more-filters-modal .modal-content').classList.add('active'), 10);};
+    
     window.toggleFavorite = (uniqueId) => {
         const index = favorites.findIndex(fav => fav.uniqueId === uniqueId);
         if (index > -1) {
@@ -1426,23 +1596,24 @@
             if (itemToAdd) favorites.push(itemToAdd);
         }
         localStorage.setItem('favorites', JSON.stringify(favorites.map(f => f.uniqueId)));
+        
         if (activeTab === 'favorites') {
             applyFilters();
         } else {
-            const row = Array.from(dom.tableBody.querySelectorAll('tr')).find(r => r.innerHTML.includes(uniqueId));
-            if(row){
-                const star = row.querySelector('.text-2xl');
-                if(star){
-                    star.innerHTML = index === -1 ? ICONS.star : ICONS.starOutline;
-                    star.classList.toggle('text-yellow-400', index === -1);
-                    star.classList.toggle('text-gray-300', index > -1);
-                    star.classList.toggle('dark:text-gray-600', index > -1);
-                }
-            }
+            // Just update the star icon visually without re-rendering the whole table
+            const allStarSpans = document.querySelectorAll(`[onclick*="toggleFavorite('${uniqueId}')"]`);
+            allStarSpans.forEach(star => {
+                const isFavoritedNow = favorites.some(f => f.uniqueId === uniqueId);
+                star.innerHTML = isFavoritedNow ? ICONS.star : ICONS.starOutline;
+                star.classList.toggle('text-yellow-400', isFavoritedNow);
+                star.classList.toggle('text-gray-300', !isFavoritedNow);
+                star.classList.toggle('dark:text-gray-600', !isFavoritedNow);
+            });
         }
     };
 
     </script>
 </body>
 </html>
+
 
